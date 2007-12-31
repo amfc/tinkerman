@@ -18,13 +18,6 @@ LOG.Class = function(className) {
 
 LOG.pageObjectName = 'page';
 
-LOG.evaluate = function(code, additionalVariables) {
-    for (var name in additionalVariables) {
-        eval("var " + name + " = additionalVariables['" + name + "'];");
-    }
-    return eval(code);
-}
-
 LOG.getSerializedHistory = function() {
     var history = LOG.history;
     var maxLength = 2000; // since all the log's history will be kept in a cookie
@@ -92,13 +85,6 @@ LOG.createOutlineFromElement = function(element) {
     div.appendChild(labelElement);
     LOG.getBody().appendChild(div);
     return div;
-}
-
-LOG.logObjectSource = function(object, title) {
-    var logItem = new LOG.ObjectLogItem;
-    logItem.init(object, LOG.console.stackedMode);
-    LOG.console.appendRow(logItem.element, title);
-    return LOG.dontLogResult;
 }
 
 LOG.onKeyDown = function(event) {

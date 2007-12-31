@@ -328,7 +328,7 @@ LOG.Console.prototype.logAndStore = function(value, source) {
     }
     
     if (source) {
-        LOG.logObjectSource(value, null, this.stackedMode);
+        this.logObjectSource(value, null, this.stackedMode);
     } else {
         this.appendRow(LOG.getValueAsHtmlElement(value, this.stackedMode, undefined, true));
     }
@@ -349,6 +349,13 @@ LOG.Console.prototype.evalScriptAndPrintResults = function($script) {
     }
 }
 
+LOG.Console.prototype.evaluate = function(code, additionalVariables) {
+    for (var name in additionalVariables) {
+        eval("var " + name + " = additionalVariables['" + name + "'];");
+    }
+    return eval(code);
+}
+
 LOG.Console.prototype.evalScript = function($script) {
     var me = this;
     if ($script == 'help') {
@@ -367,13 +374,13 @@ LOG.Console.prototype.evalScript = function($script) {
         var vars = {
             '$_': this.lastMessage,
             '$P': LOG.getObjectProperties,
-            '$S': LOG.logObjectSource,
+            '$S': function(object, title) { return me.logObjectSource(object, title) },
             '$E': LOG.createOutlineFromElement
         };
         for (var i = 0; i < LOG.clickedMessages.length; ++i) {
            vars['$' + i] = LOG.clickedMessages[i];
         }
-        return LOG.evaluate($script, vars);
+        return this.evaluate($script, vars);
     } catch (e) {
         var logItem = new LOG.ExceptionLogItem;
         logItem.init(e);
@@ -657,7 +664,6 @@ LOG.Console.prototype.createInput = function(useTextArea) {
 
 LOG.Console.prototype.unwrapBody = function() {
     var doc = this.ownerDocument;
-    
     doc.body.removeChild(this.wrapperElement);
     while (this.wrapperTopElement.firstChild) {
         child = this.wrapperTopElement.firstChild;
@@ -1075,4 +1081,11 @@ LOG.Console.prototype.writeStringToInput = function(str) {
     var endPos = currentWordAndPosition.end + str.length;
     LOG.setTextInputSelection(this.input, [endPos, endPos]);
     this.input.focus();
+}
+
+LOG.Console.prototype.logObjectSource = function(object, title) {
+    var logItem = new LOG.ObjectLogItem;
+    logItem.init(object, this.stackedMode);
+    this.appendRow(logItem.element, title);
+    return LOG.dontLogResult;
 }
