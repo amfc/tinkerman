@@ -103,7 +103,7 @@ LOG.onKeyDown = function(event) {
             }
             if (!logObjectGone && LOG.console.ownerDocument.defaultView) {
                 LOG.console.ownerDocument.defaultView.focus();
-                LOG.console.input.focus();
+                LOG.console.focus();
             } else {
                 if (logObjectGone || !LOG.console.ownerDocument.parentWindow) {
                     LOG.console.createElement();

@@ -201,35 +201,6 @@ LOG.Console.prototype.show = function() {
     }
 }
 
-LOG.Console.prototype.onToggleTextAreaClick = function(event) {
-    this.textAreaBig = !this.textAreaBig;
-    
-    var oldInput = null;
-    if (this.input) {
-        oldInput = this.input;
-    }
-    
-    this.input = this.createInput(this.textAreaBig);
-    
-    LOG.removeObjEventListener(this, oldInput, 'keydown', this.onInputKeyDown);
-    LOG.removeObjEventListener(this, oldInput, 'mousedown', LOG.stopPropagation);
-    oldInput.parentNode.replaceChild(this.input, oldInput);
-    
-    
-    if (this.textAreaBig) {
-        this.inputTableContainer.style.height = '12em';
-        this.scrollContainer.style.paddingBottom = '12em';
-        this.toggleTextAreaLink.firstChild.data = 'small';
-    } else {
-        this.inputTableContainer.style.height = '1.8em';
-        this.scrollContainer.style.paddingBottom = '1.8em';
-        this.toggleTextAreaLink.firstChild.data = 'big';
-    }
-    
-    LOG.stopPropagation(event);
-    LOG.preventDefault(event);
-}
-
 LOG.Console.prototype.prepareNewDocument = function() {
     if (LOG.willOpenInNewWindow) {
         if (!this.window || this.window.closed) {
@@ -341,208 +312,6 @@ LOG.Console.prototype.evalScript = function($script) {
     }
 }
 
-LOG.Console.prototype.getNamesStartingWith = function(start, names) {
-    var matches = [];
-    for (var i = 0; i < names.length; ++i) {
-        if (names[i].substr(0, start.length) == start) {
-            matches.push(names[i]);
-        }
-    }
-    matches.sort();
-    return matches;
-}
-
-LOG.Console.prototype.getCurrentExpression = function() {
-    function skipString(quote) {
-        for (--startWordPos; startWordPos > 0; --startWordPos) {
-            if (value.charAt(startWordPos) == quote && value.charAt(startWordPos - 1) != '\\') {
-                return;
-            }
-        }
-        throw 'unterminated string';
-    }
-    
-    var endWordPos = LOG.getTextInputSelection(this.input)[0];
-    var startWordPos = endWordPos;
-    var value = this.input.value;
-    var depth = 0, chr, bracketDepth = 0;
-    while (startWordPos > 0) {
-        chr = value.charAt(startWordPos - 1);
-        if (chr == ')') {
-            ++depth;
-        } else if (chr == '(') {
-            if (depth == 0) {
-                break;
-            }
-            --depth;
-        } else if (chr == '[') {
-            if (bracketDepth == 0) {
-                break;
-            }
-            --bracketDepth;
-        } else if (chr == ']') {
-            ++bracketDepth;
-        } else if (chr == '\'' || chr == '"') {
-            skipString(chr);
-        } else if (depth == 0 && !(/^[a-zA-Z0-9_$.]$/.test(chr))) {
-            break;
-        }
-        --startWordPos;
-    }
-    return value.substr(startWordPos, endWordPos - startWordPos);
-}
-
-LOG.Console.prototype.getCurrentWordAndPosition = function() {
-    var endWordPos = LOG.getTextInputSelection(this.input)[0];
-    var startWordPos = endWordPos;
-    var value = this.input.value;
-    var chr;
-    while (startWordPos > 0) {
-        chr = value.charAt(startWordPos - 1);
-        if (!(/^[a-zA-Z0-9_$]$/.test(chr))) {
-            break;
-        }
-        startWordPos--;
-    }
-    return {
-        word: value.substr(startWordPos, endWordPos - startWordPos),
-        start: startWordPos,
-        end: endWordPos
-    }
-}
-
-LOG.Console.prototype.onInputKeyDown = function($event) {
-    function getCommonStart(list) {
-        var common = list[0];
-        var j;
-        for (var i = 1; i < list.length; ++i) {
-            if (list[i].length < common.length) {
-                common = common.substr(0, list[i].length);
-            }
-            for (j = 0; j < common.length; ++j) {
-                if (common.charAt(j) != list[i].charAt(j)) {
-                    common = common.substr(0, j);
-                    break;
-                }
-            }
-        }
-        return common;
-    }
-    if (!$event) {
-        $event = LOG.console.getWindow().event;
-    }
-    if ($event.keyCode == 13) {
-        if (!this.textAreaBig || $event.ctrlKey) {
-            if (LOG.history[LOG.history.length - 1] != this.input.value) {
-                LOG.history.push(this.input.value);
-            }
-            LOG.historyPosition = LOG.history.length;
-            this.evalScriptAndPrintResults(this.input.value);
-            LOG.stopPropagation($event);
-            LOG.preventDefault($event);
-            if (!this.textAreaBig) {
-                this.input.value = '';
-            }
-        } else if (this.textAreaBig) { // We keep indentation in enters
-            function getLineFromLeft(value, pos) {
-                var chr, line = '';
-                while (pos >= 0) {
-                    chr = value.charAt(pos);
-                    if (chr == '\n' || chr == '\r') {
-                        break;
-                    }
-                    line = chr + line;
-                    --pos;
-                }
-                return line;
-            }
-            function getIndentation(line) {
-                var chr;
-                var indentation = '';
-                for (var i = 0; i < line.length; ++i) {
-                    chr = line.charAt(i);
-                    if (chr != ' ' && chr != '\t') {
-                        break;
-                    }
-                    indentation += chr;
-                }
-                return indentation;
-            }
-            var pos = LOG.getTextInputSelection(this.input)[0];
-            var indentation = getIndentation(getLineFromLeft(this.input.value, pos - 1));
-            this.input.value = this.input.value.substring(0, pos) + '\n' + indentation + this.input.value.substring(pos);
-            pos += indentation.length + 1;
-            LOG.setTextInputSelection(this.input, [pos, pos]);
-            LOG.stopPropagation($event);
-            LOG.preventDefault($event);
-        }
-    } else if ($event.keyCode == 27) { // Esc
-        this.onHideClick($event);
-        LOG.stopPropagation($event);
-        LOG.preventDefault($event);
-    } else if ($event.keyCode == 9) { // Tab
-        LOG.stopPropagation($event);
-        LOG.preventDefault($event);
-        var currentExpression = this.getCurrentExpression();
-        var currentWordAndPosition = this.getCurrentWordAndPosition();
-        var names;
-        if (currentExpression == currentWordAndPosition.word) {
-            names = Array.concat(
-                LOG.getObjectProperties(window),
-                [ 'escape', 'unescape', 'encodeURI', 'decodeURI', 'encodeURIComponent', 'decodeURIComponent', 'isFinite', 'isNaN',
-                  'Number', 'eval', 'parseFloat', 'parseInt', 'String', 'Infinity', 'undefined', 'NaN', 'true', 'false'
-                ]
-            );
-            if (LOG.isIE) {
-                names = names.concat(names, ['DEBUG_MODE']);
-            }
-        } else {
-            var script = currentExpression.substr(0, currentExpression.length - currentWordAndPosition.word.length);
-            if (script.charAt(script.length - 1) == '.') {
-                script = script.substr(0, script.length - 1);
-            }
-            var result = this.evalScript(script);
-            if (typeof result != 'object' || result == LOG.dontLogResult) {
-                return;
-            }
-            names = LOG.getObjectProperties(result);
-        }
-        var matches = this.getNamesStartingWith(currentWordAndPosition.word, names);
-        if (matches.length == 0) {
-            return;
-        }
-        if (matches.length > 1) {
-            this.log(matches, 'Matches');
-        }
-        var commonStart = getCommonStart(matches);
-        if (commonStart.length > currentWordAndPosition.word.length) {
-            this.input.value = this.input.value.substr(0, currentWordAndPosition.end) +
-                commonStart.substr(currentWordAndPosition.word.length) +
-                this.input.value.substr(currentWordAndPosition.end)
-            ;
-            var commonStartPos = currentWordAndPosition.end + commonStart.length - currentWordAndPosition.word.length;
-            LOG.setTextInputSelection(this.input, [commonStartPos, commonStartPos]);
-        }
-    } else if ($event.keyCode == 38 && (!this.textAreaBig || $event.ctrlKey)) { // Up
-        if (LOG.historyPosition > 0) {
-            --LOG.historyPosition;
-            this.input.value = LOG.history[LOG.historyPosition];
-        }
-        LOG.stopPropagation($event);
-        LOG.preventDefault($event);
-    } else if ($event.keyCode == 40 && (!this.textAreaBig || $event.ctrlKey)) { // Down
-        if (LOG.historyPosition == LOG.history.length - 1) {
-            this.input.value = '';
-            LOG.historyPosition == LOG.history.length;
-        } else if (LOG.historyPosition != -1 && LOG.historyPosition < LOG.history.length - 1) {
-            ++LOG.historyPosition;
-            this.input.value = LOG.history[LOG.historyPosition];
-        }
-        LOG.stopPropagation($event);
-        LOG.preventDefault($event);
-    }
-}
-
 // This searchs for some value in all the selected panels and focuses it
 LOG.Console.prototype.focusValue = function(value, dontLog) {
     // this takes into account the extra elements which the LOG could have added and ignores them
@@ -583,30 +352,6 @@ LOG.Console.prototype.focusValue = function(value, dontLog) {
             }
         }
     }
-}
-
-LOG.Console.prototype.createInput = function(useTextArea) {
-    return LOG.createElement(
-        this.ownerDocument,
-        useTextArea ? 'textarea' : 'input',
-        {
-            style: {
-                width: '100%',
-                height: '100%',
-                border: '1px solid gray',
-                fontFamily: 'monospace',
-                fontSize: '13px',
-                fontWeight: 'normal'
-            },
-            onkeydown: LOG.createEventHandler(this, 'onInputKeyDown'),
-            mousedown: function(event) {
-                if (!event) {
-                    event = LOG.console.getWindow().event;
-                }
-                LOG.stopPropagation(event);
-            }
-        }
-    );
 }
 
 LOG.Console.prototype.addConsole = function(consoleName) {
@@ -691,6 +436,9 @@ LOG.Console.prototype.createElement = function() {
     };
     
     this.textAreaBig = false;
+    
+    this.commandEditor = new LOG.CommandEditor;
+    this.commandEditor.init(doc, function(str) { me.evalScriptAndPrintResults(str) } );
     
     this.element = LOG.createElement(
         doc, 'div',
@@ -838,69 +586,7 @@ LOG.Console.prototype.createElement = function() {
                     )
                 ]
             ),
-            this.inputTableContainer = LOG.createElement(doc, 'div',
-                {
-                    style: {
-                        height: '1.8em',
-                        position: 'absolute',
-                        left: 0,
-                        backgroundColor: '#f0f0f0',
-                        bottom: 0
-                    }
-                },
-                [
-                    this.inputTable = LOG.createElement(doc, 'table',
-                        {
-                            style: {
-                                height: '100%',
-                                fontSize: '10px',
-                                borderSpacing: 0
-                            }
-                        },
-                        [
-                            LOG.createElement(doc, 'tbody', {},
-                                [
-                                    LOG.createElement(doc, 'tr', {},
-                                        [
-                                            this.inputTd = LOG.createElement(doc, 'td', {
-                                                    style: {
-                                                        width: '100%',
-                                                        verticalAlign: 'bottom'
-                                                    }
-                                                },
-                                                [
-                                                    this.input = this.createInput()
-                                                ]
-                                            ),
-                                            this.toggleTextAreaTd = LOG.createElement(doc, 'td',
-                                                {
-                                                    style: {
-                                                        width: '10px',
-                                                        verticalAlign: 'bottom'
-                                                    }
-                                                },
-                                                [
-                                                    this.toggleTextAreaLink = LOG.createElement(doc, 'a',
-                                                        {
-                                                            href: '#',
-                                                            style: {
-                                                                fontWeight: 'normal',
-                                                                fontSize: '12px'
-                                                            },
-                                                            onclick: LOG.createEventHandler(this, 'onToggleTextAreaClick')
-                                                        },
-                                                        [ 'big' ]
-                                                    )
-                                                ]
-                                            )
-                                        ]
-                                    )
-                                ]
-                            )
-                        ]
-                    )
-                ]
-            )
+            this.commandEditor.element
         ]
     );
     
@@ -921,19 +607,13 @@ LOG.Console.prototype.createElement = function() {
     }
 }
 
-LOG.Console.prototype.writeStringToInput = function(str) {
-    var currentWordAndPosition = this.getCurrentWordAndPosition();
-    this.input.value = this.input.value.substr(0, currentWordAndPosition.end) + str +
-        this.input.value.substr(currentWordAndPosition.end)
-    ;
-    var endPos = currentWordAndPosition.end + str.length;
-    LOG.setTextInputSelection(this.input, [endPos, endPos]);
-    this.input.focus();
-}
-
 LOG.Console.prototype.logObjectSource = function(object, title) {
     var logItem = new LOG.ObjectLogItem;
     logItem.init(object, this.stackedMode);
     this.appendRow(logItem.element, title);
     return LOG.dontLogResult;
+}
+
+LOG.Console.prototype.focus = function() {
+    this.commandEditor.focus();
 }
