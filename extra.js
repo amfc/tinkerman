@@ -20,3 +20,11 @@ LOG.throwExceptionWithStack = function(name, message, sourceException) {
         throw name;
     }
 }
+
+LOG.openClassInEditor = function(value) {
+    if (value.getPackage()) {
+        var packageName = value.getPackage().name;
+        var className = value.getSimpleClassName();
+        document.location = 'openClass.php?package=' + escape(packageName) + '&class=' + escape(className);
+    }
+}

@@ -1,11 +1,3 @@
-LOG.openClassInEditor = function(value) {
-    if (value.getPackage()) {
-        var packageName = value.getPackage().name;
-        var className = value.getSimpleClassName();
-        document.location = 'openClass.php?package=' + escape(packageName) + '&class=' + escape(className);
-    }
-}
-
 LOG.guessNameAsArray = function(objToFind) {
     function getPath(item) {
         var path = [];

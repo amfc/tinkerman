@@ -151,8 +151,9 @@ LOG.Console.prototype.deleteElement = function() {
     if (!this.elementCreated) {
         return;
     }
-    if (this.wrapperElement) {
-        this.unwrapBody();
+    if (this.bodyWrapper) {
+        this.bodyWrapper.uninit();
+        delete this.bodyWrapper;
     }
     if (this.htmlLogItem) {
         delete this.htmlLogItem;
@@ -188,17 +189,15 @@ LOG.Console.prototype.onHideClick = function(event) {
 
 LOG.Console.prototype.hide = function() {
     this.hidden = true;
-    if (this.wrapperBottomElement) {
-        this.wrapperBottomElement.style.display = 'none';
-        this.wrapperTopElement.style.height = '100%';
+    if (this.bodyWrapper) {
+        this.bodyWrapper.hide();
     }
 }
 
 LOG.Console.prototype.show = function() {
     this.hidden = false;
-    if (this.wrapperBottomElement) {
-        this.wrapperBottomElement.style.display = '';
-        this.setWrapperSize(this.wrapperSize);
+    if (this.bodyWrapper) {
+        this.bodyWrapper.show();
     }
 }
 
@@ -248,7 +247,6 @@ LOG.Console.prototype.prepareNewDocument = function() {
         this.ownerDocument.title = 'Log: ' + window.document.title;
         
         return this.window.document;
-        
     } else {
         if (this.window) {
             this.window.close();
@@ -267,57 +265,6 @@ LOG.Console.prototype.onNewWindowClick = function(event) {
     this.prepareNewDocument();
     this.createElement();
     LOG.addCookie('LOG_IN_NEW_WINDOW', LOG.willOpenInNewWindow ? 'true' : 'false', 30);
-}
-
-LOG.Console.prototype.onDragKeypress = function(event) {
-    if (event.keyCode == 27) {
-        this.endDrag();
-    }
-}
-
-LOG.Console.prototype.onResizeHandleMousedown = function(event) {
-    this.dragging = true;
-    this.originalDelta = event.clientY - this.wrapperBottomElement.offsetTop;
-    this.element.style.borderColor = 'black';
-    LOG.addObjEventListener(this, document, 'mousemove', this.onMousemove);
-    LOG.addObjEventListener(this, document, 'mouseup', this.onMouseup);
-    LOG.addObjEventListener(this, document, 'keypress', this.onDragKeypress);
-    if (LOG.isIE) {
-        LOG.addObjEventListener(this, document, 'selectstart', this.onSelectstart);
-    }
-    LOG.stopPropagation(event);
-    LOG.preventDefault(event);
-}
-
-LOG.Console.prototype.endDrag = function() {
-    this.dragging = false;
-    this.element.style.borderColor = 'gray';
-    LOG.removeObjEventListener(this, document, 'mousemove', this.onMousemove);
-    LOG.removeObjEventListener(this, document, 'mouseup', this.onMouseup);
-    LOG.removeObjEventListener(this, document, 'keypress', this.onDragKeypress);
-    if (LOG.isIE) {
-        LOG.removeObjEventListener(this, document, 'selectstart', this.onSelectstart);
-    }
-}
-
-LOG.Console.prototype.onSelectstart = function(event) {
-    LOG.stopPropagation(event);
-    LOG.preventDefault(event);
-}
-
-LOG.Console.prototype.onMousemove = function(event) {
-    if (this.dragging) {
-        var top = (event.clientY - this.originalDelta) / LOG.getWindowInnerSize().h;
-        if (top < 0) {
-            top = 0;
-        }
-        this.setWrapperSize(1 - top);
-        return false;
-    }
-}
-
-LOG.Console.prototype.onMouseup = function(event) {
-    this.endDrag();
 }
 
 LOG.Console.prototype.logAndStore = function(value, source) {
@@ -662,94 +609,6 @@ LOG.Console.prototype.createInput = function(useTextArea) {
     );
 }
 
-LOG.Console.prototype.unwrapBody = function() {
-    var doc = this.ownerDocument;
-    doc.body.removeChild(this.wrapperElement);
-    while (this.wrapperTopElement.firstChild) {
-        child = this.wrapperTopElement.firstChild;
-        this.wrapperTopElement.removeChild(child);
-        doc.body.appendChild(child);
-    }
-    this.wrapperElement = null;
-    this.wrapperTopElement = null;
-    this.wrapperBottomElement = null;
-    document.body.style.overflow = this.oldBodyOverflow ? this.oldBodyOverflow : '';
-    LOG.removeObjEventListener(this, this.resizeHandle, 'mousedown', this.onResizeHandleMousedown);
-}
-
-LOG.Console.prototype.setWrapperSize = function(size) {
-    this.wrapperSize = size;
-    this.wrapperTopElement.style.bottom = size * 100 + '%';
-    this.wrapperTopElement.style.height = (1 - size) * 100 + '%';
-    this.wrapperBottomElement.style.top = (1 - size) * 100 + '%';
-    this.wrapperBottomElement.style.height = size * 100 + '%';
-}
-
-LOG.Console.prototype.wrapBodyInElement = function(element) {
-    var doc = this.ownerDocument;
-    this.wrapperElement = LOG.createElement(doc, 'div',
-        {
-            style: {
-                top: '0',
-                bottom: '0',
-                position: 'absolute',
-                left: '0',
-                right: '0',
-                overflow: 'hidden',
-                height: '100%',
-                width: '100%'
-            }
-        },
-        [
-            this.wrapperTopElement = LOG.createElement(doc, 'div',
-                {
-                    style: {
-                        top: '0',
-                        width: '100%',
-                        position: 'absolute',
-                        left: '0',
-                        right: '0',
-                        overflow: 'auto'
-                    }
-                }
-            ),
-            this.wrapperBottomElement = LOG.createElement(doc, 'div',
-                {
-                    style: {
-                        width: '100%',
-                        bottom: '0',
-                        position: 'absolute',
-                        left: '0',
-                        right: '0'
-                    }
-                },
-                [
-                    element
-                ]
-            )
-        ]
-    );
-    this.oldBodyOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    
-    var size = LOG.getCookie('LOG_SIZE');
-    if (!size || isNaN(size = parseFloat(size))) {
-        size = 0.3333333;
-    }
-    
-    this.setWrapperSize(size);
-    var child;
-    while (doc.body.firstChild) {
-        child = doc.body.firstChild;
-        doc.body.removeChild(child);
-        this.wrapperTopElement.appendChild(child);
-    }
-    doc.body.appendChild(this.wrapperElement);
-    
-    LOG.addObjEventListener(this, this.resizeHandle, 'mousedown', this.onResizeHandleMousedown);
-    
-}
-
 LOG.Console.prototype.addConsole = function(consoleName) {
     if (this.consoles[consoleName]) {
         return this.consoles[consoleName];
@@ -772,7 +631,6 @@ LOG.Console.prototype.addLogPanel = function(name) {
 
 LOG.Console.prototype.createElement = function() {
     this.consoles = {};
-    
     var ownerDocument = this.prepareNewDocument();
     if (LOG.willOpenInNewWindow) {
         ownerDocument.body.innerHTML = '';
@@ -903,17 +761,6 @@ LOG.Console.prototype.createElement = function() {
                     }
                 },
                 [
-                    this.resizeHandle = LOG.createElement(doc, 'div', // resize handle
-                        {
-                            style: {
-                                top: '0px',
-                                height: '6px',
-                                width: '100%',
-                                position: 'absolute',
-                                cursor: 'n-resize'
-                            }
-                        }
-                    ),
                     LOG.createElement(doc, 'div', // toolbar
                         {
                             style: {
@@ -1060,7 +907,8 @@ LOG.Console.prototype.createElement = function() {
     var me = this;
     function append() {
         if (!LOG.willOpenInNewWindow) {
-            me.wrapBodyInElement(me.element);
+            this.bodyWrapper = new LOG.BodyWrapper;
+            this.bodyWrapper.init(me.ownerDocument, me.element);
         } else {
             doc.body.appendChild(me.element);
         }

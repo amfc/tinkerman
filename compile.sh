@@ -1,14 +1,23 @@
 #!/bin/bash
+
+function add() {
+    echo "// BEGIN $1.js" >> log.js;
+    cat $1.js >> log.js;
+    echo "// END $1.js" >> log.js;
+}
+
 echo "// Compiled LOG" > log.js
-cat core.js >> log.js
-cat cookie.js >> log.js
-cat dom.js >> log.js
-cat var.js >> log.js
-cat extra.js >> log.js
-cat guess.js >> log.js
-cat diff.js >> log.js
-cat Console.js >> log.js
-cat logItem.js >> log.js
-cat LogPanel.js >> log.js
+
+add 'core';
+add 'cookie';
+add 'dom';
+add 'var';
+add 'extra';
+add 'guess';
+add 'diff';
+add 'BodyWrapper';
+add 'Console';
+add 'logItem';
+add 'LogPanel';
 find logItems -name '*.js' -exec bash -c 'cat '{}' >> log.js; echo >> log.js' ';'
-cat init.js >> log.js
+add 'init';
