@@ -154,15 +154,6 @@ LOG.onKeyDown = function(event) {
     }
 }
 
-LOG.getEvalFunction = function() {
-    return "function (str, additionalVariables) {\n" +
-        "    for (var name in additionalVariables) {\n" +
-        "        eval(\"var \" + name + \" = additionalVariables['\" + name + \"'];\");\n" +
-        "    }\n" +
-        "    return eval(str);\n" +
-        "}\n";
-}
-
 LOG.onDocumentSelectStart = function(event) {
     if (LOG.nextClickShouldBeStopped) {
         LOG.preventDefault(event);
