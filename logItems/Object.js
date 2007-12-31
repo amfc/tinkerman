@@ -1,7 +1,4 @@
-if (typeof LOG.ObjectLogItem == 'undefined') {
-    LOG.ObjectLogItem = function() {
-    }
-}
+LOG.Class('ObjectLogItem');
 
 LOG.ObjectLogItem.prototype.init = function(value, stackedMode, alreadyLoggedContainers, showChildren, showToggleChildrenLink) {
     if (typeof alreadyLoggedContainers == 'undefined') {

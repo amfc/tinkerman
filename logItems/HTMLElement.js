@@ -1,7 +1,4 @@
-if (typeof LOG.HTMLElementLogItem == 'undefined') {
-    LOG.HTMLElementLogItem = function() {
-    }
-}
+LOG.Class('HTMLElementLogItem');
 
 LOG.HTMLElementLogItem.prototype.init = function(value, stackedMode, alreadyLoggedContainers, dontShowParentLink) {
     var doc = LOG.console.ownerDocument;

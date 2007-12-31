@@ -1,7 +1,4 @@
-if (typeof LOG.ArrayLogItem == 'undefined') {
-    LOG.ArrayLogItem = function() {
-    }
-}
+LOG.Class('ArrayLogItem');
 
 LOG.ArrayLogItem.prototype.init = function(value, stackedMode, alreadyLoggedContainers) {
     var doc = LOG.console.ownerDocument;

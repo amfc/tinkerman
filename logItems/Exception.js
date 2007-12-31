@@ -1,8 +1,5 @@
 // This works with JS and PHP exceptions traces
-if (typeof LOG.ExceptionLogItem == 'undefined') {
-    LOG.ExceptionLogItem = function() {
-    }
-}
+LOG.Class('ExceptionLogItem');
 
 LOG.ExceptionLogItem.prototype.init = function(value) {
     var doc = LOG.console.ownerDocument;

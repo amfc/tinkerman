@@ -1,7 +1,4 @@
-if (typeof LOG.TypedObjectLogItem == 'undefined') {
-    LOG.TypedObjectLogItem = function() {
-    }
-}
+LOG.Class('TypedObjectLogItem');
 
 LOG.TypedObjectLogItem.prototype.getTypeName = function() {
     var value = this.value;

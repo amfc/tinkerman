@@ -1,7 +1,4 @@
-if (typeof LOG.PathToObjectLogItem == 'undefined') {
-    LOG.PathToObjectLogItem = function() {
-    }
-}
+LOG.Class('PathToObjectLogItem');
 
 LOG.PathToObjectLogItem.prototype.init = function(value) {
     var doc = LOG.console.ownerDocument;
@@ -31,10 +28,7 @@ LOG.PathToObjectLogItem.prototype.init = function(value) {
     }
 }
 
-if (typeof LOG.PathToObjectPart == 'undefined') {
-    LOG.PathToObjectPart = function() {
-    }
-}
+LOG.Class('PathToObjectPart');
 
 LOG.PathToObjectPart.prototype.init = function(value, pathPartName) {
     var doc = LOG.console.ownerDocument;
