@@ -438,7 +438,7 @@ LOG.Console.prototype.createElement = function() {
     this.textAreaBig = false;
     
     this.commandEditor = new LOG.CommandEditor;
-    this.commandEditor.init(doc, function(str) { me.evalScriptAndPrintResults(str) } );
+    this.commandEditor.init(doc, function(str) { me.evalScriptAndPrintResults(str) }, function() { me.updateCommandEditorSize() } );
     
     this.element = LOG.createElement(
         doc, 'div',
@@ -464,8 +464,7 @@ LOG.Console.prototype.createElement = function() {
                         top: 0,
                         left: 0,
                         bottom: '0',
-                        paddingTop: '1.8em',
-                        paddingBottom: LOG.isIE ? '2em' : '1.8em'
+                        paddingTop: '1.8em'
                     }
                 },
                 [
@@ -590,6 +589,8 @@ LOG.Console.prototype.createElement = function() {
         ]
     );
     
+    this.updateCommandEditorSize();
+    
     var me = this;
     function append() {
         if (!LOG.willOpenInNewWindow) {
@@ -605,6 +606,10 @@ LOG.Console.prototype.createElement = function() {
     } else {
         LOG.addEventListener(window, 'load', append);
     }
+}
+
+LOG.Console.prototype.updateCommandEditorSize = function() {
+    this.scrollContainer.style.paddingBottom = this.commandEditor.getHeight() + 'em';
 }
 
 LOG.Console.prototype.logObjectSource = function(object, title) {

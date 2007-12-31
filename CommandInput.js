@@ -3,6 +3,7 @@ LOG.Class('CommandInput');
 LOG.CommandInput.prototype.init = function(ownerDocument, useTextArea, evalCallback) {
     this.ownerDocument = ownerDocument;
     this.evalCallback = evalCallback;
+    this.useTextArea = useTextArea;
     this.element = LOG.createElement(
         this.ownerDocument,
         useTextArea ? 'textarea' : 'input',
@@ -106,7 +107,7 @@ LOG.CommandInput.prototype.onInputKeyDown = function($event) {
         $event = LOG.console.getWindow().event;
     }
     if ($event.keyCode == 13) {
-        if (!this.textAreaBig || $event.ctrlKey) {
+        if (!this.useTextArea || $event.ctrlKey) {
             if (LOG.history[LOG.history.length - 1] != this.element.value) {
                 LOG.history.push(this.element.value);
             }
@@ -114,10 +115,10 @@ LOG.CommandInput.prototype.onInputKeyDown = function($event) {
             this.evalCallback(this.element.value);
             LOG.stopPropagation($event);
             LOG.preventDefault($event);
-            if (!this.textAreaBig) {
+            if (!this.useTextArea) {
                 this.element.value = '';
             }
-        } else if (this.textAreaBig) { // We keep indentation in enters
+        } else if (this.useTextArea) { // We keep indentation in enters
             function getLineFromLeft(value, pos) {
                 var chr, line = '';
                 while (pos >= 0) {
@@ -197,14 +198,14 @@ LOG.CommandInput.prototype.onInputKeyDown = function($event) {
             var commonStartPos = currentWordAndPosition.end + commonStart.length - currentWordAndPosition.word.length;
             LOG.setTextInputSelection(this.element, [commonStartPos, commonStartPos]);
         }
-    } else if ($event.keyCode == 38 && (!this.textAreaBig || $event.ctrlKey)) { // Up
+    } else if ($event.keyCode == 38 && (!this.useTextArea || $event.ctrlKey)) { // Up
         if (LOG.historyPosition > 0) {
             --LOG.historyPosition;
             this.element.value = LOG.history[LOG.historyPosition];
         }
         LOG.stopPropagation($event);
         LOG.preventDefault($event);
-    } else if ($event.keyCode == 40 && (!this.textAreaBig || $event.ctrlKey)) { // Down
+    } else if ($event.keyCode == 40 && (!this.useTextArea || $event.ctrlKey)) { // Down
         if (LOG.historyPosition == LOG.history.length - 1) {
             this.element.value = '';
             LOG.historyPosition == LOG.history.length;

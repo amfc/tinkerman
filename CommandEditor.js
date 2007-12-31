@@ -1,15 +1,16 @@
 LOG.Class('CommandEditor');
 
-LOG.CommandEditor.prototype.init = function(ownerDocument, evalCallback) {
+LOG.CommandEditor.prototype.init = function(ownerDocument, evalCallback, resizeCallback) {
     var doc = ownerDocument;
+    this.ownerDocument = ownerDocument;
     this.evalCallback = evalCallback;
+    this.resizeCallback = resizeCallback;
     this.input = new LOG.CommandInput;
     this.input.init(doc, false, this.evalCallback);
     
     this.element = LOG.createElement(doc, 'div',
         {
             style: {
-                height: '1.8em',
                 position: 'absolute',
                 left: 0,
                 backgroundColor: '#f0f0f0',
@@ -67,6 +68,16 @@ LOG.CommandEditor.prototype.init = function(ownerDocument, evalCallback) {
             )
         ]
     );
+    this.setHeight(1.8);
+}
+
+LOG.CommandEditor.prototype.setHeight = function(height) {
+    this.height = height;
+    this.element.style.height = height + 'em';
+}
+
+LOG.CommandEditor.prototype.getHeight = function() {
+    return this.height;
 }
 
 LOG.CommandEditor.prototype.onToggleTextAreaClick = function(event) {
@@ -78,22 +89,18 @@ LOG.CommandEditor.prototype.onToggleTextAreaClick = function(event) {
     }
     
     this.input = new LOG.CommandInput;
-    this.input.init(doc, this.textAreaBig, this.evalCallback);
+    this.input.init(this.ownerDocument, this.textAreaBig, this.evalCallback);
     
-    LOG.removeObjEventListener(this, oldInput, 'keydown', this.onInputKeyDown);
-    LOG.removeObjEventListener(this, oldInput, 'mousedown', LOG.stopPropagation);
-    oldInput.parentNode.replaceChild(this.input.element, oldInput.element);
+    oldInput.element.parentNode.replaceChild(this.input.element, oldInput.element);
     
     if (this.textAreaBig) {
-        this.element.style.height = '12em';
-        this.scrollContainer.style.paddingBottom = '12em';
+        this.setHeight(12);
         this.toggleTextAreaLink.firstChild.data = 'small';
     } else {
-        this.element.style.height = '1.8em';
-        this.scrollContainer.style.paddingBottom = '1.8em';
+        this.setHeight(1.8);
         this.toggleTextAreaLink.firstChild.data = 'big';
     }
-    
+    this.resizeCallback();
     LOG.stopPropagation(event);
     LOG.preventDefault(event);
 }
