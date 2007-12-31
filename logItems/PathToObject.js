@@ -4,7 +4,7 @@ if (typeof LOG.PathToObjectLogItem == 'undefined') {
 }
 
 LOG.PathToObjectLogItem.prototype.init = function(value) {
-    var doc = LOG.LogObject.ownerDocument;
+    var doc = LOG.console.ownerDocument;
     var me = this;
     this.value = value;
     this.element = LOG.createElement(
@@ -37,7 +37,7 @@ if (typeof LOG.PathToObjectPart == 'undefined') {
 }
 
 LOG.PathToObjectPart.prototype.init = function(value, pathPartName) {
-    var doc = LOG.LogObject.ownerDocument;
+    var doc = LOG.console.ownerDocument;
     this.value = value;
     var me = this;
     var ctrlClick = false;
@@ -61,17 +61,17 @@ LOG.PathToObjectPart.prototype.init = function(value, pathPartName) {
             },
             onmousedown: function(event) {
                 if (!event) {
-                    event = LOG.LogObject.getWindow().event;
+                    event = LOG.console.getWindow().event;
                 }
                 ctrlClick = LOG.getButtonFromEvent(event) == 'left' && event.ctrlKey;
             },
             onclick: function(event) {
                 if (!event) {
-                    event = LOG.LogObject.getWindow().event;
+                    event = LOG.console.getWindow().event;
                 }
                 if (!ctrlClick) {
-                    LOG.LogObject.logAndStore(value);
-                    LOG.LogObject.focusValue(value, true);
+                    LOG.console.logAndStore(value);
+                    LOG.console.focusValue(value, true);
                 } else if (window.Reloadable && value instanceof window.Reloadable) {
                     LOG.openClassInEditor(value);
                 }

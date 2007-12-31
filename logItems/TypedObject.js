@@ -31,7 +31,7 @@ LOG.TypedObjectLogItem.prototype.getTypeName = function() {
 }
 
 LOG.TypedObjectLogItem.prototype.init = function(value, stackedMode, alreadyLoggedContainers) {
-    var doc = LOG.LogObject.ownerDocument;
+    var doc = LOG.console.ownerDocument;
     this.showSource = false;
     this.value = value;
     this.stackedMode = stackedMode;
@@ -77,12 +77,12 @@ LOG.TypedObjectLogItem.prototype.init = function(value, stackedMode, alreadyLogg
                     },
                     onclick: function(event) {
                         if (!event) {
-                            event = LOG.LogObject.getWindow().event;
+                            event = LOG.console.getWindow().event;
                         }
                         if (event.ctrlKey) {
                             LOG.openClassInEditor(value);
                         } else {
-                            LOG.LogObject.logAndStore(value);
+                            LOG.console.logAndStore(value);
                         }
                         LOG.stopPropagation(event);
                         LOG.preventDefault(event);
@@ -109,7 +109,7 @@ LOG.TypedObjectLogItem.prototype.init = function(value, stackedMode, alreadyLogg
                     },
                     onclick: function(event) {
                         if (!event) {
-                            event = LOG.LogObject.getWindow().event;
+                            event = LOG.console.getWindow().event;
                         }
                         me.toggleShowSource();
                         LOG.stopPropagation(event);
@@ -150,7 +150,7 @@ LOG.TypedObjectLogItem.prototype.setShowSource = function(showSource) {
     if (this.showSource == showSource) {
         return;
     }
-    var doc = LOG.LogObject.ownerDocument;
+    var doc = LOG.console.ownerDocument;
     this.showSource = showSource;
     if (showSource) {
         this.srcLink.style.textDecoration = 'line-through';

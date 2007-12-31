@@ -4,7 +4,7 @@ if (typeof LOG.HTMLElementLogItem == 'undefined') {
 }
 
 LOG.HTMLElementLogItem.prototype.init = function(value, stackedMode, alreadyLoggedContainers, dontShowParentLink) {
-    var doc = LOG.LogObject.ownerDocument;
+    var doc = LOG.console.ownerDocument;
     var link;
     var showParentLink;
     
@@ -50,7 +50,7 @@ LOG.HTMLElementLogItem.prototype.init = function(value, stackedMode, alreadyLogg
                     },
                     onclick: function(event) {
                         if (!event) {
-                            event = LOG.LogObject.getWindow().event;
+                            event = LOG.console.getWindow().event;
                         }
                         me.toggleShowChildNodes(event.ctrlKey);
                         LOG.stopPropagation(event);
@@ -81,9 +81,9 @@ LOG.HTMLElementLogItem.prototype.init = function(value, stackedMode, alreadyLogg
                     },
                     onclick: function(event) {
                         if (!event) {
-                            event = LOG.LogObject.getWindow().event;
+                            event = LOG.console.getWindow().event;
                         }
-                        LOG.LogObject.logAndStore(value);
+                        LOG.console.logAndStore(value);
                         LOG.stopPropagation(event);
                         LOG.preventDefault(event);
                     },
@@ -110,7 +110,7 @@ LOG.HTMLElementLogItem.prototype.init = function(value, stackedMode, alreadyLogg
                     },
                     onclick: function(event) {
                         if (!event) {
-                            event = LOG.LogObject.getWindow().event;
+                            event = LOG.console.getWindow().event;
                         }
                         me.showParent();
                         LOG.stopPropagation(event);
@@ -198,8 +198,8 @@ LOG.HTMLElementLogItem.prototype.hideElementOutline = function() {
 }
 
 LOG.HTMLElementLogItem.prototype.getChildNodes = function() {
-    if (LOG.LogObject.wrapperElement && this.value == document.body) { // Hide LOG's wrapper elements in the DOM
-        return LOG.LogObject.wrapperTopElement.childNodes;
+    if (LOG.console.wrapperElement && this.value == document.body) { // Hide LOG's wrapper elements in the DOM
+        return LOG.console.wrapperTopElement.childNodes;
     } else {
         return this.value.childNodes;
     }
@@ -225,7 +225,7 @@ LOG.HTMLElementLogItem.prototype.setShowChildNodes = function(show, applyToChild
     this.showChildNodesLink.firstChild.nodeValue = show ? '-' : '+';
     this.startTagEnd.nodeValue = show ? '>' : '/>';
     var childNodeLogItem;
-    var doc = LOG.LogObject.ownerDocument;
+    var doc = LOG.console.ownerDocument;
     if (show) {
         if (!this.onlyTextNodeChildren) {
             this.childNodesContainer.style.display = 'block';

@@ -5,7 +5,7 @@ if (typeof LOG.ExceptionLogItem == 'undefined') {
 }
 
 LOG.ExceptionLogItem.prototype.init = function(value) {
-    var doc = LOG.LogObject.ownerDocument;
+    var doc = LOG.console.ownerDocument;
     var link;
     var me = this;
     this.showingMoreInfo = false;
@@ -41,9 +41,9 @@ LOG.ExceptionLogItem.prototype.init = function(value) {
                     },
                     onclick: function(event) {
                         if (!event) {
-                            event = LOG.LogObject.getWindow().event;
+                            event = LOG.console.getWindow().event;
                         }
-                        LOG.LogObject.logAndStore(value);
+                        LOG.console.logAndStore(value);
                         LOG.stopPropagation(event);
                         LOG.preventDefault(event);
                     }
@@ -72,7 +72,7 @@ LOG.ExceptionLogItem.prototype.init = function(value) {
                     },
                     onclick: function(event) {
                         if (!event) {
-                            event = LOG.LogObject.getWindow().event;
+                            event = LOG.console.getWindow().event;
                         }
                         LOG.preventDefault(event);
                         LOG.stopPropagation(event);
@@ -149,7 +149,7 @@ LOG.ExceptionLogItem.prototype.getStackHtmlElement = function(fileName, lineNumb
         } else {
             stackArray = this.value.stack;
         }
-        var doc = LOG.LogObject.ownerDocument;
+        var doc = LOG.console.ownerDocument;
         var element = LOG.createElement(doc, 'div');
         var link;
         for (var i = 1; i < stackArray.length; ++i) {
@@ -181,7 +181,7 @@ LOG.ExceptionLogItem.prototype.getStackHtmlElement = function(fileName, lineNumb
         return element;
     } else {
         return LOG.createElement(
-            LOG.LogObject.ownerDocument, 'div',
+            LOG.console.ownerDocument, 'div',
             {
             },
             [
@@ -193,7 +193,7 @@ LOG.ExceptionLogItem.prototype.getStackHtmlElement = function(fileName, lineNumb
 
 LOG.ExceptionLogItem.prototype.getFileLink = function(fileName, lineNumber) {
     return LOG.createElement(
-        LOG.LogObject.ownerDocument, 'a',
+        LOG.console.ownerDocument, 'a',
         {
             href: 'openFile.php?file=' + escape(fileName) + '&line=' + lineNumber
         },

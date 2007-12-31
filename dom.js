@@ -13,18 +13,6 @@ LOG.preventDefault = function(event) {
     }
 }
 
-LOG.globalContext = function() {
-    this.evaluate = function(code, additionalVariables) {
-        for (var name in additionalVariables) {
-            eval("var " + name + " = additionalVariables['" + name + "'];");
-        }
-        return eval(code);
-    }
-    this.getNames = function() {
-        return [];
-    }
-}
-
 LOG.stopPropagation = function(event) {
     if (event.stopPropagation) {
         event.stopPropagation();
@@ -122,7 +110,7 @@ LOG.runObjEventHandler = function(event, number) {
 }
 
 LOG.getWindowInnerSize = function() {
-    var document = LOG.LogObject.ownerDocument;
+    var document = LOG.console.ownerDocument;
     var w, h;
     if (self.innerHeight) { // all except Explorer
         w = self.innerWidth;
@@ -138,7 +126,7 @@ LOG.getWindowInnerSize = function() {
 }
 
 LOG.getScrollBarPositions = function() {
-    var document = LOG.LogObject.ownerDocument;
+    var document = LOG.console.ownerDocument;
     var x, y;
     if (typeof document.documentElement != 'undefined' && typeof document.documentElement.scrollLeft != 'undefined') {
         x = document.documentElement.scrollLeft;
@@ -173,8 +161,8 @@ LOG.getPosition = function(obj) {
 
 // Takes into account if the LOG wrapper element is active and either returns the true document's body or LOG's
 LOG.getBody = function(element) {
-    if (LOG.LogObject.wrapperElement) {
-        return LOG.LogObject.wrapperTopElement;
+    if (LOG.console.wrapperElement) {
+        return LOG.console.wrapperTopElement;
     } else {
         return document.body;
     }
@@ -183,7 +171,7 @@ LOG.getBody = function(element) {
 // This works both with <input type=text>s and <textarea>s
 // returns an array [start, end]
 LOG.getTextInputSelection = function(element) {
-    var document = LOG.LogObject.ownerDocument;
+    var document = LOG.console.ownerDocument;
     if (LOG.isIE) {
         var start = null, end = null;
         var selection = document.selection.createRange();
@@ -291,7 +279,7 @@ LOG.createElement = function(ownerDocument, tagName, attributes, childNodes) {
 LOG.createEventHandler = function(obj, methodName, parameter) {
     return function(event) {
         if (!event) {
-            event = LOG.LogObject.getWindow().event;
+            event = LOG.console.getWindow().event;
         }
         obj[methodName].call(obj, event, parameter);
     }

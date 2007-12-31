@@ -1,5 +1,5 @@
 LOG.getGetPositionInVariablesElement = function(value) {
-    var doc = LOG.LogObject.ownerDocument;
+    var doc = LOG.console.ownerDocument;
     var positionInVariables = LOG.indexOf(LOG.clickedMessages, value);
     if (positionInVariables == -1) {
         return null;
@@ -12,7 +12,7 @@ LOG.getGetPositionInVariablesElement = function(value) {
             },
             onclick: function(event) {
                 if (!event) {
-                    event = LOG.LogObject.getWindow().event;
+                    event = LOG.console.getWindow().event;
                 }
                 LOG.writeStringToInput('$' + positionInVariables)
                 LOG.stopPropagation(event);
@@ -34,7 +34,7 @@ LOG.getExtraInfoToLogAsHtmlElement = function(value, stackedMode, alreadyLoggedC
         return null;
     }
     var extraInfoToLog = value.getExtraInfoToLog();
-    var doc = LOG.LogObject.ownerDocument;
+    var doc = LOG.console.ownerDocument;
     var element = LOG.createElement(doc, 'span', {});
 
     for (var item in extraInfoToLog) {
@@ -51,7 +51,7 @@ LOG.getExtraInfoToLogAsHtmlElement = function(value, stackedMode, alreadyLoggedC
                     onclick: (function(item) {
                         return function(event) {
                             if (!event) {
-                                event = LOG.LogObject.getWindow().event;
+                                event = LOG.console.getWindow().event;
                             }
                             Log(extraInfoToLog[item].call(value));
                             LOG.stopPropagation(event);
@@ -112,7 +112,7 @@ LOG.getValueAsLogItem = function(value, stackedMode, alreadyLoggedContainers, sh
     }
     
     // We know the value is not a hash type object or an array or html element or a typed object
-    var document = LOG.LogObject.ownerDocument;
+    var document = LOG.console.ownerDocument;
     var i;
     var fragment = document.createDocumentFragment();
     
@@ -170,7 +170,7 @@ LOG.getValueAsLogItem = function(value, stackedMode, alreadyLoggedContainers, sh
             function(event) {
                 LOG.preventDefault(event);
                 LOG.stopPropagation(event);
-                LOG.LogObject.logAndStore(value);
+                LOG.console.logAndStore(value);
             }
         );
         
@@ -193,7 +193,7 @@ LOG.getValueAsLogItem = function(value, stackedMode, alreadyLoggedContainers, sh
         );
         LOG.addEventListener(srcLink, 'click',
             function(event) {
-                LOG.LogObject.appendRow(document.createTextNode('\n' + value.toString()));
+                LOG.console.appendRow(document.createTextNode('\n' + value.toString()));
                 LOG.preventDefault(event);
                 LOG.stopPropagation(event);
             }

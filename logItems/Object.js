@@ -14,7 +14,7 @@ LOG.ObjectLogItem.prototype.init = function(value, stackedMode, alreadyLoggedCon
         showToggleChildrenLink = true;
     }
     
-    var doc = LOG.LogObject.ownerDocument;
+    var doc = LOG.console.ownerDocument;
     
     this.stackedMode = stackedMode;
     this.alreadyLoggedContainers = alreadyLoggedContainers;
@@ -63,7 +63,7 @@ LOG.ObjectLogItem.prototype.init = function(value, stackedMode, alreadyLoggedCon
                     },
                     onclick: function(event) {
                         if (!event) {
-                            event = LOG.LogObject.getWindow().event;
+                            event = LOG.console.getWindow().event;
                         }
                         LOG.preventDefault(event);
                         LOG.stopPropagation(event);
@@ -87,11 +87,11 @@ LOG.ObjectLogItem.prototype.init = function(value, stackedMode, alreadyLoggedCon
                     },
                     onclick: function(event) {
                         if (!event) {
-                            event = LOG.LogObject.getWindow().event;
+                            event = LOG.console.getWindow().event;
                         }
                         LOG.preventDefault(event);
                         LOG.stopPropagation(event);
-                        LOG.LogObject.logAndStore(value);
+                        LOG.console.logAndStore(value);
                     }
                 },
                 [ '{' ]
@@ -114,7 +114,7 @@ LOG.ObjectLogItem.prototype.init = function(value, stackedMode, alreadyLoggedCon
                     },
                     onclick: function(event) {
                         if (!event) {
-                            event = LOG.LogObject.getWindow().event;
+                            event = LOG.console.getWindow().event;
                         }
                         LOG.preventDefault(event);
                         LOG.stopPropagation(event);
@@ -140,7 +140,7 @@ LOG.ObjectLogItem.prototype.init = function(value, stackedMode, alreadyLoggedCon
                     },
                     onclick: function(event) {
                         if (!event) {
-                            event = LOG.LogObject.getWindow().event;
+                            event = LOG.console.getWindow().event;
                         }
                         LOG.preventDefault(event);
                         LOG.stopPropagation(event);
@@ -168,7 +168,7 @@ LOG.ObjectLogItem.prototype.init = function(value, stackedMode, alreadyLoggedCon
                     },
                     onclick: function(event) {
                         if (!event) {
-                            event = LOG.LogObject.getWindow().event;
+                            event = LOG.console.getWindow().event;
                         }
                         LOG.preventDefault(event);
                         LOG.stopPropagation(event);
@@ -280,7 +280,7 @@ LOG.ObjectLogItem.prototype.toggleShowChildren = function(applyToChildren) {
 }
 
 LOG.ObjectLogItem.prototype.createProperty = function(key) {
-    var document = LOG.LogObject.ownerDocument;
+    var document = LOG.console.ownerDocument;
     var itemSpan, span, propertyValueElement;
     itemSpan = document.createElement('span');
     span = document.createElement('span');

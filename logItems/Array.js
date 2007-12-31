@@ -4,7 +4,7 @@ if (typeof LOG.ArrayLogItem == 'undefined') {
 }
 
 LOG.ArrayLogItem.prototype.init = function(value, stackedMode, alreadyLoggedContainers) {
-    var doc = LOG.LogObject.ownerDocument;
+    var doc = LOG.console.ownerDocument;
     
     if (typeof alreadyLoggedContainers == 'undefined') {
         alreadyLoggedContainers = [];
@@ -41,9 +41,9 @@ LOG.ArrayLogItem.prototype.init = function(value, stackedMode, alreadyLoggedCont
                     },
                     onclick: function(event) {
                         if (!event) {
-                            event = LOG.LogObject.getWindow().event;
+                            event = LOG.console.getWindow().event;
                         }
-                        LOG.LogObject.logAndStore(value);
+                        LOG.console.logAndStore(value);
                         LOG.stopPropagation(event);
                         LOG.preventDefault(event);
                     }
@@ -67,7 +67,7 @@ LOG.ArrayLogItem.prototype.init = function(value, stackedMode, alreadyLoggedCont
                     },
                     onclick: function(event) {
                         if (!event) {
-                            event = LOG.LogObject.getWindow().event;
+                            event = LOG.console.getWindow().event;
                         }
                         LOG.preventDefault(event);
                         LOG.stopPropagation(event);
@@ -96,7 +96,7 @@ LOG.ArrayLogItem.prototype.init = function(value, stackedMode, alreadyLoggedCont
                     },
                     onclick: function(event) {
                         if (!event) {
-                            event = LOG.LogObject.getWindow().event;
+                            event = LOG.console.getWindow().event;
                         }
                         LOG.preventDefault(event);
                         LOG.stopPropagation(event);
@@ -149,7 +149,7 @@ LOG.ArrayLogItem.prototype.setShowChildren = function(showChildren, applyToChild
 LOG.ArrayLogItem.prototype.createProperty = function(index) {
     var logItem = LOG.getValueAsLogItem(this.value[index], this.stackedMode, this.alreadyLoggedContainers);
     var span, labelElement, logItemSpan, commaSpan;
-    var doc = LOG.LogObject.ownerDocument;
+    var doc = LOG.console.ownerDocument;
     span = LOG.createElement(doc, 'span',
         {},
         [

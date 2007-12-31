@@ -3,7 +3,7 @@ if (!LOG.LogPanel) {
 }
 
 LOG.LogPanel.prototype.init = function(name, selected) {
-    var doc = LOG.LogObject.ownerDocument;
+    var doc = LOG.console.ownerDocument;
     this.labelElement = LOG.createElement(doc, 'span',
         {
             style: {

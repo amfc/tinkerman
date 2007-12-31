@@ -7,3 +7,11 @@ LOG.indexOf = function(arr, item) {
     }
     return -1;
 }
+
+LOG.getObjectProperties = function(object) {
+    var item, items = [];
+    for (item in object) {
+        items.push(item);
+    }
+    return items;
+}

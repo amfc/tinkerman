@@ -46,4 +46,3 @@ LOG.getObjectDifferences = function(oldObject, newObject) {
         changedKeys: changedKeys
     };
 }
-
