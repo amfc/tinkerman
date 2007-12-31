@@ -14,7 +14,7 @@ LOG.getGetPositionInVariablesElement = function(value) {
                 if (!event) {
                     event = LOG.console.getWindow().event;
                 }
-                LOG.writeStringToInput('$' + positionInVariables)
+                LOG.console.writeStringToInput('$' + positionInVariables)
                 LOG.stopPropagation(event);
                 LOG.preventDefault(event);
             }

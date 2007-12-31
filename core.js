@@ -74,16 +74,6 @@ LOG.focusAndBlinkElement = function(element) {
     );
 }
 
-LOG.writeStringToInput = function(str) {
-    var currentWordAndPosition = LOG.console.getCurrentWordAndPosition();
-    LOG.console.input.value = LOG.console.input.value.substr(0, currentWordAndPosition.end) + str +
-        LOG.console.input.value.substr(currentWordAndPosition.end)
-    ;
-    var endPos = currentWordAndPosition.end + str.length;
-    LOG.setTextInputSelection(LOG.console.input, [endPos, endPos]);
-    LOG.console.input.focus();
-}
-
 LOG.createOutlineFromElement = function(element) {
     var div = document.createElement('div');
     div.style.border = '2px solid red';

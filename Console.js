@@ -1066,3 +1066,13 @@ LOG.Console.prototype.createElement = function() {
         LOG.addEventListener(window, 'load', append);
     }
 }
+
+LOG.Console.prototype.writeStringToInput = function(str) {
+    var currentWordAndPosition = this.getCurrentWordAndPosition();
+    this.input.value = this.input.value.substr(0, currentWordAndPosition.end) + str +
+        this.input.value.substr(currentWordAndPosition.end)
+    ;
+    var endPos = currentWordAndPosition.end + str.length;
+    LOG.setTextInputSelection(this.input, [endPos, endPos]);
+    this.input.focus();
+}
