@@ -19,7 +19,7 @@ LOG.Evaluator.prototype.log = function(message, title, newLineAfterTitle, consol
         title,
         newLineAfterTitle,
         null,
-        console,
+        consoleName,
         dontOpen
     );
     return message;
@@ -37,8 +37,8 @@ LOG.Evaluator.prototype.logAndStore = function(value, source) {
     } else {
         this.console.appendRow(LOG.getValueAsHtmlElement(value, this.stackedMode, undefined, true));
     }
-    if (this.console.commandEditor.commandInput.value == '' || this.console.commandEditor.commandInput.value.match(/^\$[0-9]+$/)) {
-        this.console.commandEditor.commandInput.value = '$' + pos;
+    if (this.console.commandEditor.commandInput.element.value == '' || this.console.commandEditor.commandInput.element.value.match(/^\$[0-9]+$/)) {
+        this.console.commandEditor.commandInput.element.value = '$' + pos;
     }
     return;
 }

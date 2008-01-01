@@ -109,7 +109,7 @@ LOG.onKeyDown = function(event) {
                     LOG.console.createElement();
                 } else {
                     LOG.console.ownerDocument.parentWindow.focus();
-                    LOG.console.input.focus();
+                    LOG.console.commandInput.focus();
                 }
             }
         } else if (chr == 'i') {
@@ -123,7 +123,7 @@ LOG.onKeyDown = function(event) {
                     }  else {
                         LOG.console.ownerDocument.parentWindow.focus();
                     }
-                    LOG.console.input.focus();
+                    LOG.console.commandInput.focus();
                }, 0
             );
         } else if (LOG.console.elementCreated) {
@@ -186,6 +186,10 @@ LOG.onClick = function(event) {
 
 function Log(message, title, section, dontOpen, stackedMode) {
     return LOG.console.evaluator.log(message, title, true, section, dontOpen, stackedMode);
+}
+
+function LogAndStore(value, source) {
+    return LOG.console.evaluator.logAndStore(value, source);
 }
 
 function LogX(str) { // Log in external window

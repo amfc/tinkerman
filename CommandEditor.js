@@ -79,12 +79,12 @@ LOG.CommandEditor.prototype.getHeight = function() {
 
 LOG.CommandEditor.prototype.setIsBig = function(isBig) {
     this.textAreaBig = isBig;
-    if (this.input) {
-        this.input.element.parentNode.removeChild(this.input.element);
+    if (this.commandInput) {
+        this.commandInput.element.parentNode.removeChild(this.commandInput.element);
     }
-    this.input = new LOG.CommandInput;
-    this.input.init(this.ownerDocument, this.textAreaBig, this.evalCallback);
-    this.inputTd.appendChild(this.input.element);
+    this.commandInput = new LOG.CommandInput;
+    this.commandInput.init(this.ownerDocument, this.textAreaBig, this.evalCallback);
+    this.inputTd.appendChild(this.commandInput.element);
     
     if (this.textAreaBig) {
         this.setHeight(12);
@@ -103,5 +103,5 @@ LOG.CommandEditor.prototype.onToggleTextAreaClick = function(event) {
 }
 
 LOG.CommandEditor.prototype.focus = function() {
-    this.input.focus();
+    this.commandInput.focus();
 }

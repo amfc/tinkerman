@@ -40,7 +40,7 @@ LOG.ExceptionLogItem.prototype.init = function(value) {
                         if (!event) {
                             event = LOG.console.getWindow().event;
                         }
-                        LOG.console.logAndStore(value);
+                        LogAndStore(value);
                         LOG.stopPropagation(event);
                         LOG.preventDefault(event);
                     }

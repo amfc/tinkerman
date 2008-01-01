@@ -170,7 +170,7 @@ LOG.getValueAsLogItem = function(value, stackedMode, alreadyLoggedContainers, sh
             function(event) {
                 LOG.preventDefault(event);
                 LOG.stopPropagation(event);
-                LOG.console.logAndStore(value);
+                LogAndStore(value);
             }
         );
         

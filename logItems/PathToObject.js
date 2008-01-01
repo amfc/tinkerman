@@ -64,7 +64,7 @@ LOG.PathToObjectPart.prototype.init = function(value, pathPartName) {
                     event = LOG.console.getWindow().event;
                 }
                 if (!ctrlClick) {
-                    LOG.console.logAndStore(value);
+                    LogAndStore(value);
                     LOG.console.focusValue(value, true);
                 } else if (window.Reloadable && value instanceof window.Reloadable) {
                     LOG.openClassInEditor(value);

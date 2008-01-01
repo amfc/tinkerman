@@ -35,6 +35,9 @@ LOG.Console.prototype.appendRow = function(messageHtmlFragment, title, newLineAf
     if (!console) {
         console = this.console;
     }
+    if (typeof console == 'string') {
+        console = this.addConsole(console);
+    }
     if (this.hidden && !dontOpen) {
         this.show();
     }
@@ -493,7 +496,7 @@ LOG.Console.prototype.createElement = function() {
     );
     
     this.commandEditor = new LOG.CommandEditor;
-    this.commandEditor.init(doc, function(str) { me.evaluator.evalScriptAndPrintResults(str) }, function() { me.updateCommandEditorSize() } );
+    this.commandEditor.init(doc, this.evaluator, function() { me.updateCommandEditorSize() } );
     this.element.appendChild(this.commandEditor.element);
     
     var me = this;

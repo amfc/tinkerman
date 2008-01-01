@@ -1,8 +1,8 @@
 LOG.Class('CommandInput');
 
-LOG.CommandInput.prototype.init = function(ownerDocument, useTextArea, evalCallback) {
+LOG.CommandInput.prototype.init = function(ownerDocument, useTextArea, evaluator) {
     this.ownerDocument = ownerDocument;
-    this.evalCallback = evalCallback;
+    this.evaluator = evaluator;
     this.useTextArea = useTextArea;
     this.element = LOG.createElement(
         this.ownerDocument,
@@ -112,7 +112,7 @@ LOG.CommandInput.prototype.onInputKeyDown = function($event) {
                 LOG.history.push(this.element.value);
             }
             LOG.historyPosition = LOG.history.length;
-            this.evalCallback(this.element.value);
+            this.evaluator.evalScriptAndPrintResults(this.element.value);
             LOG.stopPropagation($event);
             LOG.preventDefault($event);
             if (!this.useTextArea) {
@@ -176,7 +176,7 @@ LOG.CommandInput.prototype.onInputKeyDown = function($event) {
             if (script.charAt(script.length - 1) == '.') {
                 script = script.substr(0, script.length - 1);
             }
-            var result = this.evalScript(script);
+            var result = this.evaluator.evalScript(script);
             if (typeof result != 'object' || result == LOG.dontLogResult) {
                 return;
             }

@@ -40,7 +40,7 @@ LOG.ArrayLogItem.prototype.init = function(value, stackedMode, alreadyLoggedCont
                         if (!event) {
                             event = LOG.console.getWindow().event;
                         }
-                        LOG.console.logAndStore(value);
+                        LogAndStore(value);
                         LOG.stopPropagation(event);
                         LOG.preventDefault(event);
                     }

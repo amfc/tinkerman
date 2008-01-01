@@ -88,7 +88,7 @@ LOG.ObjectLogItem.prototype.init = function(value, stackedMode, alreadyLoggedCon
                         }
                         LOG.preventDefault(event);
                         LOG.stopPropagation(event);
-                        LOG.console.logAndStore(value);
+                        LogAndStore(value);
                     }
                 },
                 [ '{' ]

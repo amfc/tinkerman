@@ -79,7 +79,7 @@ LOG.TypedObjectLogItem.prototype.init = function(value, stackedMode, alreadyLogg
                         if (event.ctrlKey) {
                             LOG.openClassInEditor(value);
                         } else {
-                            LOG.console.logAndStore(value);
+                            LogAndStore(value);
                         }
                         LOG.stopPropagation(event);
                         LOG.preventDefault(event);
