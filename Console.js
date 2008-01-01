@@ -2,33 +2,15 @@ LOG.Class('Console');
 
 LOG.Console.prototype.init = function() {
     this.elementCreated = false;
-    this.dragging = false;
     this.maxCount = 1000;
     this.append = true;
     this.stopDebugging = false;
     this.paused = false;
     this.n = 0;
-    this.lastMessage = null;
     this.ownerDocument = document;
     this.stackedMode = true;
-}
-
-LOG.Console.prototype.log = function(message, title, newLineAfterTitle, consoleName, dontOpen, stackedMode) {
-    var console;
-    if (!this.elementCreated) {
-        this.createElement();
-        if (dontOpen) {
-            this.hide();
-        }
-    }
-    if (consoleName) {
-        console = this.addConsole(consoleName);
-    } else {
-        console = this.console;
-    }
-    this.lastMessage = message;
-    this.appendRow(LOG.getValueAsHtmlElement(message, stackedMode == undefined ? this.stackedMode : stackedMode, undefined, true, true), title, newLineAfterTitle, null, console, dontOpen);
-    return message;
+    this.evaluator = new LOG.Evaluator;
+    this.evaluator.init(this);
 }
 
 LOG.Console.prototype.getWindow = function() {
@@ -238,79 +220,6 @@ LOG.Console.prototype.onNewWindowClick = function(event) {
     LOG.addCookie('LOG_IN_NEW_WINDOW', LOG.willOpenInNewWindow ? 'true' : 'false', 30);
 }
 
-LOG.Console.prototype.logAndStore = function(value, source) {
-    var pos = LOG.indexOf(LOG.clickedMessages, value);
-    if (pos == -1) {
-        pos = LOG.clickedMessages.length;
-        LOG.clickedMessages[pos] = value;
-    }
-    
-    if (source) {
-        this.logObjectSource(value, null, this.stackedMode);
-    } else {
-        this.appendRow(LOG.getValueAsHtmlElement(value, this.stackedMode, undefined, true));
-    }
-    if (LOG.console.input.value == '' || LOG.console.input.value.match(/^\$[0-9]+$/)) {
-        LOG.console.input.value = '$' + pos;
-    }
-    return;
-}
-
-LOG.Console.prototype.evalScriptAndPrintResults = function($script) {
-    var result = this.evalScript($script);
-    if (result !== LOG.dontLogResult) {
-        if ($script.indexOf('\n') == -1) {
-            this.log(result, $script, true);
-        } else {
-            this.log(result, $script.substr(0, $script.indexOf('\n')) + '...', true);
-        }
-    }
-}
-
-LOG.Console.prototype.evaluate = function(code, additionalVariables) {
-    for (var name in additionalVariables) {
-        eval("var " + name + " = additionalVariables['" + name + "'];");
-    }
-    return eval(code);
-}
-
-LOG.Console.prototype.evalScript = function($script) {
-    var me = this;
-    if ($script == 'help') {
-        this.appendRow(
-            this.ownerDocument.createTextNode(
-                '\n$0, $1 ... $n: clicked element' +
-                '\n$_: Last logged value' +
-                '\n$E(element): createOutlineFromElement' +
-                '\n$S(object, title): logObjectSource' +
-                '\n$P(object): getObjectProperties'
-            ), 'Help'
-        );
-        return LOG.dontLogResult;
-    }
-    try {
-        var vars = {
-            '$_': this.lastMessage,
-            '$P': LOG.getObjectProperties,
-            '$S': function(object, title) { return me.logObjectSource(object, title) },
-            '$E': LOG.createOutlineFromElement
-        };
-        for (var i = 0; i < LOG.clickedMessages.length; ++i) {
-           vars['$' + i] = LOG.clickedMessages[i];
-        }
-        return this.evaluate($script, vars);
-    } catch (e) {
-        var logItem = new LOG.ExceptionLogItem;
-        logItem.init(e);
-        this.appendRow(
-            logItem.element,
-            'error ' + $script,
-            true,
-            'red'
-        );
-        return LOG.dontLogResult;
-    }
-}
 
 // This searchs for some value in all the selected panels and focuses it
 LOG.Console.prototype.focusValue = function(value, dontLog) {
@@ -584,7 +493,7 @@ LOG.Console.prototype.createElement = function() {
     );
     
     this.commandEditor = new LOG.CommandEditor;
-    this.commandEditor.init(doc, function(str) { me.evalScriptAndPrintResults(str) }, function() { me.updateCommandEditorSize() } );
+    this.commandEditor.init(doc, function(str) { me.evaluator.evalScriptAndPrintResults(str) }, function() { me.updateCommandEditorSize() } );
     this.element.appendChild(this.commandEditor.element);
     
     var me = this;
@@ -608,13 +517,6 @@ LOG.Console.prototype.updateCommandEditorSize = function() {
     if (this.scrollContainer) {
         this.scrollContainer.style.paddingBottom = this.commandEditor.getHeight() + 'em';
     }
-}
-
-LOG.Console.prototype.logObjectSource = function(object, title) {
-    var logItem = new LOG.ObjectLogItem;
-    logItem.init(object, this.stackedMode);
-    this.appendRow(logItem.element, title);
-    return LOG.dontLogResult;
 }
 
 LOG.Console.prototype.focus = function() {

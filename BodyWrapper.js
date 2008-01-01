@@ -1,6 +1,7 @@
 LOG.Class('BodyWrapper');
 
 LOG.BodyWrapper.prototype.init = function(ownerDocument, elementToWrap) {
+    this.dragging = false;
     this.ownerDocument = ownerDocument;
     var doc = this.ownerDocument;
     this.element = LOG.createElement(doc, 'div',

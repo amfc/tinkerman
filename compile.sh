@@ -18,6 +18,7 @@ add diff;
 add BodyWrapper;
 add CommandInput;
 add CommandEditor;
+add Evaluator;
 add Console;
 add logItem;
 add LogPanel;
