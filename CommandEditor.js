@@ -5,8 +5,6 @@ LOG.CommandEditor.prototype.init = function(ownerDocument, evalCallback, resizeC
     this.ownerDocument = ownerDocument;
     this.evalCallback = evalCallback;
     this.resizeCallback = resizeCallback;
-    this.input = new LOG.CommandInput;
-    this.input.init(doc, false, this.evalCallback);
     
     this.element = LOG.createElement(doc, 'div',
         {
@@ -36,8 +34,7 @@ LOG.CommandEditor.prototype.init = function(ownerDocument, evalCallback, resizeC
                                                 width: '100%',
                                                 verticalAlign: 'bottom'
                                             }
-                                        },
-                                        [ this.input.element ]
+                                        }
                                     ),
                                     this.toggleTextAreaTd = LOG.createElement(doc, 'td',
                                         {
@@ -68,7 +65,7 @@ LOG.CommandEditor.prototype.init = function(ownerDocument, evalCallback, resizeC
             )
         ]
     );
-    this.setHeight(1.8);
+    this.setIsBig(false);
 }
 
 LOG.CommandEditor.prototype.setHeight = function(height) {
@@ -80,27 +77,27 @@ LOG.CommandEditor.prototype.getHeight = function() {
     return this.height;
 }
 
-LOG.CommandEditor.prototype.onToggleTextAreaClick = function(event) {
-    this.textAreaBig = !this.textAreaBig;
-    
-    var oldInput = null;
+LOG.CommandEditor.prototype.setIsBig = function(isBig) {
+    this.textAreaBig = isBig;
     if (this.input) {
-        oldInput = this.input;
+        this.input.element.parentNode.removeChild(this.input.element);
     }
-    
     this.input = new LOG.CommandInput;
     this.input.init(this.ownerDocument, this.textAreaBig, this.evalCallback);
-    
-    oldInput.element.parentNode.replaceChild(this.input.element, oldInput.element);
+    this.inputTd.appendChild(this.input.element);
     
     if (this.textAreaBig) {
         this.setHeight(12);
         this.toggleTextAreaLink.firstChild.data = 'small';
     } else {
-        this.setHeight(1.8);
+        this.setHeight(1.2);
         this.toggleTextAreaLink.firstChild.data = 'big';
     }
     this.resizeCallback();
+}
+
+LOG.CommandEditor.prototype.onToggleTextAreaClick = function(event) {
+    this.setIsBig(!this.textAreaBig);
     LOG.stopPropagation(event);
     LOG.preventDefault(event);
 }

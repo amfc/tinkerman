@@ -71,8 +71,8 @@ LOG.Console.prototype.appendRow = function(messageHtmlFragment, title, newLineAf
         console.count++;
     }
     this.n++;
-    newRow.style.fontFamily = 'monospace';
-    newRow.style.fontSize = '9pt';
+    newRow.style.fontFamily = 'terminus, monospace';
+    newRow.style.fontSize = '9px';
     newRow.style.color = 'black';
     newRow.style.borderBottom = '1px solid #aaaaaa';
     if (LOG.isGecko) {
@@ -435,11 +435,6 @@ LOG.Console.prototype.createElement = function() {
         count: 0
     };
     
-    this.textAreaBig = false;
-    
-    this.commandEditor = new LOG.CommandEditor;
-    this.commandEditor.init(doc, function(str) { me.evalScriptAndPrintResults(str) }, function() { me.updateCommandEditorSize() } );
-    
     this.element = LOG.createElement(
         doc, 'div',
         {
@@ -584,12 +579,13 @@ LOG.Console.prototype.createElement = function() {
                         ]
                     )
                 ]
-            ),
-            this.commandEditor.element
+            )
         ]
     );
     
-    this.updateCommandEditorSize();
+    this.commandEditor = new LOG.CommandEditor;
+    this.commandEditor.init(doc, function(str) { me.evalScriptAndPrintResults(str) }, function() { me.updateCommandEditorSize() } );
+    this.element.appendChild(this.commandEditor.element);
     
     var me = this;
     function append() {
@@ -609,7 +605,9 @@ LOG.Console.prototype.createElement = function() {
 }
 
 LOG.Console.prototype.updateCommandEditorSize = function() {
-    this.scrollContainer.style.paddingBottom = this.commandEditor.getHeight() + 'em';
+    if (this.scrollContainer) {
+        this.scrollContainer.style.paddingBottom = this.commandEditor.getHeight() + 'em';
+    }
 }
 
 LOG.Console.prototype.logObjectSource = function(object, title) {

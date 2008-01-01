@@ -12,7 +12,7 @@ LOG.CommandInput.prototype.init = function(ownerDocument, useTextArea, evalCallb
                 width: '100%',
                 height: '100%',
                 border: '1px solid gray',
-                fontFamily: 'monospace',
+                fontFamily: 'terminus, monospace',
                 fontSize: '13px',
                 fontWeight: 'normal'
             },
