@@ -11,6 +11,8 @@ LOG.Console.prototype.init = function() {
     this.stackedMode = true;
     this.evaluator = new LOG.Evaluator;
     this.evaluator.init(this);
+    this.count = 0;
+    this.element = LOG.createElement(doc, 'div');
 }
 
 LOG.Console.prototype.getWindow = function() {
@@ -21,7 +23,7 @@ LOG.Console.prototype.getWindow = function() {
     }
 }
 
-LOG.Console.prototype.appendRow = function(messageHtmlFragment, title, newLineAfterTitle, titleColor, console, dontOpen) {
+LOG.Console.prototype.appendRow = function(messageHtmlFragment, title, newLineAfterTitle, titleColor, dontOpen) {
     var newRow = this.ownerDocument.createElement('div');
     if (this.stopDebugging || this.paused) {
         return;
@@ -32,28 +34,22 @@ LOG.Console.prototype.appendRow = function(messageHtmlFragment, title, newLineAf
             this.hide();
         }
     }
-    if (!console) {
-        console = this.console;
-    }
-    if (typeof console == 'string') {
-        console = this.addConsole(console);
-    }
     if (this.hidden && !dontOpen) {
         this.show();
     }
     if (!dontOpen) {
-        console.panel.setSelected(true);
+        this.panel.setSelected(true);
     } else if (!console.panel.selected) {
-        console.panel.setChanged(true);
+        this.panel.setChanged(true);
     }
-    if (console.count >= this.maxCount) {
+    if (this.count >= this.maxCount) {
         if (!this.append) {
-            console.panel.contentElement.removeChild(console.panel.contentElement.lastChild);
+            this.element.removeChild(this.element.lastChild);
         } else {
-            console.panel.contentElement.removeChild(console.panel.contentElement.firstChild);
+            this.element.removeChild(this.element.firstChild);
         }
     } else {
-        console.count++;
+        this.count++;
     }
     this.n++;
     newRow.style.fontFamily = 'terminus, monospace';
@@ -66,7 +62,7 @@ LOG.Console.prototype.appendRow = function(messageHtmlFragment, title, newLineAf
         newRow.style.whiteSpace = 'pre';
     }
     newRow.style.padding = '2px';
-    if (console.count & 1) {
+    if (this.count & 1) {
         newRow.style.backgroundColor = '#faffff';
     } else {
         newRow.style.backgroundColor = '#fff3f2';
@@ -93,19 +89,6 @@ LOG.Console.prototype.appendRow = function(messageHtmlFragment, title, newLineAf
     }
 }
 
-LOG.Console.prototype.onClearClick = function(event) {
-    LOG.stopPropagation(event);
-    LOG.preventDefault(event);
-    if (this.console.panel.selected) {
-        this.clear(this.console);
-    }
-    for (var consoleName in this.consoles) {
-        if (this.consoles[consoleName].panel.selected) {
-            this.clear(this.consoles[consoleName]);
-        }
-    }
-}
-
 LOG.Console.prototype.clear = function(console) {
     if (!this.elementCreated) {
         return;
@@ -118,71 +101,9 @@ LOG.Console.prototype.clear = function(console) {
         }
     }
     console.panel.setChanged(false);
-    console.count = 0;
+    this.count = 0;
     while (console.panel.contentElement.childNodes.length > 0) {
         console.panel.contentElement.removeChild(console.panel.contentElement.firstChild);
-    }
-}
-
-LOG.Console.prototype.close = function() {
-    if (!this.elementCreated || this.stopDebugging) {
-        return;
-    }
-    this.deleteElement();
-    this.stopDebugging = true;
-}
-
-LOG.Console.prototype.deleteElement = function() {
-    if (!this.elementCreated) {
-        return;
-    }
-    if (this.bodyWrapper) {
-        this.bodyWrapper.uninit();
-        delete this.bodyWrapper;
-    }
-    if (this.htmlLogItem) {
-        delete this.htmlLogItem;
-    }
-    if (this.pageLogItem) {
-        delete this.pageLogItem;
-    }
-    this.elementCreated = false;
-}
-
-LOG.Console.prototype.onCloseClick = function(event) {
-    this.close();
-    LOG.stopPropagation(event);
-    LOG.preventDefault(event);
-}
-
-LOG.Console.prototype.onPauseClick = function(event) {
-    this.paused = !this.paused;
-    if (this.paused) {
-        this.pauseLink.firstChild.data = 'resume';
-    } else {
-        this.pauseLink.firstChild.data = 'pause';
-    }
-    LOG.stopPropagation(event);
-    LOG.preventDefault(event);
-}
-
-LOG.Console.prototype.onHideClick = function(event) {
-    this.hide();
-    LOG.stopPropagation(event);
-    LOG.preventDefault(event);
-}
-
-LOG.Console.prototype.hide = function() {
-    this.hidden = true;
-    if (this.bodyWrapper) {
-        this.bodyWrapper.hide();
-    }
-}
-
-LOG.Console.prototype.show = function() {
-    this.hidden = false;
-    if (this.bodyWrapper) {
-        this.bodyWrapper.show();
     }
 }
 
@@ -211,16 +132,6 @@ LOG.Console.prototype.prepareNewDocument = function() {
         this.ownerDocument = document;
         return document;
     }
-}
-
-LOG.Console.prototype.onNewWindowClick = function(event) {
-    LOG.stopPropagation(event);
-    LOG.preventDefault(event);
-    LOG.willOpenInNewWindow = !LOG.willOpenInNewWindow;
-    this.deleteElement();
-    this.prepareNewDocument();
-    this.createElement();
-    LOG.addCookie('LOG_IN_NEW_WINDOW', LOG.willOpenInNewWindow ? 'true' : 'false', 30);
 }
 
 
@@ -266,28 +177,7 @@ LOG.Console.prototype.focusValue = function(value, dontLog) {
     }
 }
 
-LOG.Console.prototype.addConsole = function(consoleName) {
-    if (this.consoles[consoleName]) {
-        return this.consoles[consoleName];
-    }
-    return this.consoles[consoleName] = {
-        panel: this.addLogPanel(consoleName),
-        count: 0
-    }
-}
-
-LOG.Console.prototype.addLogPanel = function(name) {
-    var doc = this.ownerDocument;
-    var logPanel = new LOG.LogPanel;
-    logPanel.init(name, false);
-    this.panelLabels.appendChild(doc.createTextNode(', '));
-    this.panelLabels.appendChild(logPanel.labelElement);
-    this.panelElements.appendChild(logPanel.panelElement);
-    return logPanel;
-}
-
 LOG.Console.prototype.createElement = function() {
-    this.consoles = {};
     var ownerDocument = this.prepareNewDocument();
     if (LOG.willOpenInNewWindow) {
         ownerDocument.body.innerHTML = '';
@@ -295,224 +185,6 @@ LOG.Console.prototype.createElement = function() {
     var doc = window.document;
     if (ownerDocument) {
         doc = ownerDocument;
-    }
-    
-    this.elementCreated = true;
-    
-    this.consolePanel = new LOG.LogPanel;
-    this.consolePanel.init('console', true);
-    
-    this.console = {
-        panel: this.consolePanel,
-        count: 0
-    }
-    
-    this.consoles.console = this.console;
-    
-    var me = this;
-    
-    this.htmlPanel = new LOG.LogPanel;
-    this.htmlPanel.init('html', false);
-    this.htmlPanel.onselect = function() {
-        if (!me.htmlLogItem) {
-            me.htmlLogItem = new LOG.HTMLElementLogItem;
-            me.htmlLogItem.init(document.getElementsByTagName('html')[0], false, [], true);
-            me.htmlPanel.contentElement.appendChild(me.htmlLogItem.element);
-        }
-    }
-    
-    this.consoles.html = {
-        panel: this.htmlPanel,
-        count: 0
-    };
-    
-    this.pagePanel = new LOG.LogPanel;
-    this.pagePanel.init('page', false);
-    this.pagePanel.onselect = function() {
-        function createPageLogItem() {
-            if (!self[LOG.pageObjectName]) {
-                setTimeout(createPageLogItem, 1000);
-                return;
-            }
-            if (!me.pageLogItem) {
-                me.pageLogItem = LOG.getValueAsLogItem(self[LOG.pageObjectName], true, []);
-                me.pagePanel.contentElement.appendChild(me.pageLogItem.element);
-            }
-        }
-        createPageLogItem();
-    }
-    
-    this.consoles.page = {
-        panel: this.pagePanel,
-        count: 0
-    };
-    
-    this.element = LOG.createElement(
-        doc, 'div',
-        {
-            style: {
-                borderTop: '1px solid gray',
-                backgroundColor: 'white',
-                color: 'gray',
-                position: 'relative',
-                height: '100%',
-                width: '100%',
-                overflow: 'hidden',
-                MozBoxSizing: 'border-box'
-            }
-        },
-        [
-            this.scrollContainer = LOG.createElement(doc, 'div',
-                {
-                    style: {
-                        position: 'absolute',
-                        width: '100%',
-                        height: LOG.isIE ? '100%' : null,
-                        top: 0,
-                        left: 0,
-                        bottom: '0',
-                        paddingTop: '1.8em'
-                    }
-                },
-                [
-                    LOG.createElement(doc, 'table',
-                        {
-                            style: {
-                                width: '100%',
-                                height: '100%'
-                            },
-                            cellPadding: '0',
-                            cellSpacing: '0'
-                        },
-                        [
-                            LOG.createElement(doc, 'tbody', {},
-                                [
-                                    this.panelElements = LOG.createElement(doc, 'tr', {},
-                                        [
-                                            this.consolePanel.panelElement,
-                                            this.htmlPanel.panelElement,
-                                            this.pagePanel.panelElement
-                                        ]
-                                    )
-                                ]
-                            )
-                        ]
-                    )
-                ]
-            ),
-            LOG.createElement(doc, 'div', // toolbar container
-                {
-                    style: {
-                        height: '1.8em',
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        MozBoxSizing: 'border-box',
-                        overflow: 'hidden',
-                        fontFamily: 'terminus, lucida console, monospace',
-                        backgroundColor: '#f0f0f0'
-                    }
-                },
-                [
-                    LOG.createElement(doc, 'div', // toolbar
-                        {
-                            style: {
-                                padding: '0.1em',
-                                width: '100%'
-                            }
-                        },
-                        [
-                            this.panelLabels = LOG.createElement(doc, 'span', {},
-                                [
-                                    this.consolePanel.labelElement,
-                                    ', ',
-                                    this.htmlPanel.labelElement,
-                                    ', ',
-                                    this.pagePanel.labelElement
-                                ]
-                            ),
-                            ', ',
-                            LOG.createElement(doc, 'a',
-                                {
-                                    href: '#',
-                                    style: {
-                                        fontWeight: 'normal'
-                                    },
-                                    onclick: LOG.createEventHandler(this, 'onClearClick')
-                                },
-                                [ 'clear' ]
-                            ),
-                            ' (alt-c), ',
-                            LOG.createElement(doc, 'a',
-                                {
-                                    href: '#',
-                                    style: {
-                                        fontWeight: 'normal'
-                                    },
-                                    onclick: LOG.createEventHandler(this, 'onCloseClick')
-                                },
-                                [ 'close' ]
-                            ),
-                            ' (alt-k), ',
-                            this.pauseLink = LOG.createElement(doc, 'a',
-                                {
-                                    href: '#',
-                                    style: {
-                                        fontWeight: 'normal'
-                                    },
-                                    onclick: LOG.createEventHandler(this, 'onPauseClick')
-                                },
-                                [ 'pause' ]
-                            ),
-                            ' (alt-p), ',
-                            LOG.createElement(doc, 'a',
-                                {
-                                    href: '#',
-                                    style: {
-                                        fontWeight: 'normal'
-                                    },
-                                    onclick: LOG.createEventHandler(this, 'onHideClick')
-                                },
-                                [ 'hide' ]
-                            ),
-                            ' (alt-h), ',
-                            LOG.createElement(doc, 'a',
-                                {
-                                    href: '#',
-                                    style: {
-                                        fontWeight: 'normal'
-                                    },
-                                    onclick: LOG.createEventHandler(this, 'onNewWindowClick')
-                                },
-                                [ LOG.willOpenInNewWindow ? 'same window' : 'new window' ]
-                            ),
-                            ' (alt-i) '
-                        ]
-                    )
-                ]
-            )
-        ]
-    );
-    
-    this.commandEditor = new LOG.CommandEditor;
-    this.commandEditor.init(doc, this.evaluator, function() { me.updateCommandEditorSize() } );
-    this.element.appendChild(this.commandEditor.element);
-    
-    var me = this;
-    function append() {
-        if (!LOG.willOpenInNewWindow) {
-            this.bodyWrapper = new LOG.BodyWrapper;
-            this.bodyWrapper.init(me.ownerDocument, me.element);
-        } else {
-            doc.body.appendChild(me.element);
-        }
-    }
-    
-    if (doc.body) {
-        append();
-    } else {
-        LOG.addEventListener(window, 'load', append);
     }
 }
 

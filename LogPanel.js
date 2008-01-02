@@ -1,6 +1,4 @@
-if (!LOG.LogPanel) {
-    LOG.LogPanel = function() {}
-}
+LOG.Class('LogPanel');
 
 LOG.LogPanel.prototype.init = function(name, selected) {
     var doc = LOG.console.ownerDocument;
