@@ -35,26 +35,26 @@ LOG.getSerializedHistory = function() {
     return '[' + items.join(',') + ']';
 }
 
-LOG.onUnload = function() {
-    LOG.addCookie('LOG_DEBUG_MODE', DEBUG_MODE ? "true" : "false", 30);
-    LOG.addCookie('LOG_OPEN', LOG.console.elementCreated && !LOG.console.hidden ? "true" : "false", 30);
-    LOG.addCookie('LOG_HISTORY', LOG.getSerializedHistory(), 30);
-    LOG.addCookie('LOG_SIZE', LOG.console.wrapperSize, 30);
-    var openConsoles = '';
-    var consoles = LOG.console.consoles;
-    for (var consoleName in consoles) {
-        if (consoles[consoleName].panel.selected) {
-            if (openConsoles) {
-                openConsoles += ',';
-            }
-            openConsoles += consoleName;
-        }
-    }
-    LOG.addCookie('LOG_OPEN_CONSOLES', openConsoles, 30);
-    if (LOG.isGecko) {
-        LOG.removeAllEventListeners();
-    }
-}
+//~ LOG.onUnload = function() {
+    //~ LOG.addCookie('LOG_DEBUG_MODE', DEBUG_MODE ? "true" : "false", 30);
+    //~ LOG.addCookie('LOG_OPEN', LOG.console.elementCreated && !LOG.console.hidden ? "true" : "false", 30);
+    //~ LOG.addCookie('LOG_HISTORY', LOG.getSerializedHistory(), 30);
+    //~ LOG.addCookie('LOG_SIZE', LOG.console.wrapperSize, 30);
+    //~ var openConsoles = '';
+    //~ var consoles = LOG.console.consoles;
+    //~ for (var consoleName in consoles) {
+        //~ if (consoles[consoleName].panel.selected) {
+            //~ if (openConsoles) {
+                //~ openConsoles += ',';
+            //~ }
+            //~ openConsoles += consoleName;
+        //~ }
+    //~ }
+    //~ LOG.addCookie('LOG_OPEN_CONSOLES', openConsoles, 30);
+    //~ if (LOG.isGecko) {
+        //~ LOG.removeAllEventListeners();
+    //~ }
+//~ }
 
 LOG.focusAndBlinkElement = function(element) {
     element.scrollIntoView();

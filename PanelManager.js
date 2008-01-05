@@ -1,10 +1,9 @@
 LOG.Class('PanelManager');
 
-LOG.PanelManager.prototype.init = function(ownerDocument, rightToolbarElement) {
-    var doc = ownerDocument;
-    
+LOG.PanelManager.prototype.init = function(doc, rightToolbarElement) {
+    this.doc = doc;
     this.element = LOG.createElement(
-        doc, 'div',
+        this.doc, 'div',
         {
             style: {
                 borderTop: '1px solid gray',
@@ -18,7 +17,7 @@ LOG.PanelManager.prototype.init = function(ownerDocument, rightToolbarElement) {
             }
         },
         [
-            this.scrollContainer = LOG.createElement(doc, 'div',
+            this.scrollContainer = LOG.createElement(this.doc, 'div',
                 {
                     style: {
                         position: 'absolute',
@@ -31,7 +30,7 @@ LOG.PanelManager.prototype.init = function(ownerDocument, rightToolbarElement) {
                     }
                 },
                 [
-                    LOG.createElement(doc, 'table',
+                    LOG.createElement(this.doc, 'table',
                         {
                             style: {
                                 width: '100%',
@@ -41,16 +40,16 @@ LOG.PanelManager.prototype.init = function(ownerDocument, rightToolbarElement) {
                             cellSpacing: '0'
                         },
                         [
-                            LOG.createElement(doc, 'tbody', {},
+                            LOG.createElement(this.doc, 'tbody', {},
                                 [
-                                    this.panelElements = LOG.createElement(doc, 'tr')
+                                    this.panelElements = LOG.createElement(this.doc, 'tr')
                                 ]
                             )
                         ]
                     )
                 ]
             ),
-            LOG.createElement(doc, 'div', // toolbar container
+            LOG.createElement(this.doc, 'div', // toolbar container
                 {
                     style: {
                         height: '1.8em',
@@ -65,7 +64,7 @@ LOG.PanelManager.prototype.init = function(ownerDocument, rightToolbarElement) {
                     }
                 },
                 [
-                    LOG.createElement(doc, 'div', // toolbar
+                    LOG.createElement(this.doc, 'div', // toolbar
                         {
                             style: {
                                 padding: '0.1em',
@@ -73,7 +72,7 @@ LOG.PanelManager.prototype.init = function(ownerDocument, rightToolbarElement) {
                             }
                         },
                         [
-                            this.panelLabels = LOG.createElement(doc, 'span'),
+                            this.panelLabels = LOG.createElement(this.doc, 'span'),
                             rightToolbarElement
                         ]
                     )
@@ -83,15 +82,12 @@ LOG.PanelManager.prototype.init = function(ownerDocument, rightToolbarElement) {
     );
 }
 
-LOG.PanelManager.prototype.add = function(name, contents) {
-    var doc = this.ownerDocument;
-    var logPanel = new LOG.LogPanel;
-    logPanel.init(name, false);
+LOG.PanelManager.prototype.add = function(logPanel) {
     if (this.panelLabels.childNodes.length > 0) {
-        this.panelLabels.appendChild(doc.createTextNode(', '));
+        this.panelLabels.appendChild(this.doc.createTextNode(', '));
     }
     this.panelLabels.appendChild(logPanel.labelElement);
     this.panelElements.appendChild(logPanel.panelElement);
-    this.contentElement.appendChild(contents);
+    logPanel.contentElement.appendChild(contents);
     return logPanel;
 }

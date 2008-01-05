@@ -1,7 +1,6 @@
 LOG.Class('LogPanel');
 
-LOG.LogPanel.prototype.init = function(name, selected) {
-    var doc = LOG.console.ownerDocument;
+LOG.LogPanel.prototype.init = function(doc, name, selected) {
     this.labelElement = LOG.createElement(doc, 'span',
         {
             style: {

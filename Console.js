@@ -1,13 +1,13 @@
 LOG.Class('Console');
 
-LOG.Console.prototype.init = function() {
+LOG.Console.prototype.init = function(doc) {
     this.elementCreated = false;
     this.maxCount = 1000;
     this.append = true;
     this.stopDebugging = false;
     this.paused = false;
     this.n = 0;
-    this.ownerDocument = document;
+    this.ownerDocument = doc;
     this.stackedMode = true;
     this.evaluator = new LOG.Evaluator;
     this.evaluator.init(this);

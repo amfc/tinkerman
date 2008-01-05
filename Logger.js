@@ -2,48 +2,52 @@ LOG.Class('Logger');
 
 LOG.Logger.prototype.init = function(doc) {
     this.consoles = {};
+    this.element = LOG.createElement(doc, 'div');
+    
     this.panelManager = new LOG.PanelManager;
-    this.panelManager.init(ownerDocument, LOG.createElement(doc, 'span', {},
-        [
-            ', ',
-            LOG.createElement(doc, 'a',
-                {
-                    href: '#',
-                    style: {
-                        fontWeight: 'normal'
+    this.panelManager.init(doc,
+        LOG.createElement(doc, 'span', {},
+            [
+                ', ',
+                LOG.createElement(doc, 'a',
+                    {
+                        href: '#',
+                        style: {
+                            fontWeight: 'normal'
+                        },
+                        onclick: LOG.createEventHandler(this, 'onClearClick')
                     },
-                    onclick: LOG.createEventHandler(this, 'onClearClick')
-                },
-                [ 'clear' ]
-            ),
-            ' (alt-c), ',
-            LOG.createElement(doc, 'a',
-                {
-                    href: '#',
-                    style: {
-                        fontWeight: 'normal'
+                    [ 'clear' ]
+                ),
+                ' (alt-c), ',
+                LOG.createElement(doc, 'a',
+                    {
+                        href: '#',
+                        style: {
+                            fontWeight: 'normal'
+                        },
+                        onclick: LOG.createEventHandler(this, 'onCloseClick')
                     },
-                    onclick: LOG.createEventHandler(this, 'onCloseClick')
-                },
-                [ 'close' ]
-            ),
-            ' (alt-k), ',
-            LOG.createElement(doc, 'a',
-                {
-                    href: '#',
-                    style: {
-                        fontWeight: 'normal'
+                    [ 'close' ]
+                ),
+                ' (alt-k), ',
+                LOG.createElement(doc, 'a',
+                    {
+                        href: '#',
+                        style: {
+                            fontWeight: 'normal'
+                        },
+                        onclick: LOG.createEventHandler(this, 'onNewWindowClick')
                     },
-                    onclick: LOG.createEventHandler(this, 'onNewWindowClick')
-                },
-                [ LOG.willOpenInNewWindow ? 'same window' : 'new window' ]
-            ),
-            ' (alt-i) '
-        ]
+                    [ LOG.willOpenInNewWindow ? 'same window' : 'new window' ]
+                ),
+                ' (alt-i) '
+            ]
+        )
     );
         
     this.consolePanel = new LOG.LogPanel;
-    this.consolePanel.init('console', true);
+    this.consolePanel.init(doc, 'console', true);
     
     this.console = {
         panel: this.consolePanel,
@@ -55,7 +59,7 @@ LOG.Logger.prototype.init = function(doc) {
     var me = this;
     
     this.htmlPanel = new LOG.LogPanel;
-    this.htmlPanel.init('html', false);
+    this.htmlPanel.init(doc, 'html', false);
     this.htmlPanel.onselect = function() {
         if (!me.htmlLogItem) {
             me.htmlLogItem = new LOG.HTMLElementLogItem;
@@ -70,7 +74,7 @@ LOG.Logger.prototype.init = function(doc) {
     };
     
     this.pagePanel = new LOG.LogPanel;
-    this.pagePanel.init('page', false);
+    this.pagePanel.init(doc, 'page', false);
     this.pagePanel.onselect = function() {
         function createPageLogItem() {
             if (!self[LOG.pageObjectName]) {
@@ -90,15 +94,15 @@ LOG.Logger.prototype.init = function(doc) {
         count: 0
     };
         
-    this.commandEditor = new LOG.CommandEditor;
-    this.commandEditor.init(doc, this.evaluator, function() { me.updateCommandEditorSize() } );
-    this.element.appendChild(this.commandEditor.element);
+    //~ this.commandEditor = new LOG.CommandEditor;
+    //~ this.commandEditor.init(doc, this.evaluator, function() { me.updateCommandEditorSize() } );
+    //~ this.element.appendChild(this.commandEditor.element);
     
     var me = this;
     function append() {
         if (!LOG.willOpenInNewWindow) {
             this.bodyWrapper = new LOG.BodyWrapper;
-            this.bodyWrapper.init(me.ownerDocument, me.element);
+            this.bodyWrapper.init(doc, me.element);
         } else {
             doc.body.appendChild(me.element);
         }
@@ -186,4 +190,3 @@ LOG.Logger.prototype.onNewWindowClick = function(event) {
     this.createElement();
     LOG.addCookie('LOG_IN_NEW_WINDOW', LOG.willOpenInNewWindow ? 'true' : 'false', 30);
 }
-
