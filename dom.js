@@ -275,10 +275,10 @@ LOG.createElement = function(ownerDocument, tagName, attributes, childNodes) {
 //  have event as a parameter but will call the callback with 2 parameters:
 //  event and the extra parameter passed. This also handles the missing event
 //  parameter from explorer.
-LOG.createEventHandler = function(obj, methodName, parameter) {
+LOG.createEventHandler = function(doc, obj, methodName, parameter) {
     return function(event) {
         if (!event) {
-            event = LOG.console.getWindow().event;
+            event = doc.parentWindow.event;
         }
         obj[methodName].call(obj, event, parameter);
     }

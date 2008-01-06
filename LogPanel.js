@@ -6,7 +6,7 @@ LOG.LogPanel.prototype.init = function(doc, name, selected) {
             style: {
                 cursor: 'pointer'
             },
-            onclick: LOG.createEventHandler(this, 'onLabelClick')
+            onclick: LOG.createEventHandler(doc, this, 'onLabelClick')
         },
         [ name ]
     );

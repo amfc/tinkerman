@@ -1,7 +1,7 @@
 LOG.Class('CommandInput');
 
-LOG.CommandInput.prototype.init = function(ownerDocument, useTextArea, evaluator) {
-    this.ownerDocument = ownerDocument;
+LOG.CommandInput.prototype.init = function(doc, useTextArea, evaluator) {
+    this.doc = doc;
     this.evaluator = evaluator;
     this.useTextArea = useTextArea;
     
@@ -22,7 +22,7 @@ LOG.CommandInput.prototype.init = function(ownerDocument, useTextArea, evaluator
     }
     
     this.element = LOG.createElement(
-        this.ownerDocument,
+        this.doc,
         useTextArea ? 'textarea' : 'input',
         {
             style: {
@@ -33,7 +33,7 @@ LOG.CommandInput.prototype.init = function(ownerDocument, useTextArea, evaluator
                 fontSize: '13px',
                 fontWeight: 'normal'
             },
-            onkeydown: LOG.createEventHandler(this, 'onInputKeyDown'),
+            onkeydown: LOG.createEventHandler(doc, this, 'onInputKeyDown'),
             mousedown: function(event) {
                 if (!event) {
                     event = LOG.console.getWindow().event;
@@ -119,9 +119,6 @@ LOG.CommandInput.prototype.onInputKeyDown = function($event) {
             }
         }
         return common;
-    }
-    if (!$event) {
-        $event = LOG.console.getWindow().event;
     }
     if ($event.keyCode == 13) {
         if (!this.useTextArea || $event.ctrlKey) {

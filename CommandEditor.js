@@ -49,7 +49,7 @@ LOG.CommandEditor.prototype.init = function(ownerDocument, evalCallback, resizeC
                                                         fontWeight: 'normal',
                                                         fontSize: '12px'
                                                     },
-                                                    onclick: LOG.createEventHandler(this, 'onToggleTextAreaClick')
+                                                    onclick: LOG.createEventHandler(doc, this, 'onToggleTextAreaClick')
                                                 },
                                                 [ 'big' ]
                                             )

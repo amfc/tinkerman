@@ -17,7 +17,7 @@ LOG.Logger.prototype.init = function(doc, inNewWindow) {
                         style: {
                             fontWeight: 'normal'
                         },
-                        onclick: LOG.createEventHandler(this, 'onClearClick')
+                        onclick: LOG.createEventHandler(doc, this, 'onClearClick')
                     },
                     [ 'clear' ]
                 ),
@@ -28,7 +28,7 @@ LOG.Logger.prototype.init = function(doc, inNewWindow) {
                         style: {
                             fontWeight: 'normal'
                         },
-                        onclick: LOG.createEventHandler(this, 'onCloseClick')
+                        onclick: LOG.createEventHandler(doc, this, 'onCloseClick')
                     },
                     [ 'close' ]
                 ),
@@ -39,7 +39,7 @@ LOG.Logger.prototype.init = function(doc, inNewWindow) {
                         style: {
                             fontWeight: 'normal'
                         },
-                        onclick: LOG.createEventHandler(this, 'onNewWindowClick')
+                        onclick: LOG.createEventHandler(doc, this, 'onNewWindowClick')
                     },
                     [ this.inNewWindow ? 'same window' : 'new window' ]
                 ),

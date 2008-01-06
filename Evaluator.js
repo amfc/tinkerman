@@ -8,7 +8,7 @@ LOG.Evaluator.prototype.init = function(console) {
 LOG.Evaluator.prototype.log = function(message, title, newLineAfterTitle, consoleName, dontOpen, stackedMode) {
     this.console.appendRow(
         LOG.getValueAsHtmlElement(
-            document, // FIXME HARDCODED!!
+            this.console.doc,
             message,
             stackedMode == undefined ?
             this.stackedMode :

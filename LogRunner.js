@@ -15,7 +15,7 @@ LOG.LogRunner.prototype.init = function() {
 
 LOG.LogRunner.prototype.appendLogger = function() {
     this.logger = new LOG.Logger;
-    this.logger.init(document, this.willOpenInNewWindow);
+    this.logger.init(this.doc, this.willOpenInNewWindow);
     this.logger.onnewwindowtoggleclick = (function(me) { return function() { me.onLoggerNewWindowToggleClick() } })(this);
     
     if (!this.willOpenInNewWindow) {
