@@ -47,6 +47,7 @@ LOG.LogRunner.prototype.onLoggerNewWindowToggleClick = function() {
     this.willOpenInNewWindow = !this.willOpenInNewWindow;
     this.doc = this.prepareNewDocument();
     this.appendLogger();
+    this.logger.focus();
 }
 
 LOG.LogRunner.prototype.getLogger = function() {
@@ -114,21 +115,9 @@ LOG.LogRunner.prototype.onKeyDown = function(event) {
             }
         } else if (chr == 'i') {
             this.onLoggerNewWindowToggleClick(event);
-            setTimeout(
-                function() {
-                    if (this.doc.defaultView) {
-                        this.doc.defaultView.focus();
-                    }  else {
-                        this.doc.parentWindow.focus();
-                    }
-                    this.logger.focus();
-               }, 0
-            );
         } else if (this.logger) {
             //~ if (chr == 'c') {
                 //~ LOG.console.onClearClick(event);
-            //~ } else if (chr == 'p') {
-                //~ LOG.console.onPauseClick(event);
             //~ } else if (chr == 'k') {
                 //~ LOG.console.onCloseClick(event);
             //~ } else if (chr == 'h') {
