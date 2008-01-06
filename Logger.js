@@ -116,6 +116,14 @@ LOG.Logger.prototype.updateCommandEditorSize = function() {
     this.box.setChildSize(1, this.commandEditor.getHeight(), 'em');
 }
 
+LOG.Logger.prototype.onNewWindowClick = function(event) {
+    LOG.stopPropagation(event);
+    LOG.preventDefault(event);
+    if (this.onnewwindowtoggleclick) {
+        this.onnewwindowtoggleclick();
+    }
+}
+
 
 
 
@@ -148,14 +156,6 @@ LOG.Logger.prototype.onCloseClick = function(event) {
     LOG.preventDefault(event);
     if (this.oncloseclick) {
         this.oncloseclick();
-    }
-}
-
-LOG.Logger.prototype.onNewWindowClick = function(event) {
-    LOG.stopPropagation(event);
-    LOG.preventDefault(event);
-    if (this.onnewwindowtoggleclick) {
-        this.onnewwindowtoggleclick();
     }
 }
 
