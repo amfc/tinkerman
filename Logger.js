@@ -97,8 +97,11 @@ LOG.Logger.prototype.init = function(doc, inNewWindow) {
         //~ count: 0
     //~ };
     
+    this.historyManager = new LOG.HistoryManager;
+    this.historyManager.init();
+    
     this.commandEditor = new LOG.CommandEditor;
-    this.commandEditor.init(doc, this.evaluator, function() { me.updateCommandEditorSize() } );
+    this.commandEditor.init(doc, this.evaluator, function() { me.updateCommandEditorSize() }, this.historyManager);
     
     this.box.add(this.panelManager.element, { size: 100, sizeUnit: '%' });
     this.box.add(this.commandEditor.element, { size: this.commandEditor.getHeight(), sizeUnit: 'em' });

@@ -1,12 +1,12 @@
 LOG.Class('CommandEditor');
 
-LOG.CommandEditor.prototype.init = function(ownerDocument, evalCallback, resizeCallback) {
-    var doc = ownerDocument;
-    this.ownerDocument = ownerDocument;
+LOG.CommandEditor.prototype.init = function(doc, evalCallback, resizeCallback, historyManager) {
+    this.doc = doc;
     this.evalCallback = evalCallback;
     this.resizeCallback = resizeCallback;
+    this.historyManager = historyManager;
     
-    this.element = LOG.createElement(doc, 'div',
+    this.element = LOG.createElement(this.doc, 'div',
         {
             style: {
                 height: '100%',
@@ -14,7 +14,7 @@ LOG.CommandEditor.prototype.init = function(ownerDocument, evalCallback, resizeC
             }
         },
         [
-            this.inputTable = LOG.createElement(doc, 'table',
+            this.inputTable = LOG.createElement(this.doc, 'table',
                 {
                     style: {
                         height: '100%',
@@ -23,18 +23,18 @@ LOG.CommandEditor.prototype.init = function(ownerDocument, evalCallback, resizeC
                     }
                 },
                 [
-                    LOG.createElement(doc, 'tbody', {},
+                    LOG.createElement(this.doc, 'tbody', {},
                         [
-                            LOG.createElement(doc, 'tr', {},
+                            LOG.createElement(this.doc, 'tr', {},
                                 [
-                                    this.inputTd = LOG.createElement(doc, 'td', {
+                                    this.inputTd = LOG.createElement(this.doc, 'td', {
                                             style: {
                                                 width: '100%',
                                                 verticalAlign: 'bottom'
                                             }
                                         }
                                     ),
-                                    this.toggleTextAreaTd = LOG.createElement(doc, 'td',
+                                    this.toggleTextAreaTd = LOG.createElement(this.doc, 'td',
                                         {
                                             style: {
                                                 width: '10px',
@@ -42,14 +42,14 @@ LOG.CommandEditor.prototype.init = function(ownerDocument, evalCallback, resizeC
                                             }
                                         },
                                         [
-                                            this.toggleTextAreaLink = LOG.createElement(doc, 'a',
+                                            this.toggleTextAreaLink = LOG.createElement(this.doc, 'a',
                                                 {
                                                     href: '#',
                                                     style: {
                                                         fontWeight: 'normal',
                                                         fontSize: '12px'
                                                     },
-                                                    onclick: LOG.createEventHandler(doc, this, 'onToggleTextAreaClick')
+                                                    onclick: LOG.createEventHandler(this.doc, this, 'onToggleTextAreaClick')
                                                 },
                                                 [ 'big' ]
                                             )
@@ -83,7 +83,7 @@ LOG.CommandEditor.prototype.setIsBig = function(isBig, dontNotifyParent) {
         this.commandInput.element.parentNode.removeChild(this.commandInput.element);
     }
     this.commandInput = new LOG.CommandInput;
-    this.commandInput.init(this.ownerDocument, this.textAreaBig, this.evalCallback);
+    this.commandInput.init(this.doc, this.textAreaBig, this.evalCallback, this.historyManager);
     this.inputTd.appendChild(this.commandInput.element);
     
     if (this.textAreaBig) {

@@ -1,25 +1,11 @@
 LOG.Class('CommandInput');
 
-LOG.CommandInput.prototype.init = function(doc, useTextArea, evaluator) {
+LOG.CommandInput.prototype.init = function(doc, useTextArea, evaluator, historyManager) {
     this.doc = doc;
     this.evaluator = evaluator;
     this.useTextArea = useTextArea;
     
-    //~ this.history = LOG.getCookie('LOG_HISTORY');
-    if (this.history) {
-        try {
-            this.history = eval('(' + this.history + ')');
-            if (this.history.length > 0) {
-                this.historyPosition = this.history.length;
-            }
-        } catch (e) {
-            this.history = [];
-            this.historyPosition = -1;
-        }
-    } else {
-        this.history = [];
-        this.historyPosition = -1;
-    }
+    this.historyManager = historyManager;
     
     this.element = LOG.createElement(
         this.doc,
@@ -122,10 +108,7 @@ LOG.CommandInput.prototype.onInputKeyDown = function($event) {
     }
     if ($event.keyCode == 13) {
         if (!this.useTextArea || $event.ctrlKey) {
-            if (this.history[this.history.length - 1] != this.element.value) {
-                this.history.push(this.element.value);
-            }
-            this.historyPosition = this.history.length;
+            this.historyManager.add(this.element.value);
             this.evaluator.evalScriptAndPrintResults(this.element.value);
             LOG.stopPropagation($event);
             LOG.preventDefault($event);
@@ -207,20 +190,11 @@ LOG.CommandInput.prototype.onInputKeyDown = function($event) {
             LOG.setTextInputSelection(this.element, [commonStartPos, commonStartPos]);
         }
     } else if ($event.keyCode == 38 && (!this.useTextArea || $event.ctrlKey)) { // Up
-        if (this.historyPosition > 0) {
-            --this.historyPosition;
-            this.element.value = this.history[this.historyPosition];
-        }
+        this.element.value = this.historyManager.up();
         LOG.stopPropagation($event);
         LOG.preventDefault($event);
     } else if ($event.keyCode == 40 && (!this.useTextArea || $event.ctrlKey)) { // Down
-        if (this.historyPosition == this.history.length - 1) {
-            this.element.value = '';
-            this.historyPosition == this.history.length;
-        } else if (this.historyPosition != -1 && this.historyPosition < this.history.length - 1) {
-            ++this.historyPosition;
-            this.element.value = this.history[this.historyPosition];
-        }
+        this.element.value = this.historyManager.down();
         LOG.stopPropagation($event);
         LOG.preventDefault($event);
     }
