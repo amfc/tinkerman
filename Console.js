@@ -59,7 +59,7 @@ LOG.Console.prototype.appendRow = function(messageHtmlFragment, title, newLineAf
     if (LOG.isGecko) {
         newRow.style.whiteSpace = '-moz-pre-wrap';
     } else {
-        newRow.style.whiteSpace = 'pre';
+        newRow.style.whiteSpace = 'pre'; // FIXME: doesn't seem to work in IE
     }
     newRow.style.padding = '2px';
     if (this.count & 1) {
