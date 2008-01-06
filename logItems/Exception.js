@@ -1,8 +1,8 @@
 // This works with JS and PHP exceptions traces
 LOG.Class('ExceptionLogItem');
 
-LOG.ExceptionLogItem.prototype.init = function(value) {
-    var doc = LOG.console.ownerDocument;
+LOG.ExceptionLogItem.prototype.init = function(doc, value) {
+    this.doc = doc;
     var link;
     var me = this;
     this.showingMoreInfo = false;
@@ -15,13 +15,13 @@ LOG.ExceptionLogItem.prototype.init = function(value) {
     }
     
     this.element = LOG.createElement(
-        doc, 'span',
+        this.doc, 'span',
         {},
         [
-            LOG.getGetPositionInVariablesElement(doc, value),
+            LOG.getGetPositionInVariablesElement(this.doc, value),
             '«',
             link = LOG.createElement(
-                doc, 'a',
+                this.doc, 'a',
                 {
                     style: {
                         textDecoration: 'none',
@@ -36,14 +36,7 @@ LOG.ExceptionLogItem.prototype.init = function(value) {
                         link.style.textDecoration = 'none';
                         link.style.color = 'red';
                     },
-                    onclick: function(event) {
-                        if (!event) {
-                            event = LOG.console.getWindow().event;
-                        }
-                        LogAndStore(value);
-                        LOG.stopPropagation(event);
-                        LOG.preventDefault(event);
-                    }
+                    onclick: LOG.createEventHandler(this.doc, this, 'onNameLinkClik')
                 },
                 [ value.name ? value.name : 'Exception' ]
             ),
@@ -52,7 +45,7 @@ LOG.ExceptionLogItem.prototype.init = function(value) {
             LOG.isGecko ? ' in ' : null,
             (LOG.isGecko && this.value.fileName) ? this.getFileLink(this.getLocalFile(this.value.fileName), this.value.lineNumber) : null,
             ' ',
-            this.showMoreLink = LOG.createElement(doc, 'a',
+            this.showMoreLink = LOG.createElement(this.doc, 'a',
                 {
                     style: {
                         textDecoration: 'underline',
@@ -67,21 +60,27 @@ LOG.ExceptionLogItem.prototype.init = function(value) {
                         me.showMoreLink.style.textDecoration = 'underline';
                         me.showMoreLink.style.color = 'black';
                     },
-                    onclick: function(event) {
-                        if (!event) {
-                            event = LOG.console.getWindow().event;
-                        }
-                        LOG.preventDefault(event);
-                        LOG.stopPropagation(event);
-                        me.toggleShowMoreInfo();
-                    }
+                    onclick: LOG.createEventHandler(this.doc, this, 'onShowMoreLinkClick')
                 },
                 [ 'more' ]
             ),
-            this.moreInfoSpan = LOG.createElement(doc, 'span'),
+            this.moreInfoSpan = LOG.createElement(this.doc, 'span'),
             '»'
         ]
     );
+}
+
+LOG.ExceptionLogItem.prototype.onShowMoreLinkClick = function(event) {
+    LOG.preventDefault(event);
+    LOG.stopPropagation(event);
+    this.toggleShowMoreInfo();
+}
+
+
+LOG.ExceptionLogItem.prototype.onNameLinkClick = function(event) {
+    LogAndStore(value);
+    LOG.stopPropagation(event);
+    LOG.preventDefault(event);
 }
 
 LOG.ExceptionLogItem.prototype.toggleShowMoreInfo = function() {
@@ -137,17 +136,16 @@ function getStackFromArguments() {
 LOG.ExceptionLogItem.prototype.getStackFromArguments = getStackFromArguments;
 
 LOG.ExceptionLogItem.prototype.getStackHtmlElement = function(fileName, lineNumber) {
-    var doc = LOG.console.ownerDocument;
     var stackArray;
     if (LOG.isIE) {
-        return LOG.getValueAsHtmlElement(doc, this.stack);
+        return LOG.getValueAsHtmlElement(this.doc, this.stack);
     } else if (this.value.stack) {
         if (typeof this.value.stack == 'string') {
             stackArray = this.getStackAsArray(this.value.stack);
         } else {
             stackArray = this.value.stack;
         }
-        var element = LOG.createElement(doc, 'div');
+        var element = LOG.createElement(this.doc, 'div');
         var link;
         for (var i = 1; i < stackArray.length; ++i) {
             if (stackArray[i].file && stackArray[i].line) {
@@ -158,16 +156,16 @@ LOG.ExceptionLogItem.prototype.getStackHtmlElement = function(fileName, lineNumb
                 link = null;
             }
             element.appendChild(
-                LOG.createElement(doc, 'div',
+                LOG.createElement(this.doc, 'div',
                     {},
                     [
                         link,
                         link ? ': ' + stackArray[i]['function'] : stackArray[i]['function'],
-                        stackArray[i]['args'] ? LOG.createElement(doc, 'span',
+                        stackArray[i]['args'] ? LOG.createElement(this.doc, 'span',
                             {},
                             [
                                 ' (',
-                                LOG.getValueAsHtmlElement(doc, stackArray[i]['args']),
+                                LOG.getValueAsHtmlElement(this.doc, stackArray[i]['args']),
                                 ')'
                             ]
                         ) : null
@@ -178,7 +176,7 @@ LOG.ExceptionLogItem.prototype.getStackHtmlElement = function(fileName, lineNumb
         return element;
     } else {
         return LOG.createElement(
-            LOG.console.ownerDocument, 'div',
+            this.doc, 'div',
             {
             },
             [
@@ -190,7 +188,7 @@ LOG.ExceptionLogItem.prototype.getStackHtmlElement = function(fileName, lineNumb
 
 LOG.ExceptionLogItem.prototype.getFileLink = function(fileName, lineNumber) {
     return LOG.createElement(
-        LOG.console.ownerDocument, 'a',
+        this.doc, 'a',
         {
             href: 'openFile.php?file=' + escape(fileName) + '&line=' + lineNumber
         },

@@ -87,7 +87,7 @@ LOG.Evaluator.prototype.evalScript = function($script) {
         return this.evaluate($script, vars);
     } catch (e) {
         var logItem = new LOG.ExceptionLogItem;
-        logItem.init(e);
+        logItem.init(this.console.doc, e);
         this.console.appendRow(
             logItem.element,
             'error ' + $script,

@@ -54,7 +54,7 @@ function Log(message, title, section, dontOpen, stackedMode) {
 }
 
 function LogAndStore(value, source) {
-    return LOG.logger.evaluator.logAndStore(value, source);
+    return LOG.logRunner.getLogger().evaluator.logAndStore(value, source);
 }
 
 function LogX(str) { // Log in external window
@@ -72,8 +72,8 @@ function LogE(expression) {
 
 function LogError(e) {
     var logItem = new LOG.ExceptionLogItem;
-    logItem.init(e);
-    LOG.console.appendRow(
+    logItem.init(LOG.logRunner.getLogger().evaluator.console.doc, e);
+    LOG.logRunner.getLogger().evaluator.console.appendRow(
         logItem.element,
         'error',
         true,
