@@ -85,7 +85,7 @@ LOG.Console.prototype.appendRow = function(messageHtmlFragment, title, newLineAf
         this.element.insertBefore(newRow, this.element.firstChild);
     } else {
         this.element.appendChild(newRow);
-        this.element.scrollTop = this.element.scrollHeight - this.element.offsetHeight + 1;
+        this.element.parentNode.scrollTop = this.element.parentNode.scrollHeight - this.element.parentNode.offsetHeight + 1;
     }
 }
 
