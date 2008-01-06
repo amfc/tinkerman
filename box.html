@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+<script src="box.js" type="text/javascript"></script>
+<style type="text/css">
+.vbox {
+  position: relative;
+  overflow: hidden;
+  height: 0;
+}
+.vbox > div {
+  position: relative;
+}
+.vbox > div > div {
+  height: 100%;
+  overflow: hidden;
+}
+.hbox {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+}
+.hbox > div {
+  float: left;
+  position: relative;
+}
+.hbox > div > div {
+  height: 100%;
+  overflow: hidden;
+}
+</style>
+<title>Sample box</title>
+</head>
+<body>
+
+<script type="text/javascript">
+var box = new Vbox;
+box.init(document, []);
+box.element.style.height = '100%';
+
+box.add(
+    document.createTextNode('hi!'),
+    { size: 75, sizeUnit: '%', minSize: 0, minSizeUnit: 'px' }
+);
+box.add(
+    document.createTextNode('pepe!'),
+    { size: 25, sizeUnit: '%', minSize: 0, minSizeUnit: 'px' }
+);
+document.body.appendChild(box.element);
+</script>
+
+</body>
+</html>
