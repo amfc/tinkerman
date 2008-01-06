@@ -58,7 +58,9 @@ LOG.BodyWrapper.prototype.init = function(ownerDocument, elementToWrap) {
         ]
     );
     this.oldBodyOverflow = document.body.style.overflow;
+    this.oldBodyMargin = document.body.style.margin;
     document.body.style.overflow = 'hidden';
+    document.body.style.margin = '0';
     
     var size = LOG.getCookie('LOG_SIZE');
     if (!size || isNaN(size = parseFloat(size))) {
@@ -89,6 +91,7 @@ LOG.BodyWrapper.prototype.uninit = function() {
     delete this.topElement;
     delete this.bottomElement;
     document.body.style.overflow = this.oldBodyOverflow ? this.oldBodyOverflow : '';
+    document.body.style.margin = this.oldBodyMargin ? this.oldBodyMargin : '';
     LOG.removeObjEventListener(this, this.resizeHandle, 'mousedown', this.onResizeHandleMousedown);
 }
 
