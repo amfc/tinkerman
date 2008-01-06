@@ -170,10 +170,9 @@ LOG.getBody = function(element) {
 // This works both with <input type=text>s and <textarea>s
 // returns an array [start, end]
 LOG.getTextInputSelection = function(element) {
-    var document = LOG.console.ownerDocument;
     if (LOG.isIE) {
         var start = null, end = null;
-        var selection = document.selection.createRange();
+        var selection = element.ownerDocument.selection.createRange();
         
         var elementSelection;
         if (element.tagName.toLowerCase() == 'textarea') {
