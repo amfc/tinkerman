@@ -1,16 +1,16 @@
-if (typeof AbstractBox == 'undefined') {
-    function AbstractBox() {
+if (!LOG.AbstractBox) {
+    LOG.AbstractBox = function() {
     }
 }
 
-AbstractBox.prototype.init = function(doc, boxItemSizes) {
+LOG.AbstractBox.prototype.init = function(doc, boxItemSizes) {
     this.doc = doc;
     this.element = doc.createElement('div');
     this.element.className = this.className;
     this.sizes = boxItemSizes;
 }
 
-AbstractBox.prototype.getFixedSize = function() {
+LOG.AbstractBox.prototype.getFixedSize = function() {
     var totalFixedSize = 0, fixedSizeUnit, unitName, item;
     for (var i = 0; i < this.sizes.length; ++i) {
         item = this.sizes[i];
@@ -27,7 +27,7 @@ AbstractBox.prototype.getFixedSize = function() {
     return { size: totalFixedSize, name: fixedSizeUnit };
 }
 
-AbstractBox.prototype.getTotalMinimumSize = function() {
+LOG.AbstractBox.prototype.getTotalMinimumSize = function() {
     var totalFixedSize = 0, fixedSizeUnit, unitValue, item, unitName;
     for (var i = 0; i < this.sizes.length; ++i) {
         item = this.sizes[i];
@@ -54,7 +54,7 @@ AbstractBox.prototype.getTotalMinimumSize = function() {
 }
 
 // How much can this child can expand before compromising other children's minimum sizes?
-AbstractBox.prototype.getChildAvailableSize = function(childNumber) {
+LOG.AbstractBox.prototype.getChildAvailableSize = function(childNumber) {
     var totalFixedSize = 0, item;
     var totalSize = 0;
     for (var i = 0; i < this.sizes.length; ++i) {
@@ -74,7 +74,7 @@ AbstractBox.prototype.getChildAvailableSize = function(childNumber) {
 }
 
 // This only works with pixels or percentages
-AbstractBox.prototype.getExtraSpaceNeededToResizeChild = function(childNumber, newSize) {
+LOG.AbstractBox.prototype.getExtraSpaceNeededToResizeChild = function(childNumber, newSize) {
     var usedSpace = 0;
     for (var i = 0; i < this.sizes.length; ++i) {
         if (i == childNumber) {
@@ -101,11 +101,11 @@ AbstractBox.prototype.getExtraSpaceNeededToResizeChild = function(childNumber, n
 }
 
 // This only works if the all minimum sizes are specified in pixels
-AbstractBox.prototype.getChildOffsetSize = function(childNumber) {
+LOG.AbstractBox.prototype.getChildOffsetSize = function(childNumber) {
     return this.element.childNodes[childNumber].firstChild[this.sizeProperty == 'width' ? 'offsetWidth' : 'offsetHeight'];
 }
 
-AbstractBox.prototype.updateSizes = function() {
+LOG.AbstractBox.prototype.updateSizes = function() {
     function setStyle(element, property, value) {
         element.style.setProperty(property, value, null);
     }
@@ -140,43 +140,45 @@ AbstractBox.prototype.updateSizes = function() {
     }
 }
 
-AbstractBox.prototype.setChildSize = function(childNumber, size, sizeUnit) {
+LOG.AbstractBox.prototype.setChildSize = function(childNumber, size, sizeUnit) {
     this.sizes[childNumber].size = size;
     this.sizes[childNumber].sizeUnit = sizeUnit;
     this.updateSizes();
 }
 
-AbstractBox.prototype.getChildSize = function(childNumber) {
+LOG.AbstractBox.prototype.getChildSize = function(childNumber) {
     return this.sizes[childNumber];
 }
 
-AbstractBox.prototype.add = function(element, size) { //  size: { size, sizeUnit: '%' | 'px', minSize, minSizeUnit }
+LOG.AbstractBox.prototype.add = function(element, size) { //  size: { size, sizeUnit: '%' | 'px', minSize, minSizeUnit }
     var outer = this.doc.createElement('div');
     var inner = this.doc.createElement('div');
+    outer.className = 'LOG_box_outer';
     outer.appendChild(inner);
     inner.appendChild(element);
+    outer.className = 'LOG_box_inner';
     this.sizes.push(size);
     this.element.appendChild(outer);
     this.updateSizes();
 }
 
-if (typeof Hbox == 'undefined') {
-    function Hbox() {
+if (!LOG.Hbox) {
+    LOG.Hbox = function() {
     }
 }
 
-Hbox.prototype = new AbstractBox;
-Hbox.prototype.sizeProperty = 'width';
-Hbox.prototype.reservedSpacePosition = 'right';
-Hbox.prototype.className = 'hbox';
+LOG.Hbox.prototype = new LOG.AbstractBox;
+LOG.Hbox.prototype.sizeProperty = 'width';
+LOG.Hbox.prototype.reservedSpacePosition = 'right';
+LOG.Hbox.prototype.className = 'LOG_hbox';
 
 
-if (typeof Vbox == 'undefined') {
-    function Vbox() {
+if (!LOG.Vbox) {
+    LOG.Vbox = function() {
     }
 }
 
-Vbox.prototype = new AbstractBox;
-Vbox.prototype.sizeProperty = 'height';
-Vbox.prototype.reservedSpacePosition = 'bottom';
-Vbox.prototype.className = 'vbox';
+LOG.Vbox.prototype = new LOG.AbstractBox;
+LOG.Vbox.prototype.sizeProperty = 'height';
+LOG.Vbox.prototype.reservedSpacePosition = 'bottom';
+LOG.Vbox.prototype.className = 'LOG_vbox';
