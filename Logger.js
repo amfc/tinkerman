@@ -1,7 +1,8 @@
 LOG.Class('Logger');
 
 LOG.Logger.prototype.init = function(doc, inNewWindow) {
-    this.consoles = {};
+    this.doc = doc;
+    this.panels = {};
     this.inNewWindow = inNewWindow;
     this.box = new LOG.Vbox;
     this.box.init(doc);
@@ -48,61 +49,53 @@ LOG.Logger.prototype.init = function(doc, inNewWindow) {
         )
     );
     
-    this.consolePanel = new LOG.LogPanel;
-    this.consolePanel.init(doc, 'console', true);
-    this.consolePanel.setSelected(true);
+    // create the default console
+    
     var console = new LOG.Console;
     console.init(doc);
     this.evaluator = new LOG.Evaluator;
     this.evaluator.init(console);
-    this.consolePanel.contentElement.appendChild(console.element);
     
-    this.panelManager.add(this.consolePanel);
+    var consolePanel = this.addPanel('console', console);
+    consolePanel.setSelected(true);
     
-    this.console = {
-        panel: this.consolePanel,
-        count: 0
-    }
+    //~ var me = this;
     
-    this.consoles.console = this.console;
+    //~ this.htmlPanel = new LOG.LogPanel;
+    //~ this.htmlPanel.init(doc, 'html', false);
+    //~ this.htmlPanel.onselect = function() {
+        //~ if (!me.htmlLogItem) {
+            //~ me.htmlLogItem = new LOG.HTMLElementLogItem;
+            //~ me.htmlLogItem.init(document.getElementsByTagName('html')[0], false, [], true);
+            //~ me.htmlPanel.contentElement.appendChild(me.htmlLogItem.element);
+        //~ }
+    //~ }
     
-    var me = this;
+    //~ this.consoles.html = {
+        //~ panel: this.htmlPanel,
+        //~ count: 0
+    //~ };
     
-    this.htmlPanel = new LOG.LogPanel;
-    this.htmlPanel.init(doc, 'html', false);
-    this.htmlPanel.onselect = function() {
-        if (!me.htmlLogItem) {
-            me.htmlLogItem = new LOG.HTMLElementLogItem;
-            me.htmlLogItem.init(document.getElementsByTagName('html')[0], false, [], true);
-            me.htmlPanel.contentElement.appendChild(me.htmlLogItem.element);
-        }
-    }
+    //~ this.pagePanel = new LOG.LogPanel;
+    //~ this.pagePanel.init(doc, 'page', false);
+    //~ this.pagePanel.onselect = function() {
+        //~ function createPageLogItem() {
+            //~ if (!self[LOG.pageObjectName]) {
+                //~ setTimeout(createPageLogItem, 1000);
+                //~ return;
+            //~ }
+            //~ if (!me.pageLogItem) {
+                //~ me.pageLogItem = LOG.getValueAsLogItem(doc, self[LOG.pageObjectName], true, []);
+                //~ me.pagePanel.contentElement.appendChild(me.pageLogItem.element);
+            //~ }
+        //~ }
+        //~ createPageLogItem();
+    //~ }
     
-    this.consoles.html = {
-        panel: this.htmlPanel,
-        count: 0
-    };
-    
-    this.pagePanel = new LOG.LogPanel;
-    this.pagePanel.init(doc, 'page', false);
-    this.pagePanel.onselect = function() {
-        function createPageLogItem() {
-            if (!self[LOG.pageObjectName]) {
-                setTimeout(createPageLogItem, 1000);
-                return;
-            }
-            if (!me.pageLogItem) {
-                me.pageLogItem = LOG.getValueAsLogItem(doc, self[LOG.pageObjectName], true, []);
-                me.pagePanel.contentElement.appendChild(me.pageLogItem.element);
-            }
-        }
-        createPageLogItem();
-    }
-    
-    this.consoles.page = {
-        panel: this.pagePanel,
-        count: 0
-    };
+    //~ this.consoles.page = {
+        //~ panel: this.pagePanel,
+        //~ count: 0
+    //~ };
     
     this.commandEditor = new LOG.CommandEditor;
     this.commandEditor.init(doc, this.evaluator, function() { me.updateCommandEditorSize() } );
@@ -140,25 +133,34 @@ LOG.Logger.prototype.onKeyDown = function(event) {
     }
 }
 
-// unchecked - unimplemented
-
-LOG.Logger.prototype.addConsole = function(consoleName, content) {
-    if (this.consoles[consoleName]) {
-        return this.consoles[consoleName];
+LOG.Logger.prototype.addPanel = function(panelName, content) {
+    if (this.panels[panelName]) {
+        return this.panels[panelName];
     }
-    return this.consoles[consoleName] = {
-        panel: this.panelManager.add(consoleName),
+    
+    var panel = new LOG.LogPanel;
+    panel.init(this.doc, panelName);
+    panel.contentElement.appendChild(content.element);
+    this.panelManager.add(panel);
+    
+    this.panels[panelName] = {
+        panel: panel,
         content: content
-    }
+    };
+    
+    return panel;
 }
+
+// unchecked - unimplemented
 
 
 LOG.Logger.prototype.onClearClick = function(event) {
     LOG.stopPropagation(event);
     LOG.preventDefault(event);
-    for (var consoleName in this.consoles) {
-        if (this.consoles[consoleName].panel.selected) {
-            this.consoles[consoleName].content.clear();
+    for (var panelName in this.panels) {
+        if (this.panels[panelName].panel.selected) {
+            this.panels[panelName].panel.setChanged(false);
+            this.panels[panelName].content.clear();
         }
     }
 }
@@ -168,6 +170,48 @@ LOG.Logger.prototype.onCloseClick = function(event) {
     LOG.preventDefault(event);
     if (this.oncloseclick) {
         this.oncloseclick();
+    }
+}
+
+// This searchs for some value in all the selected panels and focuses it
+LOG.Logger.prototype.focusValue = function(value, dontLog) {
+    // this takes into account the extra elements which the LOG could have added and ignores them
+    function getPathToNodeFromHtmlNode(node) {
+        var htmlNode = document.getElementsByTagName('html')[0];
+        var path = [];
+        while (node && node != htmlNode) {
+            path.unshift(LOG.getChildNodeNumber(node));
+            node = node.parentNode;
+            if (node == LOG.console.wrapperTopElement) {
+                node = document.body;
+            }
+        }
+        return path;
+    }
+    var path = LOG.guessDomNodeOwnerName(value);
+    if (!dontLog) {
+        // Log the path into the console panel
+        var logItem = new LOG.PathToObjectLogItem;
+        logItem.init(path);
+        this.appendRow(logItem.element);
+    }
+    if (path) {
+        if (value.nodeType) {
+            // Focus the element in the html panel
+            if (this.htmlLogItem) {
+                this.htmlLogItem.focusChild(getPathToNodeFromHtmlNode(value));
+            }
+        }
+        
+        // Focus the element in the page panel
+        if (this.pageLogItem) {
+            path.pathToObject.shift(); // remove the 'page' part
+            if (path.pathToObject.length == 0) {
+                LOG.focusAndBlinkElement(this.pageLogItem.element);
+            } else {
+                this.pageLogItem.focusProperty(path.pathToObject);
+            }
+        }
     }
 }
 
