@@ -1,8 +1,8 @@
 LOG.Class('Logger');
 
-LOG.Logger.prototype.init = function(doc) {
+LOG.Logger.prototype.init = function(doc, inNewWindow) {
     this.consoles = {};
-    
+    this.inNewWindow = inNewWindow;
     this.box = new LOG.Vbox;
     this.box.init(doc);
     
@@ -41,7 +41,7 @@ LOG.Logger.prototype.init = function(doc) {
                         },
                         onclick: LOG.createEventHandler(this, 'onNewWindowClick')
                     },
-                    [ LOG.willOpenInNewWindow ? 'same window' : 'new window' ]
+                    [ this.inNewWindow ? 'same window' : 'new window' ]
                 ),
                 ' (alt-i) '
             ]
@@ -107,26 +107,20 @@ LOG.Logger.prototype.init = function(doc) {
     this.commandEditor = new LOG.CommandEditor;
     this.commandEditor.init(doc, this.evaluator, function() { me.updateCommandEditorSize() } );
     
-    var me = this;
-    function append() {
-        if (!LOG.willOpenInNewWindow) {
-            this.bodyWrapper = new LOG.BodyWrapper;
-            this.bodyWrapper.init(doc, me.element);
-        } else {
-            doc.body.appendChild(me.element);
-        }
-    }
-    
     this.box.add(this.panelManager.element, { size: 100, sizeUnit: '%' });
     this.box.add(this.commandEditor.element, { size: this.commandEditor.getHeight(), sizeUnit: 'em' });
     this.element = this.box.element;
-    
-    if (doc.body) {
-        append();
-    } else {
-        LOG.addEventListener(window, 'load', append);
-    }
 }
+
+LOG.Logger.prototype.updateCommandEditorSize = function() {
+    this.box.setChildSize(1, this.commandEditor.getHeight(), 'em');
+}
+
+
+
+
+
+// unchecked - unimplemented
 
 LOG.Logger.prototype.addConsole = function(consoleName, content) {
     if (this.consoles[consoleName]) {
@@ -138,6 +132,7 @@ LOG.Logger.prototype.addConsole = function(consoleName, content) {
     }
 }
 
+
 LOG.Logger.prototype.onClearClick = function(event) {
     LOG.stopPropagation(event);
     LOG.preventDefault(event);
@@ -148,65 +143,19 @@ LOG.Logger.prototype.onClearClick = function(event) {
     }
 }
 
-LOG.Logger.prototype.close = function() {
-    if (!this.elementCreated || this.stopDebugging) {
-        return;
-    }
-    this.deleteElement();
-    this.stopDebugging = true;
-}
-
-LOG.Logger.prototype.deleteElement = function() {
-    if (!this.elementCreated) {
-        return;
-    }
-    if (this.bodyWrapper) {
-        this.bodyWrapper.uninit();
-        delete this.bodyWrapper;
-    }
-    if (this.htmlLogItem) {
-        delete this.htmlLogItem;
-    }
-    if (this.pageLogItem) {
-        delete this.pageLogItem;
-    }
-    this.elementCreated = false;
-}
-
 LOG.Logger.prototype.onCloseClick = function(event) {
-    this.close();
     LOG.stopPropagation(event);
     LOG.preventDefault(event);
-}
-
-LOG.Logger.prototype.hide = function() {
-    this.hidden = true;
-    if (this.bodyWrapper) {
-        this.bodyWrapper.hide();
-    }
-}
-
-LOG.Logger.prototype.show = function() {
-    this.hidden = false;
-    if (this.bodyWrapper) {
-        this.bodyWrapper.show();
+    if (this.oncloseclick) {
+        this.oncloseclick();
     }
 }
 
 LOG.Logger.prototype.onNewWindowClick = function(event) {
     LOG.stopPropagation(event);
     LOG.preventDefault(event);
-    LOG.willOpenInNewWindow = !LOG.willOpenInNewWindow;
-    this.deleteElement();
-    this.prepareNewDocument();
-    this.createElement();
-    LOG.addCookie('LOG_IN_NEW_WINDOW', LOG.willOpenInNewWindow ? 'true' : 'false', 30);
-}
-
-LOG.Logger.prototype.updateCommandEditorSize = function() {
-    this.box.setChildSize(1, this.commandEditor.getHeight(), 'em');
-    //~ if (this.scrollContainer) {
-        //~ this.scrollContainer.style.paddingBottom = this.commandEditor.getHeight() + 'em';
-    //~ }
+    if (this.onnewwindowtoggleclick) {
+        this.onnewwindowtoggleclick();
+    }
 }
 

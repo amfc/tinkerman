@@ -1,7 +1,6 @@
 LOG.Class('Console');
 
 LOG.Console.prototype.init = function(doc) {
-    this.elementCreated = false;
     this.maxCount = 1000;
     this.append = true;
     this.stopDebugging = false;
@@ -95,9 +94,6 @@ LOG.Console.prototype.appendRow = function(messageHtmlFragment, title, newLineAf
 }
 
 LOG.Console.prototype.clear = function(console) {
-    if (!this.elementCreated) {
-        return;
-    }
     if (!console) {
         console = this.console;
     } else {
@@ -111,34 +107,6 @@ LOG.Console.prototype.clear = function(console) {
         console.panel.contentElement.removeChild(console.panel.contentElement.firstChild);
     }
 }
-
-LOG.Console.prototype.prepareNewDocument = function() {
-    if (LOG.willOpenInNewWindow) {
-        if (!this.window || this.window.closed) {
-            this.window = window.open('', 'LOG_logWindow', 'resizable=yes,scrollbars=yes,status=yes');
-            if (!this.window) {
-                LOG.willOpenInNewWindow = false;
-                this.ownerDocument = document;
-                return document;
-            }
-        }
-        this.ownerDocument = this.window.document;
-        this.ownerDocument.open();
-        this.ownerDocument.write('<html><head><style>a { text-decoration: underline; cursor: pointer; color: #36a; }\n a:hover { color: #36f; }\n * { font-size: 9pt; font-family: monospace, verdana, sans-serif; } BODY { margin: 0 }</style></head><body></body></html>');
-        this.ownerDocument.close();
-        this.ownerDocument.title = 'Log: ' + window.document.title;
-        
-        return this.window.document;
-    } else {
-        if (this.window) {
-            this.window.close();
-        }
-        delete this.window;
-        this.ownerDocument = document;
-        return document;
-    }
-}
-
 
 // This searchs for some value in all the selected panels and focuses it
 LOG.Console.prototype.focusValue = function(value, dontLog) {

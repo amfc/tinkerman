@@ -40,7 +40,7 @@ if (LOG.getCookie('LOG_DEBUG_MODE') == "true") {
     //~ }
 //~ }
 
-LOG.logger = new LOG.Logger;
-LOG.logger.init(document);
+LOG.logRunner = new LOG.LogRunner;
+LOG.logRunner.init(document);
 
 LOG.loaded = true;
