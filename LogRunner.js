@@ -109,14 +109,6 @@ LOG.LogRunner.prototype.onKeyDown = function(event) {
             this.showLogger();
         } else if (chr == 'i') {
             this.onLoggerNewWindowToggleClick(event);
-        } else if (this.logger) {
-            //~ if (chr == 'c') {
-                //~ LOG.console.onClearClick(event);
-            //~ } else if (chr == 'k') {
-                //~ LOG.console.onCloseClick(event);
-            //~ } else if (chr == 'h') {
-                //~ LOG.console.onHideClick(event);
-            //~ }
         }
     }
 }

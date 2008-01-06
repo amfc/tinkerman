@@ -130,6 +130,15 @@ LOG.Logger.prototype.onKeyDown = function(event) {
         }
         LOG.stopPropagation(event);
         LOG.preventDefault(event);
+    } else {
+        var chr = String.fromCharCode(event.keyCode).toLowerCase();
+        if (event.altKey && event.shiftKey) {
+            if (chr == 'c') {
+                this.onClearClick(event);
+            } else if (chr == 'k') {
+                this.onCloseClick(event);
+            }
+        }
     }
 }
 
