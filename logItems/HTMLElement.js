@@ -187,8 +187,10 @@ LOG.HTMLElementLogItem.prototype.showElementOutline = function() {
 }
 
 LOG.HTMLElementLogItem.prototype.hideElementOutline = function() {
-    this.outlineElement.parentNode.removeChild(this.outlineElement);
-    delete this.outlineElement;
+    if (this.outlineElement) {
+        this.outlineElement.parentNode.removeChild(this.outlineElement);
+        delete this.outlineElement;
+    }
 }
 
 LOG.HTMLElementLogItem.prototype.getChildNodes = function() { // FIXME: Hack, works directly with BodyWrapper
