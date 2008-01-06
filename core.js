@@ -185,7 +185,7 @@ LOG.onClick = function(event) {
 }
 
 function Log(message, title, section, dontOpen, stackedMode) {
-    return LOG.logger.evaluator.log(message, title, true, section, dontOpen, stackedMode);
+    return LOG.logRunner.getLogger().evaluator.log(message, title, true, section, dontOpen, stackedMode);
 }
 
 function LogAndStore(value, source) {

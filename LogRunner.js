@@ -33,6 +33,10 @@ LOG.LogRunner.prototype.onLoggerNewWindowToggleClick = function() {
     this.appendLogger();
 }
 
+LOG.LogRunner.prototype.getLogger = function() {
+    return this.logger;
+}
+
 LOG.LogRunner.prototype.prepareNewDocument = function() {
     if (this.willOpenInNewWindow) {
         if (!this.window || this.window.closed) {
@@ -45,7 +49,7 @@ LOG.LogRunner.prototype.prepareNewDocument = function() {
         }
         this.ownerDocument = this.window.document;
         this.ownerDocument.open();
-        this.ownerDocument.write('<html><head><style>a { text-decoration: underline; cursor: pointer; color: #36a; }\n a:hover { color: #36f; }\n * { font-size: 9pt; font-family: monospace, verdana, sans-serif; } BODY { margin: 0 }</style></head><body></body></html>');
+        this.ownerDocument.write('<html><head><style> BODY { margin: 0em }</style></head><body></body></html>');
         this.ownerDocument.close();
         this.ownerDocument.title = 'Log: ' + window.document.title;
         
