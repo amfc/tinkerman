@@ -1,10 +1,3 @@
-//~ LOG.addEventListener(window, 'unload', LOG.onUnload);
-LOG.addEventListener(document, 'mousedown', LOG.onMouseDown, true);
-LOG.addEventListener(document, 'mouseup', LOG.onClick, true);
-LOG.addEventListener(document, 'click', LOG.onClick, true);
-LOG.addEventListener(document, 'keydown', LOG.onKeyDown, true);
-LOG.addEventListener(document, 'selectstart', LOG.onDocumentSelectStart, true);
-
 var DEBUG_MODE = false;
 
 if (LOG.getCookie('LOG_DEBUG_MODE') == "true") {

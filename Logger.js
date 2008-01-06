@@ -124,6 +124,10 @@ LOG.Logger.prototype.onNewWindowClick = function(event) {
     }
 }
 
+LOG.Logger.prototype.focus = function() {
+    this.commandEditor.focus();
+}
+
 
 
 
