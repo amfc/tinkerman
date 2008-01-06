@@ -109,18 +109,17 @@ LOG.runObjEventHandler = function(event, number) {
     LOG.objEventListeners[number].handler.call(LOG.objEventListeners[number].obj, event);
 }
 
-LOG.getWindowInnerSize = function() {
-    var document = LOG.console.ownerDocument;
+LOG.getWindowInnerSize = function(doc) {
     var w, h;
     if (self.innerHeight) { // all except Explorer
         w = self.innerWidth;
         h = self.innerHeight;
-    } else if (document.documentElement && document.documentElement.clientHeight) { // Explorer 6 Strict Mode
-        w = document.documentElement.clientWidth;
-        h = document.documentElement.clientHeight;
-    } else if (document.body) { // other
-        w = document.body.clientWidth;
-        h = document.body.clientHeight;
+    } else if (doc.documentElement && doc.documentElement.clientHeight) { // Explorer 6 Strict Mode
+        w = doc.documentElement.clientWidth;
+        h = doc.documentElement.clientHeight;
+    } else if (doc.body) { // other
+        w = doc.body.clientWidth;
+        h = doc.body.clientHeight;
     }
     return {w: w, h: h}
 }

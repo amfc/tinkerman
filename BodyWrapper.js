@@ -130,7 +130,7 @@ LOG.BodyWrapper.prototype.onSelectstart = function(event) {
 
 LOG.BodyWrapper.prototype.onMousemove = function(event) {
     if (this.dragging) {
-        var top = (event.clientY - this.originalDelta) / LOG.getWindowInnerSize().h;
+        var top = (event.clientY - this.originalDelta) / LOG.getWindowInnerSize(this.ownerDocument).h;
         if (top < 0) {
             top = 0;
         }
