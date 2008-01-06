@@ -201,7 +201,7 @@ LOG.Logger.prototype.focusValue = function(value, dontLog) {
     if (!dontLog) {
         // Log the path into the console panel
         var logItem = new LOG.PathToObjectLogItem;
-        logItem.init(path);
+        logItem.init(this.doc, path);
         this.appendRow(logItem.element);
     }
     if (path) {

@@ -1,42 +1,42 @@
 LOG.Class('PathToObjectLogItem');
 
-LOG.PathToObjectLogItem.prototype.init = function(value) {
-    var doc = LOG.console.ownerDocument;
+LOG.PathToObjectLogItem.prototype.init = function(doc, value) {
+    this.doc = doc;
     var me = this;
     this.value = value;
     this.element = LOG.createElement(
-        doc, 'span',
+        this.doc, 'span',
         {}
     );
     if (value) {
         var part, i;
         for (i = 0; i < value.pathToObject.length; ++i) {
             part = new LOG.PathToObjectPart;
-            part.init(value.pathToObject[i].obj, i == 0 ? value.pathToObject[i].name : LOG.getPropertyAccessor(value.pathToObject[i].name));
-            this.element.appendChild(LOG.createElement(doc, 'span', { style: { fontSize: '0.1pt' } }, [ ' ' ]));
+            part.init(this.doc, value.pathToObject[i].obj, i == 0 ? value.pathToObject[i].name : LOG.getPropertyAccessor(value.pathToObject[i].name));
+            this.element.appendChild(LOG.createElement(this.doc, 'span', { style: { fontSize: '0.1pt' } }, [ ' ' ]));
             this.element.appendChild(part.element);
         }
         var node = value.pathToObject[value.pathToObject.length - 1].obj;
         for (i = 0; i < value.pathToElement.length; ++i) {
             part = new LOG.PathToObjectPart;
             node = node.childNodes[value.pathToElement[i]];
-            part.init(node, '.childNodes[' + value.pathToElement[i] + ']');
+            part.init(this.doc, node, '.childNodes[' + value.pathToElement[i] + ']');
             this.element.appendChild(part.element);
         }
     } else {
-        this.element.appendChild(document.createTextNode('Could not compute path'));
+        this.element.appendChild(this.doc.createTextNode('Could not compute path'));
     }
 }
 
 LOG.Class('PathToObjectPart');
 
-LOG.PathToObjectPart.prototype.init = function(value, pathPartName) {
-    var doc = LOG.console.ownerDocument;
+LOG.PathToObjectPart.prototype.init = function(doc, value, pathPartName) {
+    this.doc = doc;
     this.value = value;
+    this.ctrlClick = false;
     var me = this;
-    var ctrlClick = false;
     var link = this.element = LOG.createElement(
-        doc, 'a',
+        this.doc, 'a',
         {
             style: {
                 textDecoration: 'none',
@@ -53,29 +53,28 @@ LOG.PathToObjectPart.prototype.init = function(value, pathPartName) {
                 link.style.color = 'black';
                 me.hideElementOutline();
             },
-            onmousedown: function(event) {
-                if (!event) {
-                    event = LOG.console.getWindow().event;
-                }
-                ctrlClick = LOG.getButtonFromEvent(event) == 'left' && event.ctrlKey;
-            },
-            onclick: function(event) {
-                if (!event) {
-                    event = LOG.console.getWindow().event;
-                }
-                if (!ctrlClick) {
-                    LogAndStore(value);
-                    LOG.console.focusValue(value, true);
-                } else if (window.Reloadable && value instanceof window.Reloadable) {
-                    LOG.openClassInEditor(value);
-                }
-                LOG.stopPropagation(event);
-                LOG.preventDefault(event);
-            }
+            onmousedown: LOG.createEventHandler(this.doc, this, 'onLinkMouseDown'),
+            onclick: LOG.createEventHandler(this.doc, this, 'onLinkClick')
         },
         [ pathPartName ]
     );
 }
+
+LOG.PathToObjectPart.prototype.onLinkMouseDown = function(event) {
+    this.ctrlClick = LOG.getButtonFromEvent(event) == 'left' && event.ctrlKey;
+}
+
+LOG.PathToObjectPart.prototype.onLinkClick = function(event) {
+    if (!this.ctrlClick) {
+        LogAndStore(value);
+        LOG.console.focusValue(value, true);
+    } else if (window.Reloadable && value instanceof window.Reloadable) {
+        LOG.openClassInEditor(value);
+    }
+    LOG.stopPropagation(event);
+    LOG.preventDefault(event);
+}
+
 
 LOG.PathToObjectPart.prototype.showElementOutline = function() {
     if (this.value.getDomNode) {
