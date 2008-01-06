@@ -63,19 +63,21 @@ LOG.CommandEditor.prototype.init = function(ownerDocument, evalCallback, resizeC
             )
         ]
     );
-    this.setIsBig(false);
+    this.setIsBig(false, true);
 }
 
-LOG.CommandEditor.prototype.setHeight = function(height) {
+LOG.CommandEditor.prototype.setHeight = function(height, dontNotifyParent) {
     this.height = height;
-    //~ this.element.style.height = height + 'em';
+    if (!dontNotifyParent) {
+        this.resizeCallback();
+    }
 }
 
 LOG.CommandEditor.prototype.getHeight = function() {
     return this.height;
 }
 
-LOG.CommandEditor.prototype.setIsBig = function(isBig) {
+LOG.CommandEditor.prototype.setIsBig = function(isBig, dontNotifyParent) {
     this.textAreaBig = isBig;
     if (this.commandInput) {
         this.commandInput.element.parentNode.removeChild(this.commandInput.element);
@@ -85,13 +87,12 @@ LOG.CommandEditor.prototype.setIsBig = function(isBig) {
     this.inputTd.appendChild(this.commandInput.element);
     
     if (this.textAreaBig) {
-        this.setHeight(12);
+        this.setHeight(4, dontNotifyParent);
         this.toggleTextAreaLink.firstChild.data = 'small';
     } else {
-        this.setHeight(1.2);
+        this.setHeight(1.2, dontNotifyParent);
         this.toggleTextAreaLink.firstChild.data = 'big';
     }
-    this.resizeCallback();
 }
 
 LOG.CommandEditor.prototype.onToggleTextAreaClick = function(event) {

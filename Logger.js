@@ -118,7 +118,7 @@ LOG.Logger.prototype.init = function(doc) {
     }
     
     this.box.add(this.panelManager.element, { size: 100, sizeUnit: '%' });
-    this.box.add(this.commandEditor.element, { size: 1.3, sizeUnit: 'em' });
+    this.box.add(this.commandEditor.element, { size: this.commandEditor.getHeight(), sizeUnit: 'em' });
     this.element = this.box.element;
     
     if (doc.body) {
@@ -204,6 +204,7 @@ LOG.Logger.prototype.onNewWindowClick = function(event) {
 }
 
 LOG.Logger.prototype.updateCommandEditorSize = function() {
+    this.box.setChildSize(1, this.commandEditor.getHeight(), 'em');
     //~ if (this.scrollContainer) {
         //~ this.scrollContainer.style.paddingBottom = this.commandEditor.getHeight() + 'em';
     //~ }
