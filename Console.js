@@ -5,17 +5,13 @@ LOG.Console.prototype.init = function(doc) {
     this.append = true;
     this.stopDebugging = false;
     this.n = 0;
-    this.ownerDocument = doc;
+    this.doc = doc;
     this.stackedMode = true;
     this.count = 0;
     this.element = LOG.createElement(doc, 'div');
-    //~ var ownerDocument = this.prepareNewDocument();
+    //~ var doc = this.prepareNewDocument();
     //~ if (LOG.willOpenInNewWindow) {
-        //~ ownerDocument.body.innerHTML = '';
-    //~ }
-    //~ var doc = window.document;
-    //~ if (ownerDocument) {
-        //~ doc = ownerDocument;
+        //~ doc.body.innerHTML = '';
     //~ }
 }
 
@@ -28,7 +24,7 @@ LOG.Console.prototype.getWindow = function() {
 }
 
 LOG.Console.prototype.appendRow = function(messageHtmlFragment, title, newLineAfterTitle, titleColor, dontOpen) {
-    var newRow = this.ownerDocument.createElement('div');
+    var newRow = this.doc.createElement('div');
     if (this.stopDebugging) {
         return;
     }
@@ -71,17 +67,17 @@ LOG.Console.prototype.appendRow = function(messageHtmlFragment, title, newLineAf
     } else {
         newRow.style.backgroundColor = '#fff3f2';
     }
-    var em = this.ownerDocument.createElement('em');
-    em.appendChild(this.ownerDocument.createTextNode(this.n));
+    var em = this.doc.createElement('em');
+    em.appendChild(this.doc.createTextNode(this.n));
     newRow.appendChild(em);
-    newRow.appendChild(this.ownerDocument.createTextNode(': '));
+    newRow.appendChild(this.doc.createTextNode(': '));
     
     if (title) {
-        var strong = this.ownerDocument.createElement('strong');
+        var strong = this.doc.createElement('strong');
         if (titleColor) {
             strong.style.color = titleColor;
         }
-        strong.appendChild(this.ownerDocument.createTextNode(title + ': ' + (newLineAfterTitle ? '\n' : '')));
+        strong.appendChild(this.doc.createTextNode(title + ': ' + (newLineAfterTitle ? '\n' : '')));
         newRow.appendChild(strong);
     }
     newRow.appendChild(messageHtmlFragment);
