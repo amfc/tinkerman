@@ -1,8 +1,7 @@
 LOG.Class('ArrayLogItem');
 
-LOG.ArrayLogItem.prototype.init = function(value, stackedMode, alreadyLoggedContainers) {
-    var doc = LOG.console.ownerDocument;
-    
+LOG.ArrayLogItem.prototype.init = function(doc, value, stackedMode, alreadyLoggedContainers) {
+    this.doc = doc;
     if (typeof alreadyLoggedContainers == 'undefined') {
         alreadyLoggedContainers = [];
     }
@@ -12,12 +11,12 @@ LOG.ArrayLogItem.prototype.init = function(value, stackedMode, alreadyLoggedCont
     var me = this;
     var link;
     this.element = LOG.createElement(
-        doc, 'span',
+        this.doc, 'span',
         {},
         [
-            LOG.getGetPositionInVariablesElement(doc, value),
+            LOG.getGetPositionInVariablesElement(this.doc, value),
             link = LOG.createElement(
-                doc, 'a',
+                this.doc, 'a',
                 {
                     style: {
                         textDecoration: 'none',
@@ -47,7 +46,7 @@ LOG.ArrayLogItem.prototype.init = function(value, stackedMode, alreadyLoggedCont
                 },
                 [ '[' ]
             ),
-            this.updateLink = LOG.createElement(doc, 'a',
+            this.updateLink = LOG.createElement(this.doc, 'a',
                 {
                     style: {
                         textDecoration: 'none',
@@ -75,7 +74,7 @@ LOG.ArrayLogItem.prototype.init = function(value, stackedMode, alreadyLoggedCont
             ),
             ' ',
             this.stackedToggleLink = LOG.createElement(
-                doc, 'a',
+                this.doc, 'a',
                 {
                     style: {
                         textDecoration: 'none',
@@ -104,7 +103,7 @@ LOG.ArrayLogItem.prototype.init = function(value, stackedMode, alreadyLoggedCont
                 },
                 [ '\u25ba' ]
             ),
-            this.propertiesSpan = LOG.createElement(doc, 'span')
+            this.propertiesSpan = LOG.createElement(this.doc, 'span')
         ]
     );
     
@@ -113,13 +112,13 @@ LOG.ArrayLogItem.prototype.init = function(value, stackedMode, alreadyLoggedCont
     this.oldValue = LOG.shallowClone(value);
     
     for (var i = 0; i < value.length; i++) {
-        this.createProperty(i, LOG.getValueAsLogItem(doc, value[i], stackedMode, alreadyLoggedContainers));
+        this.createProperty(i, LOG.getValueAsLogItem(this.doc, value[i], stackedMode, alreadyLoggedContainers));
         me.lastVisibleProperty = this.properties[i];
         this.propertiesSpan.appendChild(this.properties[i].element);
     }
     
     var endSpan = LOG.createElement(
-        doc, 'span',
+        this.doc, 'span',
         {},
         [ ']' ]
     );
@@ -144,14 +143,13 @@ LOG.ArrayLogItem.prototype.setShowChildren = function(showChildren, applyToChild
 }
 
 LOG.ArrayLogItem.prototype.createProperty = function(index) {
-    var doc = LOG.console.ownerDocument;
-    var logItem = LOG.getValueAsLogItem(doc, this.value[index], this.stackedMode, this.alreadyLoggedContainers);
+    var logItem = LOG.getValueAsLogItem(this.doc, this.value[index], this.stackedMode, this.alreadyLoggedContainers);
     var span, labelElement, logItemSpan, commaSpan;
-    span = LOG.createElement(doc, 'span',
+    span = LOG.createElement(this.doc, 'span',
         {},
         [
             labelElement = LOG.createElement(
-                doc, 'span',
+                this.doc, 'span',
                 {
                     style: {
                         display: 'none',
@@ -161,12 +159,12 @@ LOG.ArrayLogItem.prototype.createProperty = function(index) {
                 [ index + ': ' ]
             ),
             logItemSpan = LOG.createElement(
-                doc, 'span',
+                this.doc, 'span',
                 {},
                 [logItem.element]
             ),
             commaSpan = LOG.createElement(
-                doc, 'span',
+                this.doc, 'span',
                 {},
                 [', ']
             )
