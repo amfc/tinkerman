@@ -74,12 +74,8 @@ LOG.AbstractBox.prototype.add = function(element, size) { //  size: { size, size
     this.element.appendChild(
         LOG.createElement(
             this.doc, 'div',
-            {
-                style: {
-                    position: 'relative',
-                    MozBoxSizing: 'border-box',
-                    boxSizing: 'border-box'
-                }
+            { // opera 9.25 doesn't understand border-box if set as as an attribute of .style
+                style: 'position: relative; -moz-box-sizing: border-box; box-sizing: border-box'
             },
             [
             
