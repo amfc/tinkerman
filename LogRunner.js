@@ -54,6 +54,13 @@ LOG.LogRunner.prototype.getLogger = function() {
     return this.logger;
 }
 
+LOG.LogRunner.prototype.onLogWindowUnload = function() {
+    delete this.logger;
+    delete this.window;
+    this.willOpenInNewWindow = false;
+    this.doc = document;
+}
+
 LOG.LogRunner.prototype.prepareNewDocument = function() {
     if (this.willOpenInNewWindow) {
         if (!this.window || this.window.closed) {
@@ -69,6 +76,8 @@ LOG.LogRunner.prototype.prepareNewDocument = function() {
         this.doc.write('<html><head><style> BODY { margin: 0em }</style></head><body></body></html>');
         this.doc.close();
         this.doc.title = 'Log: ' + window.document.title;
+        this.doc.body.onunload = this.caller('onLogWindowUnload');
+        this.doc.body.onkeydown = LOG.createEventHandler(this.doc, this, 'onKeyDown');
         
         return this.window.document;
     } else {
@@ -96,23 +105,7 @@ LOG.LogRunner.prototype.onKeyDown = function(event) {
                 this.stopDebugging = false;
                 this.createLogger();
             }
-            var logObjectGone = false;
-            try {
-                this.showLogger();
-            } catch (e) {
-                logObjectGone = true;
-            }
-            if (!logObjectGone && this.doc.defaultView) {
-                this.doc.defaultView.focus();
-                this.logger.focus();
-            } else {
-                if (logObjectGone || !this.doc.parentWindow) {
-                    this.createLogger();
-                } else {
-                    this.doc.parentWindow.focus();
-                    this.logger.focus();
-                }
-            }
+            this.showLogger();
         } else if (chr == 'i') {
             this.onLoggerNewWindowToggleClick(event);
         } else if (this.logger) {
@@ -133,6 +126,7 @@ LOG.LogRunner.prototype.showLogger = function() {
     } else {
         this.window.focus();
     }
+    this.logger.focus();
 }
 
 // Unmigrated stuff
