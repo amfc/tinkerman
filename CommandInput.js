@@ -172,10 +172,11 @@ LOG.CommandInput.prototype.onInputKeyDown = function($event) {
         var currentWordAndPosition = this.getCurrentWordAndPosition();
         var names;
         if (currentExpression == currentWordAndPosition.word) {
-            names = Array.concat(
-                LOG.getObjectProperties(window),
-                [ 'escape', 'unescape', 'encodeURI', 'decodeURI', 'encodeURIComponent', 'decodeURIComponent', 'isFinite', 'isNaN',
-                  'Number', 'eval', 'parseFloat', 'parseInt', 'String', 'Infinity', 'undefined', 'NaN', 'true', 'false'
+            names = LOG.getObjectProperties(window).concat(
+                [
+                    'escape', 'unescape', 'encodeURI', 'decodeURI', 'encodeURIComponent',
+                    'decodeURIComponent', 'isFinite', 'isNaN', 'Number', 'eval', 'parseFloat',
+                    'parseInt', 'String', 'Infinity', 'undefined', 'NaN', 'true', 'false'
                 ]
             );
             if (LOG.isIE) {
