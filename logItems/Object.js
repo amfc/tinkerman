@@ -1,6 +1,6 @@
 LOG.Class('ObjectLogItem');
 
-LOG.ObjectLogItem.prototype.init = function(value, stackedMode, alreadyLoggedContainers, showChildren, showToggleChildrenLink) {
+LOG.ObjectLogItem.prototype.init = function(doc, value, stackedMode, alreadyLoggedContainers, showChildren, showToggleChildrenLink) {
     if (typeof alreadyLoggedContainers == 'undefined') {
         alreadyLoggedContainers = [];
     }
@@ -11,7 +11,7 @@ LOG.ObjectLogItem.prototype.init = function(value, stackedMode, alreadyLoggedCon
         showToggleChildrenLink = true;
     }
     
-    var doc = LOG.console.ownerDocument;
+    this.doc = doc;
     
     this.stackedMode = stackedMode;
     this.alreadyLoggedContainers = alreadyLoggedContainers;
@@ -58,14 +58,7 @@ LOG.ObjectLogItem.prototype.init = function(value, stackedMode, alreadyLoggedCon
                         me.toggleChildrenLink.style.textDecoration = 'none';
                         me.toggleChildrenLink.style.color = 'black';
                     },
-                    onclick: function(event) {
-                        if (!event) {
-                            event = LOG.console.getWindow().event;
-                        }
-                        LOG.preventDefault(event);
-                        LOG.stopPropagation(event);
-                        me.toggleShowChildren(event.ctrlKey);
-                    }
+                    onclick: LOG.createEventHandler(doc, this, 'onElementClick')
                 },
                 [ showChildren ? '-' : '+' ]
             ) : null,
@@ -82,14 +75,7 @@ LOG.ObjectLogItem.prototype.init = function(value, stackedMode, alreadyLoggedCon
                     onmouseout: function() {
                         endHighlightCurlyBraces();
                     },
-                    onclick: function(event) {
-                        if (!event) {
-                            event = LOG.console.getWindow().event;
-                        }
-                        LOG.preventDefault(event);
-                        LOG.stopPropagation(event);
-                        LogAndStore(value);
-                    }
+                    onclick: LOG.createEventHandler(doc, this, 'onStartObjectLinkClick')
                 },
                 [ '{' ]
             ),
@@ -109,14 +95,7 @@ LOG.ObjectLogItem.prototype.init = function(value, stackedMode, alreadyLoggedCon
                         me.updateLink.style.textDecoration = 'none';
                         me.updateLink.style.color = 'black';
                     },
-                    onclick: function(event) {
-                        if (!event) {
-                            event = LOG.console.getWindow().event;
-                        }
-                        LOG.preventDefault(event);
-                        LOG.stopPropagation(event);
-                        me.toggleAutoUpdate();
-                    }
+                    onclick: LOG.createEventHandler(doc, this, 'onUpdateLinkClick')
                 },
                 [ '\u21ba' ]
             ),
@@ -200,6 +179,24 @@ LOG.ObjectLogItem.prototype.init = function(value, stackedMode, alreadyLoggedCon
     this.setShowChildren(showChildren);
 }
 
+LOG.ObjectLogItem.prototype.onUpdateLinkClick = function(event) {
+    LOG.preventDefault(event);
+    LOG.stopPropagation(event);
+    this.toggleAutoUpdate();
+}
+
+LOG.ObjectLogItem.prototype.onStartObjectLinkClick = function(event) {
+    LOG.preventDefault(event);
+    LOG.stopPropagation(event);
+    LogAndStore(value);
+}
+
+LOG.ObjectLogItem.prototype.onElementClick = function(event) {
+    LOG.preventDefault(event);
+    LOG.stopPropagation(event);
+    this.toggleShowChildren(event.ctrlKey);
+}
+
 LOG.ObjectLogItem.prototype.setShowChildren = function(showChildren, applyToChildren) {
     if (this.showingChildren == showChildren) {
         return;
@@ -277,20 +274,19 @@ LOG.ObjectLogItem.prototype.toggleShowChildren = function(applyToChildren) {
 }
 
 LOG.ObjectLogItem.prototype.createProperty = function(key) {
-    var document = LOG.console.ownerDocument;
     var itemSpan, span, propertyValueElement;
-    itemSpan = document.createElement('span');
-    span = document.createElement('span');
-    span.appendChild(document.createTextNode(key));
+    itemSpan = this.doc.createElement('span');
+    span = this.doc.createElement('span');
+    span.appendChild(this.doc.createTextNode(key));
     span.style.color = '#930';
     itemSpan.appendChild(span);
-    itemSpan.appendChild(document.createTextNode(': '));
-    propertyValueElement = document.createElement('span');
-    var logItem = LOG.getValueAsLogItem(document, this.value[key], this.stackedMode, this.alreadyLoggedContainers)
+    itemSpan.appendChild(this.doc.createTextNode(': '));
+    propertyValueElement = this.doc.createElement('span');
+    var logItem = LOG.getValueAsLogItem(this.doc, this.value[key], this.stackedMode, this.alreadyLoggedContainers)
     propertyValueElement.appendChild(logItem.element);
     itemSpan.appendChild(propertyValueElement);
-    var commaSpan = document.createElement('span')
-    commaSpan.appendChild(document.createTextNode(', '));
+    var commaSpan = this.doc.createElement('span')
+    commaSpan.appendChild(this.doc.createTextNode(', '));
     itemSpan.appendChild(commaSpan);
     this.properties[key] = {
         element: itemSpan,

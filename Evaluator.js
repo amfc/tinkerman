@@ -100,7 +100,7 @@ LOG.Evaluator.prototype.evalScript = function($script) {
 
 LOG.Evaluator.prototype.logObjectSource = function(object, title) {
     var logItem = new LOG.ObjectLogItem;
-    logItem.init(object, this.stackedMode);
+    logItem.init(this.console.doc, object, this.stackedMode);
     this.console.appendRow(logItem.element, title);
     return LOG.dontLogResult;
 }

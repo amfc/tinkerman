@@ -97,7 +97,7 @@ LOG.getValueAsLogItem = function(doc, value, stackedMode, alreadyLoggedContainer
             return logItem;
         } else {
             var logItem = new LOG.ObjectLogItem;
-            logItem.init(value, stackedMode, alreadyLoggedContainers, showFirstLevelObjectChildren, showExpandObjectChildren);
+            logItem.init(doc, value, stackedMode, alreadyLoggedContainers, showFirstLevelObjectChildren, showExpandObjectChildren);
             return logItem;
         }
     }
