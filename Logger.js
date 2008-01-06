@@ -66,7 +66,7 @@ LOG.Logger.prototype.init = function(doc, inNewWindow) {
     //~ this.htmlPanel.onselect = function() {
         //~ if (!me.htmlLogItem) {
             //~ me.htmlLogItem = new LOG.HTMLElementLogItem;
-            //~ me.htmlLogItem.init(document.getElementsByTagName('html')[0], false, [], true);
+            //~ me.htmlLogItem.init(this.doc, document.getElementsByTagName('html')[0], false, [], true);
             //~ me.htmlPanel.contentElement.appendChild(me.htmlLogItem.element);
         //~ }
     //~ }

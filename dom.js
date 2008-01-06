@@ -160,8 +160,8 @@ LOG.getPosition = function(obj) {
 
 // Takes into account if the LOG wrapper element is active and either returns the true document's body or LOG's
 LOG.getBody = function(element) {
-    if (LOG.console.wrapperElement) {
-        return LOG.console.wrapperTopElement;
+    if (LOG.logRunner.wrapperElement) {
+        return LOG.logRunner.wrapperTopElement;
     } else {
         return document.body;
     }

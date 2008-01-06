@@ -1,7 +1,7 @@
 LOG.Class('HTMLElementLogItem');
 
-LOG.HTMLElementLogItem.prototype.init = function(value, stackedMode, alreadyLoggedContainers, dontShowParentLink) {
-    var doc = LOG.console.ownerDocument;
+LOG.HTMLElementLogItem.prototype.init = function(doc, value, stackedMode, alreadyLoggedContainers, dontShowParentLink) {
+    this.doc = doc;
     var link;
     var showParentLink;
     
@@ -22,14 +22,14 @@ LOG.HTMLElementLogItem.prototype.init = function(value, stackedMode, alreadyLogg
         }
     }
     this.showChildNodes = false;
-    this.element = LOG.createElement(doc, 'span',
+    this.element = LOG.createElement(this.doc, 'span',
         {
             style: {
                 color: '#00e'
             }
         },
         [
-            this.showChildNodesLink = LOG.createElement(doc, 'a',
+            this.showChildNodesLink = LOG.createElement(this.doc, 'a',
                 {
                     style: {
                         textDecoration: 'none',
@@ -45,14 +45,7 @@ LOG.HTMLElementLogItem.prototype.init = function(value, stackedMode, alreadyLogg
                         me.showChildNodesLink.style.textDecoration = 'none';
                         me.showChildNodesLink.style.color = 'black';
                     },
-                    onclick: function(event) {
-                        if (!event) {
-                            event = LOG.console.getWindow().event;
-                        }
-                        me.toggleShowChildNodes(event.ctrlKey);
-                        LOG.stopPropagation(event);
-                        LOG.preventDefault(event);
-                    },
+                    onclick: LOG.createEventHandler(this.doc, this, 'onShowChildNodesLinkClick'),
                     title: 'Toggle show child nodes'
                 },
                 [
@@ -62,7 +55,7 @@ LOG.HTMLElementLogItem.prototype.init = function(value, stackedMode, alreadyLogg
                 ]
             ),
             '<',
-            link = LOG.createElement(doc, 'a',
+            link = LOG.createElement(this.doc, 'a',
                 {
                     style: {
                         textDecoration: 'none',
@@ -76,22 +69,15 @@ LOG.HTMLElementLogItem.prototype.init = function(value, stackedMode, alreadyLogg
                         link.style.textDecoration = 'none';
                         me.hideElementOutline();
                     },
-                    onclick: function(event) {
-                        if (!event) {
-                            event = LOG.console.getWindow().event;
-                        }
-                        LogAndStore(value);
-                        LOG.stopPropagation(event);
-                        LOG.preventDefault(event);
-                    },
+                    onclick: LOG.createEventHandler(this.doc, this, 'onTagNameLinkClick'),
                     href: '#'
                 },
                 [
                     value.tagName.toLowerCase()
                 ]
             ),
-            LOG.getGetPositionInVariablesElement(doc, value),
-            (!dontShowParentLink ? showParentLink = LOG.createElement(doc, 'a',
+            LOG.getGetPositionInVariablesElement(this.doc, value),
+            (!dontShowParentLink ? showParentLink = LOG.createElement(this.doc, 'a',
                 {
                     style: {
                         textDecoration: 'none',
@@ -105,29 +91,22 @@ LOG.HTMLElementLogItem.prototype.init = function(value, stackedMode, alreadyLogg
                         showParentLink.style.textDecoration = 'none';
                         showParentLink.style.color = 'gray';
                     },
-                    onclick: function(event) {
-                        if (!event) {
-                            event = LOG.console.getWindow().event;
-                        }
-                        me.showParent();
-                        LOG.stopPropagation(event);
-                        LOG.preventDefault(event);
-                    },
+                    onclick: LOG.createEventHandler(this.doc, this, 'onShowParentLinkClick'),
                     title: 'Show parent node'
                 },
                 ['\u21A5']
             ) : null),
-            this.propertiesContainer = LOG.createElement(doc, 'span'),
-            this.startTagEnd = doc.createTextNode(this.showChildNodes ? '>' : '/>'),
-            this.withChildNodesEnd = LOG.createElement(doc, 'span',
+            this.propertiesContainer = LOG.createElement(this.doc, 'span'),
+            this.startTagEnd = this.doc.createTextNode(this.showChildNodes ? '>' : '/>'),
+            this.withChildNodesEnd = LOG.createElement(this.doc, 'span',
                 {
                     style: {
                         display: this.showChildNodes ? null :  'none'
                     }
                 },
                 [
-                    this.childNodesContainer = LOG.createElement(doc, 'span'),
-                    this.endTag = LOG.createElement(doc, 'span',
+                    this.childNodesContainer = LOG.createElement(this.doc, 'span'),
+                    this.endTag = LOG.createElement(this.doc, 'span',
                         {
                             onmouseover: function() {
                                 link.style.textDecoration = 'underline';
@@ -149,15 +128,15 @@ LOG.HTMLElementLogItem.prototype.init = function(value, stackedMode, alreadyLogg
     
     for (var i = 0; i < value.attributes.length; ++i) {
         if (value.attributes[i].specified) {
-            this.propertiesContainer.appendChild(doc.createTextNode(' '));
+            this.propertiesContainer.appendChild(this.doc.createTextNode(' '));
             this.propertiesContainer.appendChild(
-                LOG.createElement(doc, 'span',
+                LOG.createElement(this.doc, 'span',
                     { style: {color: '#036' } },
                     [ value.attributes[i].name + '=' ]
                 )
             );
             this.propertiesContainer.appendChild(
-                LOG.createElement(doc, 'span',
+                LOG.createElement(this.doc, 'span',
                     { style: { color: '#630' } },
                     [ '"' + value.attributes[i].value.replace(/"/, '"') + '"' ]
                 )
@@ -167,6 +146,24 @@ LOG.HTMLElementLogItem.prototype.init = function(value, stackedMode, alreadyLogg
     if (this.hasChildNodes && this.value.nodeName.toLowerCase() != 'script' && this.value.nodeName.toLowerCase() != 'style' && this.onlyTextNodeChildren) {
         this.setShowChildNodes(true);
     }
+}
+
+LOG.HTMLElementLogItem.prototype.onShowParentLinkClick = function(event) {
+    this.showParent();
+    LOG.stopPropagation(event);
+    LOG.preventDefault(event);
+}
+
+LOG.HTMLElementLogItem.prototype.onTagNameLinkClick = function(event) {
+    LogAndStore(this.value);
+    LOG.stopPropagation(event);
+    LOG.preventDefault(event);
+}
+
+LOG.HTMLElementLogItem.prototype.onShowChildNodesLinkClick = function(event) {
+    this.toggleShowChildNodes(event.ctrlKey);
+    LOG.stopPropagation(event);
+    LOG.preventDefault(event);
 }
 
 LOG.HTMLElementLogItem.prototype.focusChild = function(pathToChild) {
@@ -194,9 +191,9 @@ LOG.HTMLElementLogItem.prototype.hideElementOutline = function() {
     delete this.outlineElement;
 }
 
-LOG.HTMLElementLogItem.prototype.getChildNodes = function() {
-    if (LOG.console.wrapperElement && this.value == document.body) { // Hide LOG's wrapper elements in the DOM
-        return LOG.console.wrapperTopElement.childNodes;
+LOG.HTMLElementLogItem.prototype.getChildNodes = function() { // FIXME: Hack, works directly with BodyWrapper
+    if (LOG.logRunner.bodyWrapper && this.value == document.body) { // Hide LOG's wrapper elements in the DOM
+        return LOG.logRunner.bodyWrapper.topElement.childNodes;
     } else {
         return this.value.childNodes;
     }
@@ -222,7 +219,6 @@ LOG.HTMLElementLogItem.prototype.setShowChildNodes = function(show, applyToChild
     this.showChildNodesLink.firstChild.nodeValue = show ? '-' : '+';
     this.startTagEnd.nodeValue = show ? '>' : '/>';
     var childNodeLogItem;
-    var doc = LOG.console.ownerDocument;
     if (show) {
         if (!this.onlyTextNodeChildren) {
             this.childNodesContainer.style.display = 'block';
@@ -236,17 +232,17 @@ LOG.HTMLElementLogItem.prototype.setShowChildNodes = function(show, applyToChild
             childNode = childNodes[i];
             if (childNode.nodeType == 1) {
                 childNodeLogItem = new LOG.HTMLElementLogItem;
-                childNodeLogItem.init(childNode, this.stackedMode, this.alreadyLoggedContainers, true);
+                childNodeLogItem.init(this.doc, childNode, this.stackedMode, this.alreadyLoggedContainers, true);
                 childNodeToAppend = childNodeLogItem.element;
                 if (applyToChildNodes) {
                     childNodeLogItem.setShowChildNodes(true, true);
                 }
                 this.childNodeItems[i] = childNodeLogItem;
             } else if (childNode.nodeName == '#text') {
-                childNodeToAppend = LOG.createElement(doc, 'span', { style: { color: 'gray' } }, [ '\u00A0' + childNode.nodeValue ] );
+                childNodeToAppend = LOG.createElement(this.doc, 'span', { style: { color: 'gray' } }, [ '\u00A0' + childNode.nodeValue ] );
                 this.childNodeItems[i] = childNodeToAppend;
             } else {
-                childNodeToAppend = LOG.getValueAsLogItem(doc, childNode).element;
+                childNodeToAppend = LOG.getValueAsLogItem(this.doc, childNode).element;
                 this.childNodeItems[i] = childNodeToAppend;
             }
             if (!this.onlyTextNodeChildren) {

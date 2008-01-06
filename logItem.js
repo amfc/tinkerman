@@ -85,7 +85,7 @@ LOG.getValueAsLogItem = function(doc, value, stackedMode, alreadyLoggedContainer
     if (value != null && typeof value == 'object') {
         if (value.nodeType && value.nodeType == 1) { // 1: element node
             var logItem = new LOG.HTMLElementLogItem;
-            logItem.init(value, stackedMode, alreadyLoggedContainers);
+            logItem.init(doc, value, stackedMode, alreadyLoggedContainers);
             return logItem;
         }  else if (value instanceof Array || /* filter DOM Select elements */ !value.nodeType && value.item && typeof value.length != 'undefined') {
             var logItem = new LOG.ArrayLogItem;
