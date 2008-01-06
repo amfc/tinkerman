@@ -170,7 +170,6 @@ LOG.getSerializedHistory = function() {
 }
 
 //~ LOG.onUnload = function() {
-    //~ LOG.addCookie('LOG_DEBUG_MODE', DEBUG_MODE ? "true" : "false", 30);
     //~ LOG.addCookie('LOG_OPEN', LOG.logger && !LOG.console.hidden ? "true" : "false", 30);
     //~ LOG.addCookie('LOG_HISTORY', LOG.getSerializedHistory(), 30);
     //~ LOG.addCookie('LOG_SIZE', LOG.console.wrapperSize, 30);
@@ -234,12 +233,6 @@ LOG.onClick = function(event) {
     }
 }
 
-
-var DEBUG_MODE = false;
-
-if (LOG.getCookie('LOG_DEBUG_MODE') == "true") {
-    DEBUG_MODE = true;
-}
 
 //~ if (!LOG.loaded) {
     //~ LOG.console = new LOG.Console;

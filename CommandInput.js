@@ -179,9 +179,6 @@ LOG.CommandInput.prototype.onInputKeyDown = function($event) {
                     'parseInt', 'String', 'Infinity', 'undefined', 'NaN', 'true', 'false'
                 ]
             );
-            if (LOG.isIE) {
-                names = names.concat(names, ['DEBUG_MODE']);
-            }
         } else {
             var script = currentExpression.substr(0, currentExpression.length - currentWordAndPosition.word.length);
             if (script.charAt(script.length - 1) == '.') {
