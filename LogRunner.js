@@ -33,6 +33,7 @@ LOG.LogRunner.prototype.appendLogger = function() {
     this.logger = new LOG.Logger;
     this.logger.init(this.doc, this.willOpenInNewWindow);
     this.logger.onnewwindowtoggleclick = this.caller('onLoggerNewWindowToggleClick');
+    this.logger.onescpress = this.caller('onLoggerEscPress');
     
     if (!this.willOpenInNewWindow) {
         this.bodyWrapper = new LOG.BodyWrapper;
@@ -99,8 +100,8 @@ LOG.LogRunner.prototype.deleteElement = function() {
 
 LOG.LogRunner.prototype.onKeyDown = function(event) {
     var chr = String.fromCharCode(event.keyCode).toLowerCase();
-    if (event.altKey) {
-        if (chr == 'o') {
+    if (event.altKey && event.shiftKey) {
+        if (chr == 'm') {
             if (!this.logger) {
                 this.stopDebugging = false;
                 this.createLogger();
@@ -129,7 +130,17 @@ LOG.LogRunner.prototype.showLogger = function() {
     this.logger.focus();
 }
 
+LOG.LogRunner.prototype.hide = function() {
+    if (this.bodyWrapper) {
+        this.bodyWrapper.hide();
+    }
+}
+
 // Unmigrated stuff
+
+LOG.LogRunner.prototype.onLoggerEscPress = function() {
+    this.hide();
+}
 
 //~ LOG.LogRunner.prototype.close = function() {
     //~ if (!this.logger || this.stopDebugging) {
@@ -137,12 +148,6 @@ LOG.LogRunner.prototype.showLogger = function() {
     //~ }
     //~ this.deleteElement();
     //~ this.stopDebugging = true;
-//~ }
-
-//~ LOG.LogRunner.prototype.hide = function() {
-    //~ if (this.bodyWrapper) {
-        //~ this.bodyWrapper.hide();
-    //~ }
 //~ }
 
 //~ LOG.LogRunner.prototype.onNewWindowClick = function(event) {

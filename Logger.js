@@ -110,6 +110,8 @@ LOG.Logger.prototype.init = function(doc, inNewWindow) {
     this.box.add(this.panelManager.element, { size: 100, sizeUnit: '%' });
     this.box.add(this.commandEditor.element, { size: this.commandEditor.getHeight(), sizeUnit: 'em' });
     this.element = this.box.element;
+    var me = this;
+    LOG.addEventListener(this.element, 'keydown', function(event) { me.onKeyDown(event) });
 }
 
 LOG.Logger.prototype.updateCommandEditorSize = function() {
@@ -128,9 +130,15 @@ LOG.Logger.prototype.focus = function() {
     this.commandEditor.focus();
 }
 
-
-
-
+LOG.Logger.prototype.onKeyDown = function(event) {
+    if (event.keyCode == 27) { // Esc
+        if (this.onescpress) {
+            this.onescpress();
+        }
+        LOG.stopPropagation(event);
+        LOG.preventDefault(event);
+    }
+}
 
 // unchecked - unimplemented
 

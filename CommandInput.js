@@ -165,10 +165,6 @@ LOG.CommandInput.prototype.onInputKeyDown = function($event) {
             LOG.stopPropagation($event);
             LOG.preventDefault($event);
         }
-    } else if ($event.keyCode == 27) { // Esc
-        LOG.console.hide();
-        LOG.stopPropagation($event);
-        LOG.preventDefault($event);
     } else if ($event.keyCode == 9) { // Tab
         LOG.stopPropagation($event);
         LOG.preventDefault($event);
