@@ -17,12 +17,20 @@ box.init(document);
 box.element.style.height = '100%';
 
 box.add(
-    document.createTextNode('hi!'),
-    { size: 75, sizeUnit: '%', minSize: 0, minSizeUnit: 'px' }
+    LOG.createElement(document, 'div', { style: { backgroundColor: 'red', height: '100%' } }, ['75%']),
+    { size: 75, sizeUnit: '%' }
 );
 box.add(
-    document.createTextNode('pepe!'),
-    { size: 25, sizeUnit: '%', minSize: 0, minSizeUnit: 'px' }
+    LOG.createElement(document, 'div', { style: { backgroundColor: 'green', height: '100%' } }, ['10em']),
+    { size: 10, sizeUnit: 'em' }
+);
+box.add(
+    LOG.createElement(document, 'div', { style: { backgroundColor: 'blue', height: '100%' } }, ['25%']),
+    { size: 25, sizeUnit: '%' }
+);
+box.add(
+    LOG.createElement(document, 'div', { style: { backgroundColor: 'olive', height: '100%' } }, ['5em']),
+    { size: 5, sizeUnit: 'em' }
 );
 document.body.appendChild(box.element);
 </script>
