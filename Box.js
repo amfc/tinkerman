@@ -121,9 +121,7 @@ LOG.AbstractBox.prototype.updateSizes = function() {
     }
     
     var fixedSize = this.getFixedSize();
-    //~ console.log(fixedSize.size);
     var totalMinimumSize = this.getTotalMinimumSize();
-    console.log(totalMinimumSize);
     if (!totalMinimumSize.name && fixedSize.name) {
         totalMinimumSize.name = fixedSize.name;
     }
