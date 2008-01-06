@@ -4,6 +4,23 @@ LOG.CommandInput.prototype.init = function(ownerDocument, useTextArea, evaluator
     this.ownerDocument = ownerDocument;
     this.evaluator = evaluator;
     this.useTextArea = useTextArea;
+    
+    //~ this.history = LOG.getCookie('LOG_HISTORY');
+    if (this.history) {
+        try {
+            this.history = eval('(' + this.history + ')');
+            if (this.history.length > 0) {
+                this.historyPosition = this.history.length;
+            }
+        } catch (e) {
+            this.history = [];
+            this.historyPosition = -1;
+        }
+    } else {
+        this.history = [];
+        this.historyPosition = -1;
+    }
+    
     this.element = LOG.createElement(
         this.ownerDocument,
         useTextArea ? 'textarea' : 'input',
@@ -108,10 +125,10 @@ LOG.CommandInput.prototype.onInputKeyDown = function($event) {
     }
     if ($event.keyCode == 13) {
         if (!this.useTextArea || $event.ctrlKey) {
-            if (LOG.history[LOG.history.length - 1] != this.element.value) {
-                LOG.history.push(this.element.value);
+            if (this.history[this.history.length - 1] != this.element.value) {
+                this.history.push(this.element.value);
             }
-            LOG.historyPosition = LOG.history.length;
+            this.historyPosition = this.history.length;
             this.evaluator.evalScriptAndPrintResults(this.element.value);
             LOG.stopPropagation($event);
             LOG.preventDefault($event);
@@ -199,19 +216,19 @@ LOG.CommandInput.prototype.onInputKeyDown = function($event) {
             LOG.setTextInputSelection(this.element, [commonStartPos, commonStartPos]);
         }
     } else if ($event.keyCode == 38 && (!this.useTextArea || $event.ctrlKey)) { // Up
-        if (LOG.historyPosition > 0) {
-            --LOG.historyPosition;
-            this.element.value = LOG.history[LOG.historyPosition];
+        if (this.historyPosition > 0) {
+            --this.historyPosition;
+            this.element.value = this.history[this.historyPosition];
         }
         LOG.stopPropagation($event);
         LOG.preventDefault($event);
     } else if ($event.keyCode == 40 && (!this.useTextArea || $event.ctrlKey)) { // Down
-        if (LOG.historyPosition == LOG.history.length - 1) {
+        if (this.historyPosition == this.history.length - 1) {
             this.element.value = '';
-            LOG.historyPosition == LOG.history.length;
-        } else if (LOG.historyPosition != -1 && LOG.historyPosition < LOG.history.length - 1) {
-            ++LOG.historyPosition;
-            this.element.value = LOG.history[LOG.historyPosition];
+            this.historyPosition == this.history.length;
+        } else if (this.historyPosition != -1 && this.historyPosition < this.history.length - 1) {
+            ++this.historyPosition;
+            this.element.value = this.history[this.historyPosition];
         }
         LOG.stopPropagation($event);
         LOG.preventDefault($event);

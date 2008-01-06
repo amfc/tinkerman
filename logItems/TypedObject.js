@@ -44,7 +44,7 @@ LOG.TypedObjectLogItem.prototype.init = function(value, stackedMode, alreadyLogg
         'span',
         {},
         [
-            LOG.getGetPositionInVariablesElement(value),
+            LOG.getGetPositionInVariablesElement(doc, value),
             '«',
             this.link = LOG.createElement(doc, 'a',
                 {
@@ -117,7 +117,7 @@ LOG.TypedObjectLogItem.prototype.init = function(value, stackedMode, alreadyLogg
                     'src'
                 ]
             ),
-            LOG.getExtraInfoToLogAsHtmlElement(value, stackedMode, alreadyLoggedContainers),
+            LOG.getExtraInfoToLogAsHtmlElement(doc, value, stackedMode, alreadyLoggedContainers),
             (typeof value.toString == 'function' && value.toString != Object.prototype.toString) ? ' ' + value.toString() : null,
             this.srcElement = LOG.createElement(doc, 'span'),
             '»'

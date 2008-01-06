@@ -15,7 +15,7 @@ LOG.ArrayLogItem.prototype.init = function(value, stackedMode, alreadyLoggedCont
         doc, 'span',
         {},
         [
-            LOG.getGetPositionInVariablesElement(value),
+            LOG.getGetPositionInVariablesElement(doc, value),
             link = LOG.createElement(
                 doc, 'a',
                 {
@@ -113,7 +113,7 @@ LOG.ArrayLogItem.prototype.init = function(value, stackedMode, alreadyLoggedCont
     this.oldValue = LOG.shallowClone(value);
     
     for (var i = 0; i < value.length; i++) {
-        this.createProperty(i, LOG.getValueAsLogItem(value[i], stackedMode, alreadyLoggedContainers));
+        this.createProperty(i, LOG.getValueAsLogItem(doc, value[i], stackedMode, alreadyLoggedContainers));
         me.lastVisibleProperty = this.properties[i];
         this.propertiesSpan.appendChild(this.properties[i].element);
     }
@@ -144,9 +144,9 @@ LOG.ArrayLogItem.prototype.setShowChildren = function(showChildren, applyToChild
 }
 
 LOG.ArrayLogItem.prototype.createProperty = function(index) {
-    var logItem = LOG.getValueAsLogItem(this.value[index], this.stackedMode, this.alreadyLoggedContainers);
-    var span, labelElement, logItemSpan, commaSpan;
     var doc = LOG.console.ownerDocument;
+    var logItem = LOG.getValueAsLogItem(doc, this.value[index], this.stackedMode, this.alreadyLoggedContainers);
+    var span, labelElement, logItemSpan, commaSpan;
     span = LOG.createElement(doc, 'span',
         {},
         [
@@ -288,7 +288,7 @@ LOG.ArrayLogItem.prototype.updateAndMarkDifferences = function() {
         while (propertyValueElement.firstChild) {
             propertyValueElement.removeChild(propertyValueElement.firstChild);
         }
-        me.properties[key].logItem = LOG.getValueAsLogItem(me.value[key], me.stackedMode, me.alreadyLoggedContainers);
+        me.properties[key].logItem = LOG.getValueAsLogItem(LOG.console.ownerDocument, me.value[key], me.stackedMode, me.alreadyLoggedContainers);
         if (wasShowingChildren) {
             me.properties[key].logItem.setShowChildren(wasShowingChildren);
         }

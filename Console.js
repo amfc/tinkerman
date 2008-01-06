@@ -5,14 +5,19 @@ LOG.Console.prototype.init = function(doc) {
     this.maxCount = 1000;
     this.append = true;
     this.stopDebugging = false;
-    this.paused = false;
     this.n = 0;
     this.ownerDocument = doc;
     this.stackedMode = true;
-    this.evaluator = new LOG.Evaluator;
-    this.evaluator.init(this);
     this.count = 0;
     this.element = LOG.createElement(doc, 'div');
+    //~ var ownerDocument = this.prepareNewDocument();
+    //~ if (LOG.willOpenInNewWindow) {
+        //~ ownerDocument.body.innerHTML = '';
+    //~ }
+    //~ var doc = window.document;
+    //~ if (ownerDocument) {
+        //~ doc = ownerDocument;
+    //~ }
 }
 
 LOG.Console.prototype.getWindow = function() {
@@ -25,23 +30,23 @@ LOG.Console.prototype.getWindow = function() {
 
 LOG.Console.prototype.appendRow = function(messageHtmlFragment, title, newLineAfterTitle, titleColor, dontOpen) {
     var newRow = this.ownerDocument.createElement('div');
-    if (this.stopDebugging || this.paused) {
+    if (this.stopDebugging) {
         return;
     }
-    if (!this.elementCreated) {
-        this.createElement();
-        if (dontOpen) {
-            this.hide();
-        }
-    }
-    if (this.hidden && !dontOpen) {
-        this.show();
-    }
-    if (!dontOpen) {
-        this.panel.setSelected(true);
-    } else if (!console.panel.selected) {
-        this.panel.setChanged(true);
-    }
+    //~ if (!this.elementCreated) {
+        //~ this.createElement();
+        //~ if (dontOpen) {
+            //~ this.hide();
+        //~ }
+    //~ }
+    //~ if (this.hidden && !dontOpen) {
+        //~ this.show();
+    //~ }
+    //~ if (!dontOpen) {
+        //~ this.panel.setSelected(true);
+    //~ } else if (!console.panel.selected) {
+        //~ this.panel.setChanged(true);
+    //~ }
     if (this.count >= this.maxCount) {
         if (!this.append) {
             this.element.removeChild(this.element.lastChild);
@@ -82,10 +87,10 @@ LOG.Console.prototype.appendRow = function(messageHtmlFragment, title, newLineAf
     }
     newRow.appendChild(messageHtmlFragment);
     if (!this.append) {
-        console.panel.contentElement.insertBefore(newRow, console.panel.contentElement.firstChild);
+        this.element.insertBefore(newRow, this.element.firstChild);
     } else {
-        console.panel.contentElement.appendChild(newRow);
-        console.panel.contentElement.scrollTop = console.panel.contentElement.scrollHeight - console.panel.contentElement.offsetHeight + 1;
+        this.element.appendChild(newRow);
+        this.element.scrollTop = this.element.scrollHeight - this.element.offsetHeight + 1;
     }
 }
 
@@ -174,23 +179,6 @@ LOG.Console.prototype.focusValue = function(value, dontLog) {
                 this.pageLogItem.focusProperty(path.pathToObject);
             }
         }
-    }
-}
-
-LOG.Console.prototype.createElement = function() {
-    var ownerDocument = this.prepareNewDocument();
-    if (LOG.willOpenInNewWindow) {
-        ownerDocument.body.innerHTML = '';
-    }
-    var doc = window.document;
-    if (ownerDocument) {
-        doc = ownerDocument;
-    }
-}
-
-LOG.Console.prototype.updateCommandEditorSize = function() {
-    if (this.scrollContainer) {
-        this.scrollContainer.style.paddingBottom = this.commandEditor.getHeight() + 'em';
     }
 }
 

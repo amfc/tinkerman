@@ -3,7 +3,6 @@ LOG.Class('Logger');
 LOG.Logger.prototype.init = function(doc) {
     this.consoles = {};
     this.element = LOG.createElement(doc, 'div');
-    
     this.panelManager = new LOG.PanelManager;
     this.panelManager.init(doc,
         LOG.createElement(doc, 'span', {},
@@ -45,9 +44,18 @@ LOG.Logger.prototype.init = function(doc) {
             ]
         )
     );
+    this.element.appendChild(this.panelManager.element);
         
     this.consolePanel = new LOG.LogPanel;
     this.consolePanel.init(doc, 'console', true);
+    this.consolePanel.setSelected(true);
+    var console = new LOG.Console;
+    console.init(doc);
+    this.evaluator = new LOG.Evaluator;
+    this.evaluator.init(console);
+    this.consolePanel.contentElement.appendChild(console.element);
+    
+    this.panelManager.add(this.consolePanel);
     
     this.console = {
         panel: this.consolePanel,
@@ -82,7 +90,7 @@ LOG.Logger.prototype.init = function(doc) {
                 return;
             }
             if (!me.pageLogItem) {
-                me.pageLogItem = LOG.getValueAsLogItem(self[LOG.pageObjectName], true, []);
+                me.pageLogItem = LOG.getValueAsLogItem(doc, self[LOG.pageObjectName], true, []);
                 me.pagePanel.contentElement.appendChild(me.pageLogItem.element);
             }
         }
@@ -93,10 +101,10 @@ LOG.Logger.prototype.init = function(doc) {
         panel: this.pagePanel,
         count: 0
     };
-        
-    //~ this.commandEditor = new LOG.CommandEditor;
-    //~ this.commandEditor.init(doc, this.evaluator, function() { me.updateCommandEditorSize() } );
-    //~ this.element.appendChild(this.commandEditor.element);
+    
+    this.commandEditor = new LOG.CommandEditor;
+    this.commandEditor.init(doc, this.evaluator, function() { me.updateCommandEditorSize() } );
+    this.element.appendChild(this.commandEditor.element);
     
     var me = this;
     function append() {
@@ -190,3 +198,10 @@ LOG.Logger.prototype.onNewWindowClick = function(event) {
     this.createElement();
     LOG.addCookie('LOG_IN_NEW_WINDOW', LOG.willOpenInNewWindow ? 'true' : 'false', 30);
 }
+
+LOG.Logger.prototype.updateCommandEditorSize = function() {
+    if (this.scrollContainer) {
+        this.scrollContainer.style.paddingBottom = this.commandEditor.getHeight() + 'em';
+    }
+}
+

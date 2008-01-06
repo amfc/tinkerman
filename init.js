@@ -15,21 +15,6 @@ if (LOG.getCookie('LOG_DEBUG_MODE') == "true") {
     //~ LOG.console = new LOG.Console;
     //~ LOG.console.init();
     //~ LOG.willOpenInNewWindow = LOG.getCookie('LOG_IN_NEW_WINDOW') == 'true';
-    //~ LOG.history = LOG.getCookie('LOG_HISTORY');
-    //~ if (LOG.history) {
-        //~ try {
-            //~ LOG.history = eval('(' + LOG.history + ')');
-            //~ if (LOG.history.length > 0) {
-                //~ LOG.historyPosition = LOG.history.length;
-            //~ }
-        //~ } catch (e) {
-            //~ LOG.history = [];
-            //~ LOG.historyPosition = -1;
-        //~ }
-    //~ } else {
-        //~ LOG.history = [];
-        //~ LOG.historyPosition = -1;
-    //~ }
     
     //~ (function() {
         //~ var logWasOpen = LOG.getCookie('LOG_OPEN');

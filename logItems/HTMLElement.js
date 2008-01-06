@@ -90,7 +90,7 @@ LOG.HTMLElementLogItem.prototype.init = function(value, stackedMode, alreadyLogg
                     value.tagName.toLowerCase()
                 ]
             ),
-            LOG.getGetPositionInVariablesElement(value),
+            LOG.getGetPositionInVariablesElement(doc, value),
             (!dontShowParentLink ? showParentLink = LOG.createElement(doc, 'a',
                 {
                     style: {
@@ -246,7 +246,7 @@ LOG.HTMLElementLogItem.prototype.setShowChildNodes = function(show, applyToChild
                 childNodeToAppend = LOG.createElement(doc, 'span', { style: { color: 'gray' } }, [ '\u00A0' + childNode.nodeValue ] );
                 this.childNodeItems[i] = childNodeToAppend;
             } else {
-                childNodeToAppend = LOG.getValueAsLogItem(childNode).element;
+                childNodeToAppend = LOG.getValueAsLogItem(doc, childNode).element;
                 this.childNodeItems[i] = childNodeToAppend;
             }
             if (!this.onlyTextNodeChildren) {

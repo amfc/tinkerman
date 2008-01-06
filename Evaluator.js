@@ -8,6 +8,7 @@ LOG.Evaluator.prototype.init = function(console) {
 LOG.Evaluator.prototype.log = function(message, title, newLineAfterTitle, consoleName, dontOpen, stackedMode) {
     this.console.appendRow(
         LOG.getValueAsHtmlElement(
+            document, // FIXME HARDCODED!!
             message,
             stackedMode == undefined ?
             this.stackedMode :
@@ -35,7 +36,7 @@ LOG.Evaluator.prototype.logAndStore = function(value, source) {
     if (source) {
         this.logObjectSource(value, null, this.stackedMode);
     } else {
-        this.console.appendRow(LOG.getValueAsHtmlElement(value, this.stackedMode, undefined, true));
+        this.console.appendRow(LOG.getValueAsHtmlElement(document, value, this.stackedMode, undefined, true));
     }
     if (this.console.commandEditor.commandInput.element.value == '' || this.console.commandEditor.commandInput.element.value.match(/^\$[0-9]+$/)) {
         this.console.commandEditor.commandInput.element.value = '$' + pos;

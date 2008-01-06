@@ -1,5 +1,4 @@
-LOG.getGetPositionInVariablesElement = function(value) {
-    var doc = LOG.console.ownerDocument;
+LOG.getGetPositionInVariablesElement = function(doc, value) {
     var positionInVariables = LOG.indexOf(LOG.clickedMessages, value);
     if (positionInVariables == -1) {
         return null;
@@ -25,21 +24,20 @@ LOG.getGetPositionInVariablesElement = function(value) {
     );
 }
 
-LOG.getValueAsHtmlElement = function(value, stackedMode, alreadyLoggedContainers, showFirstLevelObjectChildren, showExpandObjectChildren) {
-   return LOG.getValueAsLogItem(value, stackedMode, alreadyLoggedContainers, showFirstLevelObjectChildren, showExpandObjectChildren).element;
+LOG.getValueAsHtmlElement = function(doc, value, stackedMode, alreadyLoggedContainers, showFirstLevelObjectChildren, showExpandObjectChildren) {
+   return LOG.getValueAsLogItem(doc, value, stackedMode, alreadyLoggedContainers, showFirstLevelObjectChildren, showExpandObjectChildren).element;
 }
 
-LOG.getExtraInfoToLogAsHtmlElement = function(value, stackedMode, alreadyLoggedContainers) {
+LOG.getExtraInfoToLogAsHtmlElement = function(doc, value, stackedMode, alreadyLoggedContainers) {
     if (!value.getExtraInfoToLog) {
         return null;
     }
     var extraInfoToLog = value.getExtraInfoToLog();
-    var doc = LOG.console.ownerDocument;
     var element = LOG.createElement(doc, 'span', {});
 
     for (var item in extraInfoToLog) {
         if (typeof extraInfoToLog[item] == 'function') {
-            element.appendChild(document.createTextNode(' '));
+            element.appendChild(doc.createTextNode(' '));
             var link = LOG.createElement(doc, 'a',
                 {
                     style: {
@@ -75,14 +73,14 @@ LOG.getExtraInfoToLogAsHtmlElement = function(value, stackedMode, alreadyLoggedC
                 [' ' + item + ': ']
             );
             element.appendChild(span);
-            element.appendChild(LOG.getValueAsHtmlElement(extraInfoToLog[item], stackedMode, alreadyLoggedContainers));
+            element.appendChild(LOG.getValueAsHtmlElement(doc, extraInfoToLog[item], stackedMode, alreadyLoggedContainers));
         }
     }
     return element;
 }
 
 
-LOG.getValueAsLogItem = function(value, stackedMode, alreadyLoggedContainers, showFirstLevelObjectChildren, showExpandObjectChildren) {
+LOG.getValueAsLogItem = function(doc, value, stackedMode, alreadyLoggedContainers, showFirstLevelObjectChildren, showExpandObjectChildren) {
     // Simple object (used as hash tables), array, html element and typed objects are special (since they are implemented as separate objects) and should be handled separately
     if (value != null && typeof value == 'object') {
         if (value.nodeType && value.nodeType == 1) { // 1: element node
@@ -105,18 +103,17 @@ LOG.getValueAsLogItem = function(value, stackedMode, alreadyLoggedContainers, sh
     }
     
     function appendExtraInfoToLog() {
-        var extraInfoElement = LOG.getExtraInfoToLogAsHtmlElement(value, stackedMode, alreadyLoggedContainers);
+        var extraInfoElement = LOG.getExtraInfoToLogAsHtmlElement(doc, value, stackedMode, alreadyLoggedContainers);
         if (extraInfoElement) {
             fragment.appendChild(extraInfoElement);
         }
     }
     
     // We know the value is not a hash type object or an array or html element or a typed object
-    var document = LOG.console.ownerDocument;
     var i;
-    var fragment = document.createDocumentFragment();
+    var fragment = doc.createDocumentFragment();
     
-    var span = LOG.getGetPositionInVariablesElement(value);
+    var span = LOG.getGetPositionInVariablesElement(doc, value);
     if (span) {
         fragment.appendChild(span);
     }
@@ -126,34 +123,34 @@ LOG.getValueAsLogItem = function(value, stackedMode, alreadyLoggedContainers, sh
     }
     if (typeof value == 'object') {
         if (value == null) {
-            fragment.appendChild(document.createTextNode('null'));
+            fragment.appendChild(doc.createTextNode('null'));
         } else if (LOG.indexOf(alreadyLoggedContainers, value) != -1) {
-            fragment.appendChild(document.createTextNode('<Ref>'));
+            fragment.appendChild(doc.createTextNode('<Ref>'));
         } else if (typeof value == 'object' && value.nodeType == 8) { // 8 = comment
-            fragment.appendChild(document.createTextNode('[Comment] '));
-            fragment.appendChild(LOG.getValueAsHtmlElement(value.nodeValue, stackedMode, alreadyLoggedContainers));
+            fragment.appendChild(doc.createTextNode('[Comment] '));
+            fragment.appendChild(LOG.getValueAsHtmlElement(doc, value.nodeValue, stackedMode, alreadyLoggedContainers));
         } else if (typeof value == 'object' && value.nodeName == '#text') {
-            fragment.appendChild(document.createTextNode('[NodeText] '));
-            fragment.appendChild(LOG.getValueAsHtmlElement(value.nodeValue, stackedMode, alreadyLoggedContainers));
+            fragment.appendChild(doc.createTextNode('[NodeText] '));
+            fragment.appendChild(LOG.getValueAsHtmlElement(doc, value.nodeValue, stackedMode, alreadyLoggedContainers));
         }
     } else if (typeof value == 'string') {
-        fragment.appendChild(document.createTextNode('"' + value.toString() + '"'));
+        fragment.appendChild(doc.createTextNode('"' + value.toString() + '"'));
     } else if (typeof value == 'function') {
         var result = /function[^(]*(\([^)]*\))/.exec(value.toString());
         var text;
         if (!result) {
-            text = document.createTextNode(value.toString());
+            text = doc.createTextNode(value.toString());
         } else {
             text = 'f' + result[1];
         }
         
-        fragment.appendChild(document.createTextNode('«'));
+        fragment.appendChild(doc.createTextNode('«'));
         
         
-        var link = document.createElement('a');
+        var link = doc.createElement('a');
         link.style.textDecoration = 'none';
         link.style.color = 'gray';
-        link.appendChild(document.createTextNode(text));
+        link.appendChild(doc.createTextNode(text));
         fragment.appendChild(link);
         link.href = '#';
         LOG.addEventListener(link, 'mouseover',
@@ -174,12 +171,12 @@ LOG.getValueAsLogItem = function(value, stackedMode, alreadyLoggedContainers, sh
             }
         );
         
-        fragment.appendChild(document.createTextNode(' '));
-        var srcLink = document.createElement('a');
+        fragment.appendChild(doc.createTextNode(' '));
+        var srcLink = doc.createElement('a');
         srcLink.style.textDecoration = 'none';
         srcLink.style.color = 'green';
         srcLink.style.fontSize = '8pt';
-        srcLink.appendChild(document.createTextNode('src'));
+        srcLink.appendChild(doc.createTextNode('src'));
         
         LOG.addEventListener(srcLink, 'mouseover',
             function() {
@@ -193,16 +190,16 @@ LOG.getValueAsLogItem = function(value, stackedMode, alreadyLoggedContainers, sh
         );
         LOG.addEventListener(srcLink, 'click',
             function(event) {
-                LOG.console.appendRow(document.createTextNode('\n' + value.toString()));
+                LOG.console.appendRow(doc.createTextNode('\n' + value.toString()));
                 LOG.preventDefault(event);
                 LOG.stopPropagation(event);
             }
         );
         fragment.appendChild(srcLink);
         appendExtraInfoToLog();
-        fragment.appendChild(document.createTextNode('»'));
+        fragment.appendChild(doc.createTextNode('»'));
     } else if (typeof value != 'undefined' && typeof value.toString == 'function') {
-        fragment.appendChild(document.createTextNode(value.toString()));
+        fragment.appendChild(doc.createTextNode(value.toString()));
     }
     return {
        element: fragment

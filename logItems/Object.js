@@ -42,7 +42,7 @@ LOG.ObjectLogItem.prototype.init = function(value, stackedMode, alreadyLoggedCon
     this.element = LOG.createElement(doc, 'span',
         {},
         [
-            LOG.getGetPositionInVariablesElement(value),
+            LOG.getGetPositionInVariablesElement(doc, value),
             showToggleChildrenLink ? this.toggleChildrenLink = LOG.createElement(doc, 'a',
                 {
                     style: {
@@ -286,7 +286,7 @@ LOG.ObjectLogItem.prototype.createProperty = function(key) {
     itemSpan.appendChild(span);
     itemSpan.appendChild(document.createTextNode(': '));
     propertyValueElement = document.createElement('span');
-    var logItem = LOG.getValueAsLogItem(this.value[key], this.stackedMode, this.alreadyLoggedContainers)
+    var logItem = LOG.getValueAsLogItem(document, this.value[key], this.stackedMode, this.alreadyLoggedContainers)
     propertyValueElement.appendChild(logItem.element);
     itemSpan.appendChild(propertyValueElement);
     var commaSpan = document.createElement('span')
@@ -327,7 +327,7 @@ LOG.ObjectLogItem.prototype.updateAndMarkDifferences = function() {
         while (propertyValueElement.firstChild) {
             propertyValueElement.removeChild(propertyValueElement.firstChild);
         }
-        me.properties[key].logItem = LOG.getValueAsLogItem(me.value[key], me.stackedMode, me.alreadyLoggedContainers);
+        me.properties[key].logItem = LOG.getValueAsLogItem(LOG.console.ownerDocument, me.value[key], me.stackedMode, me.alreadyLoggedContainers);
         me.properties[key].element = me.properties[key].logItem.element;
         if (wasShowingChildren) {
             me.properties[key].logItem.setShowChildren(wasShowingChildren);

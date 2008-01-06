@@ -18,7 +18,7 @@ LOG.ExceptionLogItem.prototype.init = function(value) {
         doc, 'span',
         {},
         [
-            LOG.getGetPositionInVariablesElement(value),
+            LOG.getGetPositionInVariablesElement(doc, value),
             '«',
             link = LOG.createElement(
                 doc, 'a',
@@ -137,16 +137,16 @@ function getStackFromArguments() {
 LOG.ExceptionLogItem.prototype.getStackFromArguments = getStackFromArguments;
 
 LOG.ExceptionLogItem.prototype.getStackHtmlElement = function(fileName, lineNumber) {
+    var doc = LOG.console.ownerDocument;
     var stackArray;
     if (LOG.isIE) {
-        return LOG.getValueAsHtmlElement(this.stack);
+        return LOG.getValueAsHtmlElement(doc, this.stack);
     } else if (this.value.stack) {
         if (typeof this.value.stack == 'string') {
             stackArray = this.getStackAsArray(this.value.stack);
         } else {
             stackArray = this.value.stack;
         }
-        var doc = LOG.console.ownerDocument;
         var element = LOG.createElement(doc, 'div');
         var link;
         for (var i = 1; i < stackArray.length; ++i) {
@@ -167,7 +167,7 @@ LOG.ExceptionLogItem.prototype.getStackHtmlElement = function(fileName, lineNumb
                             {},
                             [
                                 ' (',
-                                LOG.getValueAsHtmlElement(stackArray[i]['args']),
+                                LOG.getValueAsHtmlElement(doc, stackArray[i]['args']),
                                 ')'
                             ]
                         ) : null

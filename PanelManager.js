@@ -88,6 +88,5 @@ LOG.PanelManager.prototype.add = function(logPanel) {
     }
     this.panelLabels.appendChild(logPanel.labelElement);
     this.panelElements.appendChild(logPanel.panelElement);
-    logPanel.contentElement.appendChild(contents);
     return logPanel;
 }
