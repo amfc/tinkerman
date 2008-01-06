@@ -5,8 +5,18 @@ if (!LOG.AbstractBox) {
 
 LOG.AbstractBox.prototype.init = function(doc) {
     this.doc = doc;
-    this.element = doc.createElement('div');
-    this.element.className = this.className;
+    this.element = LOG.createElement(
+        doc,
+        'div',
+        {
+            style: {
+                position: 'relative',
+                overflow: 'hidden',
+                height: '100%',
+                width: '100%'
+            }
+        }
+    );
     this.sizes = [];
 }
 
@@ -111,7 +121,9 @@ LOG.AbstractBox.prototype.updateSizes = function() {
     }
     
     var fixedSize = this.getFixedSize();
+    //~ console.log(fixedSize.size);
     var totalMinimumSize = this.getTotalMinimumSize();
+    console.log(totalMinimumSize);
     if (!totalMinimumSize.name && fixedSize.name) {
         totalMinimumSize.name = fixedSize.name;
     }
@@ -151,14 +163,35 @@ LOG.AbstractBox.prototype.getChildSize = function(childNumber) {
 }
 
 LOG.AbstractBox.prototype.add = function(element, size) { //  size: { size, sizeUnit: %|px|em, minSize, minSizeUnit }
-    var outer = this.doc.createElement('div');
-    var inner = this.doc.createElement('div');
-    outer.className = 'LOG_box_outer';
-    outer.appendChild(inner);
-    inner.appendChild(element);
-    outer.className = 'LOG_box_inner';
+    this.element.appendChild(
+        LOG.createElement(
+            this.doc, 'div',
+            {
+                style: {
+                    position: 'relative',
+                    MozBoxSizing: 'border-box',
+                    boxSizing: 'border-box'
+                }
+            },
+            [
+            
+                LOG.createElement(
+                    this.doc, 'div',
+                    {
+                        style: {
+                            height: '100%',
+                            overflow: 'hidden'
+                        }
+                    },
+                    [
+                        element
+                    ]
+                )
+            ]
+        )
+    );
+    
     this.sizes.push(size);
-    this.element.appendChild(outer);
     this.updateSizes();
 }
 
@@ -170,7 +203,6 @@ if (!LOG.Hbox) {
 LOG.Hbox.prototype = new LOG.AbstractBox;
 LOG.Hbox.prototype.sizeProperty = 'width';
 LOG.Hbox.prototype.reservedSpacePosition = 'right';
-LOG.Hbox.prototype.className = 'LOG_hbox';
 
 
 if (!LOG.Vbox) {
@@ -181,4 +213,3 @@ if (!LOG.Vbox) {
 LOG.Vbox.prototype = new LOG.AbstractBox;
 LOG.Vbox.prototype.sizeProperty = 'height';
 LOG.Vbox.prototype.reservedSpacePosition = 'bottom';
-LOG.Vbox.prototype.className = 'LOG_vbox';

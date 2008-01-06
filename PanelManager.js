@@ -8,13 +8,8 @@ LOG.PanelManager.prototype.init = function(doc, rightToolbarElement) {
     this.scrollContainer = LOG.createElement(this.doc, 'div',
         {
             style: {
-                position: 'absolute',
                 width: '100%',
-                height: LOG.isIE ? '100%' : null,
-                top: 0,
-                left: 0,
-                bottom: '0',
-                paddingTop: '1.8em'
+                height: '100%'
             }
         },
         [
@@ -40,15 +35,9 @@ LOG.PanelManager.prototype.init = function(doc, rightToolbarElement) {
     this.toolbarContainer = LOG.createElement(this.doc, 'div', // toolbar container
         {
             style: {
-                height: '1.8em',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                MozBoxSizing: 'border-box',
-                overflow: 'hidden',
                 fontFamily: 'terminus, lucida console, monospace',
-                backgroundColor: '#f0f0f0'
+                backgroundColor: '#f0f0f0',
+                height: '100%'
             }
         },
         [
@@ -67,8 +56,8 @@ LOG.PanelManager.prototype.init = function(doc, rightToolbarElement) {
         ]
     );
     
+    box.add(this.toolbarContainer, { size: 1.3, sizeUnit: 'em' });
     box.add(this.scrollContainer, { size: 100, sizeUnit: '%' });
-    box.add(this.toolbarContainer, { size: 2, sizeUnit: 'em' });
 }
 
 LOG.PanelManager.prototype.add = function(logPanel) {

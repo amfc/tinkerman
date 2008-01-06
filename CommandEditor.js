@@ -9,10 +9,8 @@ LOG.CommandEditor.prototype.init = function(ownerDocument, evalCallback, resizeC
     this.element = LOG.createElement(doc, 'div',
         {
             style: {
-                position: 'absolute',
-                left: 0,
-                backgroundColor: '#f0f0f0',
-                bottom: 0
+                height: '100%',
+                backgroundColor: '#f0f0f0'
             }
         },
         [
@@ -70,7 +68,7 @@ LOG.CommandEditor.prototype.init = function(ownerDocument, evalCallback, resizeC
 
 LOG.CommandEditor.prototype.setHeight = function(height) {
     this.height = height;
-    this.element.style.height = height + 'em';
+    //~ this.element.style.height = height + 'em';
 }
 
 LOG.CommandEditor.prototype.getHeight = function() {

@@ -2,7 +2,10 @@ LOG.Class('Logger');
 
 LOG.Logger.prototype.init = function(doc) {
     this.consoles = {};
-    this.element = LOG.createElement(doc, 'div');
+    
+    this.box = new LOG.Vbox;
+    this.box.init(doc);
+    
     this.panelManager = new LOG.PanelManager;
     this.panelManager.init(doc,
         LOG.createElement(doc, 'span', {},
@@ -44,8 +47,7 @@ LOG.Logger.prototype.init = function(doc) {
             ]
         )
     );
-    this.element.appendChild(this.panelManager.element);
-        
+    
     this.consolePanel = new LOG.LogPanel;
     this.consolePanel.init(doc, 'console', true);
     this.consolePanel.setSelected(true);
@@ -104,7 +106,6 @@ LOG.Logger.prototype.init = function(doc) {
     
     this.commandEditor = new LOG.CommandEditor;
     this.commandEditor.init(doc, this.evaluator, function() { me.updateCommandEditorSize() } );
-    this.element.appendChild(this.commandEditor.element);
     
     var me = this;
     function append() {
@@ -116,12 +117,15 @@ LOG.Logger.prototype.init = function(doc) {
         }
     }
     
+    this.box.add(this.panelManager.element, { size: 100, sizeUnit: '%' });
+    this.box.add(this.commandEditor.element, { size: 1.3, sizeUnit: 'em' });
+    this.element = this.box.element;
+    
     if (doc.body) {
         append();
     } else {
         LOG.addEventListener(window, 'load', append);
     }
-
 }
 
 LOG.Logger.prototype.addConsole = function(consoleName, content) {
@@ -200,8 +204,8 @@ LOG.Logger.prototype.onNewWindowClick = function(event) {
 }
 
 LOG.Logger.prototype.updateCommandEditorSize = function() {
-    if (this.scrollContainer) {
-        this.scrollContainer.style.paddingBottom = this.commandEditor.getHeight() + 'em';
-    }
+    //~ if (this.scrollContainer) {
+        //~ this.scrollContainer.style.paddingBottom = this.commandEditor.getHeight() + 'em';
+    //~ }
 }
 
