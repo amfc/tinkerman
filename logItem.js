@@ -93,7 +93,7 @@ LOG.getValueAsLogItem = function(doc, value, stackedMode, alreadyLoggedContainer
             return logItem;
         } else if (value.getClassName || value instanceof String || value instanceof Date || value instanceof Number || value instanceof Boolean) { // an object we can Log
             var logItem = new LOG.TypedObjectLogItem;
-            logItem.init(value, stackedMode, alreadyLoggedContainers);
+            logItem.init(doc, value, stackedMode, alreadyLoggedContainers);
             return logItem;
         } else {
             var logItem = new LOG.ObjectLogItem;
