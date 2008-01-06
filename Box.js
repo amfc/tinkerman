@@ -3,11 +3,11 @@ if (!LOG.AbstractBox) {
     }
 }
 
-LOG.AbstractBox.prototype.init = function(doc, boxItemSizes) {
+LOG.AbstractBox.prototype.init = function(doc) {
     this.doc = doc;
     this.element = doc.createElement('div');
     this.element.className = this.className;
-    this.sizes = boxItemSizes;
+    this.sizes = [];
 }
 
 LOG.AbstractBox.prototype.getFixedSize = function() {
@@ -150,7 +150,7 @@ LOG.AbstractBox.prototype.getChildSize = function(childNumber) {
     return this.sizes[childNumber];
 }
 
-LOG.AbstractBox.prototype.add = function(element, size) { //  size: { size, sizeUnit: '%' | 'px', minSize, minSizeUnit }
+LOG.AbstractBox.prototype.add = function(element, size) { //  size: { size, sizeUnit: %|px|em, minSize, minSizeUnit }
     var outer = this.doc.createElement('div');
     var inner = this.doc.createElement('div');
     outer.className = 'LOG_box_outer';

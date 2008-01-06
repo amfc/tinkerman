@@ -24,5 +24,6 @@ add logItem;
 add LogPanel;
 add PanelManager;
 add Logger;
+add Box;
 find logItems -name '*.js' -exec bash -c 'cat '{}' >> log.js; echo >> log.js' ';'
 add 'init';
