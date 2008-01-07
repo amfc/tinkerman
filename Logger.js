@@ -162,7 +162,7 @@ LOG.Logger.prototype.addPanel = function(panelName, content) {
     return panel;
 }
 
-// unchecked - unimplemented
+// FIXME: unchecked - unimplemented
 
 
 LOG.Logger.prototype.onClearClick = function(event) {
