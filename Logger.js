@@ -1,6 +1,6 @@
 LOG.Class('Logger');
 
-LOG.Logger.prototype.init = function(doc, inNewWindow, historyManager) {
+LOG.Logger.prototype.init = function(doc, inNewWindow, historyManager, openSectionsStr) {
     this.doc = doc;
     this.sections = {};
     this.inNewWindow = inNewWindow;
@@ -105,6 +105,33 @@ LOG.Logger.prototype.init = function(doc, inNewWindow, historyManager) {
     this.element = this.box.element;
     var me = this;
     LOG.addEventListener(this.element, 'keydown', function(event) { me.onKeyDown(event) });
+    
+    this.unserializeOpenSections(openSectionsStr);
+    
+}
+
+LOG.Logger.prototype.unserializeOpenSections = function(str) {
+    if (str) {
+        this.sections.console.panel.setSelected(false);
+        var openSections = str.split(',');
+        for (var i = 0; i < openSections.length; ++i) {
+            this.getOrAddConsoleSection(openSections[i]).panel.setSelected(true);
+        }
+    }
+}
+
+LOG.Logger.prototype.serializeOpenSections = function() {
+    var out = '';
+    var sections = this.sections;
+    for (var sectionName in sections) {
+        if (sections[sectionName].panel.selected) {
+            if (out) {
+                out += ',';
+            }
+            out += sectionName;
+        }
+    }
+    return out;
 }
 
 LOG.Logger.prototype.logText = function(text, title) {

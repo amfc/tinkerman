@@ -8,12 +8,17 @@ LOG.LogRunner.prototype.init = function() {
     this.historyManager = new LOG.HistoryManager;
     this.historyManager.init(LOG.getCookie('LOG_HISTORY'));
     this.bodyWrapperSavedSize = parseFloat(LOG.getCookie('LOG_SIZE'));
+    this.loggerSavedOpenSections = LOG.getCookie('LOG_OPEN_SECTIONS');
     //~ LOG.addEventListener(document, 'mousedown', this.caller('onMouseDown'), true);
     //~ LOG.addEventListener(document, 'mouseup', this.caller('onClick'), true);
     //~ LOG.addEventListener(document, 'click', this.caller('onClick'), true);
     LOG.addEventListener(document, 'keydown', LOG.createEventHandler(document, this, 'onKeyDown'), true);
     //~ LOG.addEventListener(document, 'selectstart', this.caller('onDocumentSelectStart'), true);
     LOG.addEventListener(window, 'unload', this.caller('onUnload'));
+    
+    if (LOG.getCookie('LOG_OPEN') == 'true') {
+        this.createLogger();
+    }
 }
 
 LOG.LogRunner.prototype.caller = function(methodName) {
@@ -35,7 +40,7 @@ LOG.LogRunner.prototype.appendLogger = function() {
     this.doc = this.prepareNewDocument();
     
     this.logger = new LOG.Logger;
-    this.logger.init(this.doc, this.willOpenInNewWindow, this.historyManager);
+    this.logger.init(this.doc, this.willOpenInNewWindow, this.historyManager, this.loggerSavedOpenSections);
     this.logger.onnewwindowtoggleclick = this.caller('onLoggerNewWindowToggleClick');
     this.logger.onescpress = this.caller('onLoggerEscPress');
     
@@ -140,21 +145,13 @@ LOG.LogRunner.prototype.onUnload = function() {
         LOG.addCookie('LOG_SIZE', this.bodyWrapperSavedSize, 30);
     }
     LOG.addCookie('LOG_IN_NEW_WINDOW', this.willOpenInNewWindow ? 'true' : 'false', 30);
-    //~ LOG.addCookie('LOG_OPEN', LOG.logger && !LOG.console.hidden ? "true" : "false", 30);
-    //~ var openConsoles = '';
-    //~ var consoles = LOG.console.consoles;
-    //~ for (var consoleName in consoles) {
-        //~ if (consoles[consoleName].panel.selected) {
-            //~ if (openConsoles) {
-                //~ openConsoles += ',';
-            //~ }
-            //~ openConsoles += consoleName;
-        //~ }
-    //~ }
-    //~ LOG.addCookie('LOG_OPEN_CONSOLES', openConsoles, 30);
-    //~ if (LOG.isGecko) {
-        //~ LOG.removeAllEventListeners();
-    //~ }
+    LOG.addCookie('LOG_OPEN', this.logger && !this.bodyWrapper.hidden ? "true" : "false", 30);
+    if (this.logger) {
+        LOG.addCookie('LOG_OPEN_SECTIONS', this.logger.serializeOpenSections(), 30);
+    }
+    if (LOG.isGecko) {
+        LOG.removeAllEventListeners();
+    }
 }
 
 // Unmigrated stuff
@@ -223,33 +220,3 @@ LOG.onClick = function(event) {
         LOG.stopPropagation(event);
     }
 }
-
-
-//~ if (!LOG.loaded) {
-    //~ LOG.console = new LOG.Console;
-    //~ LOG.console.init();
-    
-    //~ (function() {
-        //~ var logWasOpen = LOG.getCookie('LOG_OPEN');
-        //~ if (logWasOpen == 'true') {
-            //~ LOG.console.createElement();
-            //~ var openConsoles = LOG.getCookie('LOG_OPEN_CONSOLES');
-            //~ if (openConsoles) {
-                //~ LOG.console.consoles.console.panel.setSelected(false);
-                //~ openConsoles = openConsoles.split(',');
-                //~ for (var i = 0; i < openConsoles.length; ++i) {
-                    //~ if (LOG.console.consoles[openConsoles[i]]) {
-                        //~ LOG.console.consoles[openConsoles[i]].panel.setSelected(true);
-                    //~ } else {
-                        //~ LOG.console.addConsole(openConsoles[i]).panel.setSelected(true);
-                    //~ }
-                //~ }
-            //~ }
-        //~ }
-    //~ })();
-//~ } else {
-    //~ if (LOG.wasOpen) {
-        //~ LOG.console.createElement();
-    //~ }
-//~ }
-

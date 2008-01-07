@@ -71,7 +71,7 @@ LOG.BodyWrapper.prototype.init = function(ownerDocument, elementToWrap, initialS
         this.topElement.appendChild(child);
     }
     doc.body.appendChild(this.element);
-    
+    this.hidden = false;
     LOG.addObjEventListener(this, this.resizeHandle, 'mousedown', this.onResizeHandleMousedown);
 }
 
@@ -155,6 +155,7 @@ LOG.BodyWrapper.prototype.setSize = function(size) {
 }
 
 LOG.BodyWrapper.prototype.hide = function() {
+    this.hidden = true;
     if (this.bottomElement) {
         this.bottomElement.style.display = 'none';
         this.topElement.style.height = '100%';
@@ -162,6 +163,7 @@ LOG.BodyWrapper.prototype.hide = function() {
 }
 
 LOG.BodyWrapper.prototype.show = function() {
+    this.hidden = false;
     if (this.bottomElement) {
         this.bottomElement.style.display = '';
         this.setSize(this.size);
