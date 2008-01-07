@@ -4,7 +4,7 @@ if (!LOG.LogRunner) {
 
 LOG.LogRunner.prototype.init = function() {
     this.doc = document;
-    this.willOpenInNewWindow = false;
+    this.willOpenInNewWindow = LOG.getCookie('LOG_IN_NEW_WINDOW') == 'true';
     this.historyManager = new LOG.HistoryManager;
     this.historyManager.init(LOG.getCookie('LOG_HISTORY'));
     this.bodyWrapperSavedSize = parseFloat(LOG.getCookie('LOG_SIZE'));
@@ -32,6 +32,8 @@ LOG.LogRunner.prototype.createLogger = function() {
 }
 
 LOG.LogRunner.prototype.appendLogger = function() {
+    this.doc = this.prepareNewDocument();
+    
     this.logger = new LOG.Logger;
     this.logger.init(this.doc, this.willOpenInNewWindow, this.historyManager);
     this.logger.onnewwindowtoggleclick = this.caller('onLoggerNewWindowToggleClick');
@@ -48,7 +50,6 @@ LOG.LogRunner.prototype.appendLogger = function() {
 LOG.LogRunner.prototype.onLoggerNewWindowToggleClick = function() {
     this.deleteElement();
     this.willOpenInNewWindow = !this.willOpenInNewWindow;
-    this.doc = this.prepareNewDocument();
     this.appendLogger();
     this.logger.focus();
 }
@@ -138,6 +139,7 @@ LOG.LogRunner.prototype.onUnload = function() {
     } else {
         LOG.addCookie('LOG_SIZE', this.bodyWrapperSavedSize, 30);
     }
+    LOG.addCookie('LOG_IN_NEW_WINDOW', this.willOpenInNewWindow ? 'true' : 'false', 30);
     //~ LOG.addCookie('LOG_OPEN', LOG.logger && !LOG.console.hidden ? "true" : "false", 30);
     //~ var openConsoles = '';
     //~ var consoles = LOG.console.consoles;
@@ -176,7 +178,6 @@ LOG.LogRunner.prototype.onLoggerEscPress = function() {
     //~ this.deleteElement();
     //~ this.prepareNewDocument();
     //~ this.createLogger();
-    //~ LOG.addCookie('LOG_IN_NEW_WINDOW', this.willOpenInNewWindow ? 'true' : 'false', 30);
 //~ }
 
 LOG.onDocumentSelectStart = function(event) {
@@ -227,7 +228,6 @@ LOG.onClick = function(event) {
 //~ if (!LOG.loaded) {
     //~ LOG.console = new LOG.Console;
     //~ LOG.console.init();
-    //~ LOG.willOpenInNewWindow = LOG.getCookie('LOG_IN_NEW_WINDOW') == 'true';
     
     //~ (function() {
         //~ var logWasOpen = LOG.getCookie('LOG_OPEN');
