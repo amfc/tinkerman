@@ -19,7 +19,7 @@ LOG.CommandInput.prototype.init = function(doc, useTextArea, evaluator, historyM
                 fontSize: '13px',
                 fontWeight: 'normal'
             },
-            onkeydown: LOG.createEventHandler(doc, this, 'onInputKeyDown'),
+            onkeypress: LOG.createEventHandler(doc, this, 'onInputKeyPress'),
             mousedown: function(event) {
                 if (!event) {
                     event = LOG.console.getWindow().event;
@@ -89,7 +89,7 @@ LOG.CommandInput.prototype.getCurrentWordAndPosition = function() {
     }
 }
 
-LOG.CommandInput.prototype.onInputKeyDown = function($event) {
+LOG.CommandInput.prototype.onInputKeyPress = function($event) {
     function getCommonStart(list) {
         var common = list[0];
         var j;
@@ -190,7 +190,7 @@ LOG.CommandInput.prototype.onInputKeyDown = function($event) {
             LOG.setTextInputSelection(this.element, [commonStartPos, commonStartPos]);
         }
     } else if ($event.keyCode == 38 && (!this.useTextArea || $event.ctrlKey)) { // Up
-        this.element.value = this.historyManager.up();
+        this.element.value = this.historyManager.up(this.element.value);
         LOG.stopPropagation($event);
         LOG.preventDefault($event);
     } else if ($event.keyCode == 40 && (!this.useTextArea || $event.ctrlKey)) { // Down

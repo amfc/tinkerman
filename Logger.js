@@ -1,6 +1,6 @@
 LOG.Class('Logger');
 
-LOG.Logger.prototype.init = function(doc, inNewWindow) {
+LOG.Logger.prototype.init = function(doc, inNewWindow, historyManager) {
     this.doc = doc;
     this.panels = {};
     this.inNewWindow = inNewWindow;
@@ -97,8 +97,7 @@ LOG.Logger.prototype.init = function(doc, inNewWindow) {
         //~ count: 0
     //~ };
     
-    this.historyManager = new LOG.HistoryManager;
-    this.historyManager.init();
+    this.historyManager = historyManager;
     
     this.commandEditor = new LOG.CommandEditor;
     this.commandEditor.init(doc, this.evaluator, function() { me.updateCommandEditorSize() }, this.historyManager);

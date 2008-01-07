@@ -5,13 +5,14 @@ if (!LOG.LogRunner) {
 LOG.LogRunner.prototype.init = function() {
     this.doc = document;
     this.willOpenInNewWindow = false;
-    //~ this.createLogger();
-    //~ LOG.addEventListener(window, 'unload', this.caller('onUnload'));
+    this.historyManager = new LOG.HistoryManager;
+    this.historyManager.init(LOG.getCookie('LOG_HISTORY'));
     //~ LOG.addEventListener(document, 'mousedown', this.caller('onMouseDown'), true);
     //~ LOG.addEventListener(document, 'mouseup', this.caller('onClick'), true);
     //~ LOG.addEventListener(document, 'click', this.caller('onClick'), true);
     LOG.addEventListener(document, 'keydown', LOG.createEventHandler(document, this, 'onKeyDown'), true);
     //~ LOG.addEventListener(document, 'selectstart', this.caller('onDocumentSelectStart'), true);
+    LOG.addEventListener(window, 'unload', this.caller('onUnload'));
 }
 
 LOG.LogRunner.prototype.caller = function(methodName) {
@@ -31,7 +32,7 @@ LOG.LogRunner.prototype.createLogger = function() {
 
 LOG.LogRunner.prototype.appendLogger = function() {
     this.logger = new LOG.Logger;
-    this.logger.init(this.doc, this.willOpenInNewWindow);
+    this.logger.init(this.doc, this.willOpenInNewWindow, this.historyManager);
     this.logger.onnewwindowtoggleclick = this.caller('onLoggerNewWindowToggleClick');
     this.logger.onescpress = this.caller('onLoggerEscPress');
     
@@ -128,6 +129,27 @@ LOG.LogRunner.prototype.hide = function() {
     }
 }
 
+LOG.LogRunner.prototype.onUnload = function() {
+    LOG.addCookie('LOG_HISTORY', this.historyManager.serialize(), 30);
+    //~ LOG.addCookie('LOG_OPEN', LOG.logger && !LOG.console.hidden ? "true" : "false", 30);
+    //~ LOG.addCookie('LOG_HISTORY', LOG.getSerializedHistory(), 30);
+    //~ LOG.addCookie('LOG_SIZE', LOG.console.wrapperSize, 30);
+    //~ var openConsoles = '';
+    //~ var consoles = LOG.console.consoles;
+    //~ for (var consoleName in consoles) {
+        //~ if (consoles[consoleName].panel.selected) {
+            //~ if (openConsoles) {
+                //~ openConsoles += ',';
+            //~ }
+            //~ openConsoles += consoleName;
+        //~ }
+    //~ }
+    //~ LOG.addCookie('LOG_OPEN_CONSOLES', openConsoles, 30);
+    //~ if (LOG.isGecko) {
+        //~ LOG.removeAllEventListeners();
+    //~ }
+}
+
 // Unmigrated stuff
 
 LOG.LogRunner.prototype.onLoggerEscPress = function() {
@@ -150,43 +172,6 @@ LOG.LogRunner.prototype.onLoggerEscPress = function() {
     //~ this.prepareNewDocument();
     //~ this.createLogger();
     //~ LOG.addCookie('LOG_IN_NEW_WINDOW', this.willOpenInNewWindow ? 'true' : 'false', 30);
-//~ }
-
-LOG.getSerializedHistory = function() {
-    var history = LOG.history;
-    var maxLength = 2000; // since all the log's history will be kept in a cookie
-    var strLength = 3; // since we count both square brackets and the comma of the next element
-    var appendedOne = false;
-    var items = [], item;
-    for (var i = history.length - 1; i >= 0; --i) {
-        item = "\"" + history[i].replace('"', "\"") + "\"";
-        if (strLength + item.length > maxLength) {
-            break;
-        }
-        items.unshift(item);
-        strLength += item.length + 1;
-    }
-    return '[' + items.join(',') + ']';
-}
-
-//~ LOG.onUnload = function() {
-    //~ LOG.addCookie('LOG_OPEN', LOG.logger && !LOG.console.hidden ? "true" : "false", 30);
-    //~ LOG.addCookie('LOG_HISTORY', LOG.getSerializedHistory(), 30);
-    //~ LOG.addCookie('LOG_SIZE', LOG.console.wrapperSize, 30);
-    //~ var openConsoles = '';
-    //~ var consoles = LOG.console.consoles;
-    //~ for (var consoleName in consoles) {
-        //~ if (consoles[consoleName].panel.selected) {
-            //~ if (openConsoles) {
-                //~ openConsoles += ',';
-            //~ }
-            //~ openConsoles += consoleName;
-        //~ }
-    //~ }
-    //~ LOG.addCookie('LOG_OPEN_CONSOLES', openConsoles, 30);
-    //~ if (LOG.isGecko) {
-        //~ LOG.removeAllEventListeners();
-    //~ }
 //~ }
 
 LOG.onDocumentSelectStart = function(event) {
