@@ -1,6 +1,6 @@
 LOG.Class('BodyWrapper');
 
-LOG.BodyWrapper.prototype.init = function(ownerDocument, elementToWrap) {
+LOG.BodyWrapper.prototype.init = function(ownerDocument, elementToWrap, initialSize) {
     this.dragging = false;
     this.ownerDocument = ownerDocument;
     var doc = this.ownerDocument;
@@ -62,12 +62,8 @@ LOG.BodyWrapper.prototype.init = function(ownerDocument, elementToWrap) {
     document.body.style.overflow = 'hidden';
     document.body.style.margin = '0';
     
-    var size = LOG.getCookie('LOG_SIZE');
-    if (!size || isNaN(size = parseFloat(size))) {
-        size = 0.3333333;
-    }
+    this.setSize(initialSize ? initialSize : 0.3333333);
     
-    this.setSize(size);
     var child;
     while (doc.body.firstChild) {
         child = doc.body.firstChild;
@@ -144,6 +140,10 @@ LOG.BodyWrapper.prototype.onMousemove = function(event) {
 
 LOG.BodyWrapper.prototype.onMouseup = function(event) {
     this.endDrag();
+}
+
+LOG.BodyWrapper.prototype.getSize = function() {
+    return this.size;
 }
 
 LOG.BodyWrapper.prototype.setSize = function(size) {

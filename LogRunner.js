@@ -7,6 +7,7 @@ LOG.LogRunner.prototype.init = function() {
     this.willOpenInNewWindow = false;
     this.historyManager = new LOG.HistoryManager;
     this.historyManager.init(LOG.getCookie('LOG_HISTORY'));
+    this.bodyWrapperSavedSize = parseFloat(LOG.getCookie('LOG_SIZE'));
     //~ LOG.addEventListener(document, 'mousedown', this.caller('onMouseDown'), true);
     //~ LOG.addEventListener(document, 'mouseup', this.caller('onClick'), true);
     //~ LOG.addEventListener(document, 'click', this.caller('onClick'), true);
@@ -38,7 +39,7 @@ LOG.LogRunner.prototype.appendLogger = function() {
     
     if (!this.willOpenInNewWindow) {
         this.bodyWrapper = new LOG.BodyWrapper;
-        this.bodyWrapper.init(this.doc, this.logger.element);
+        this.bodyWrapper.init(this.doc, this.logger.element, this.bodyWrapperSavedSize);
     } else {
         this.doc.body.appendChild(this.logger.element);
     }
@@ -94,6 +95,7 @@ LOG.LogRunner.prototype.prepareNewDocument = function() {
 
 LOG.LogRunner.prototype.deleteElement = function() {
     if (this.bodyWrapper) {
+        this.bodyWrapperSavedSize = this.bodyWrapper.getSize();
         this.bodyWrapper.uninit();
         delete this.bodyWrapper;
     }
@@ -131,9 +133,12 @@ LOG.LogRunner.prototype.hide = function() {
 
 LOG.LogRunner.prototype.onUnload = function() {
     LOG.addCookie('LOG_HISTORY', this.historyManager.serialize(), 30);
+    if (this.bodyWrapper) {
+        LOG.addCookie('LOG_SIZE', this.bodyWrapper.getSize(), 30);
+    } else {
+        LOG.addCookie('LOG_SIZE', this.bodyWrapperSavedSize, 30);
+    }
     //~ LOG.addCookie('LOG_OPEN', LOG.logger && !LOG.console.hidden ? "true" : "false", 30);
-    //~ LOG.addCookie('LOG_HISTORY', LOG.getSerializedHistory(), 30);
-    //~ LOG.addCookie('LOG_SIZE', LOG.console.wrapperSize, 30);
     //~ var openConsoles = '';
     //~ var consoles = LOG.console.consoles;
     //~ for (var consoleName in consoles) {
