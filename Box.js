@@ -1,7 +1,4 @@
-if (!LOG.AbstractBox) {
-    LOG.AbstractBox = function() {
-    }
-}
+LOG.Class('AbstractBox');
 
 LOG.AbstractBox.prototype.init = function(doc) {
     this.doc = doc;
