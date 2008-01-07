@@ -24,20 +24,6 @@ LOG.Console.prototype.appendRow = function(messageHtmlFragment, title, newLineAf
     if (this.stopDebugging) {
         return;
     }
-    //~ if (!this.elementCreated) {
-        //~ this.createElement();
-        //~ if (dontOpen) {
-            //~ this.hide();
-        //~ }
-    //~ }
-    //~ if (this.hidden && !dontOpen) {
-        //~ this.show();
-    //~ }
-    //~ if (!dontOpen) {
-        //~ this.panel.setSelected(true);
-    //~ } else if (!console.panel.selected) {
-        //~ this.panel.setChanged(true);
-    //~ }
     if (this.count >= this.maxCount) {
         if (!this.append) {
             this.element.removeChild(this.element.lastChild);
