@@ -50,11 +50,11 @@ LOG.createOutlineFromElement = function(element) {
 }
 
 function Log(message, title, section, dontOpen, stackedMode) {
-    return LOG.logRunner.getLogger().evaluator.log(message, title, true, section, dontOpen, stackedMode);
+    return LOG.logRunner.getLogger().log(message, title, true, section, dontOpen, stackedMode);
 }
 
 function LogAndStore(value, source) {
-    return LOG.logRunner.getLogger().evaluator.logAndStore(value, source);
+    return LOG.logRunner.getLogger().logAndStore(value, source);
 }
 
 function LogX(str) { // Log in external window

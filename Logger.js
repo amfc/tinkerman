@@ -2,7 +2,7 @@ LOG.Class('Logger');
 
 LOG.Logger.prototype.init = function(doc, inNewWindow, historyManager) {
     this.doc = doc;
-    this.panels = {};
+    this.sections = {};
     this.inNewWindow = inNewWindow;
     this.box = new LOG.Vbox;
     this.box.init(doc);
@@ -50,15 +50,13 @@ LOG.Logger.prototype.init = function(doc, inNewWindow, historyManager) {
     );
     
     // create the default console
+    var consoleSection = this.addConsoleSection('console');
+    consoleSection.panel.setSelected(true);
+    this.defaultConsole = consoleSection.content;
     
-    var console = new LOG.Console;
-    console.init(doc);
     this.evaluator = new LOG.Evaluator;
-    this.evaluator.init(console);
-    
-    var consolePanel = this.addPanel('console', console);
-    consolePanel.setSelected(true);
-    
+    this.evaluator.init(this);
+
     //~ var me = this;
     
     //~ this.htmlPanel = new LOG.LogPanel;
@@ -109,6 +107,72 @@ LOG.Logger.prototype.init = function(doc, inNewWindow, historyManager) {
     LOG.addEventListener(this.element, 'keydown', function(event) { me.onKeyDown(event) });
 }
 
+LOG.Logger.prototype.logText = function(text, title) {
+    this.defaultConsole.appendRow(this.doc.createTextNode(text), title);
+}
+
+LOG.Logger.prototype.logException = function(exception, title) {
+    var logItem = new LOG.ExceptionLogItem;
+    logItem.init(this.doc, exception);
+    this.defaultConsole.appendRow(
+        logItem.element,
+        title,
+        true,
+        'red'
+    );
+}
+
+LOG.Logger.prototype.logObjectSource = function(object, title) {
+    var logItem = new LOG.ObjectLogItem;
+    logItem.init(this.doc, object, this.stackedMode);
+    this.defaultConsole.appendRow(logItem.element, title);
+    return LOG.dontLogResult;
+}
+
+LOG.Logger.prototype.log = function(message, title, newLineAfterTitle, sectionName, dontOpen, stackedMode) {
+    if (!sectionName) {
+        sectionName = 'console';
+    }
+    var section = this.getOrAddConsoleSection(sectionName);
+    section.content.appendRow(
+        LOG.getValueAsHtmlElement(
+            this.doc,
+            message,
+            stackedMode == undefined ? this.stackedMode : stackedMode,
+            undefined,
+            true,
+            true
+        ),
+        title,
+        newLineAfterTitle,
+        null
+    );
+    if (!dontOpen) {
+        section.panel.setSelected(true);
+    } else if (!section.panel.selected) {
+        section.panel.setChanged(true);
+    }
+    return message;
+}
+
+LOG.Logger.prototype.logAndStore = function(value, source) {
+    var pos = LOG.indexOf(LOG.clickedMessages, value);
+    if (pos == -1) {
+        pos = LOG.clickedMessages.length;
+        LOG.clickedMessages[pos] = value;
+    }
+    
+    if (source) {
+        this.logObjectSource(value, null, this.stackedMode);
+    } else {
+        this.console.appendRow(LOG.getValueAsHtmlElement(document, value, this.stackedMode, undefined, true));
+    }
+    if (this.console.commandEditor.commandInput.element.value == '' || this.console.commandEditor.commandInput.element.value.match(/^\$[0-9]+$/)) {
+        this.console.commandEditor.commandInput.element.value = '$' + pos;
+    }
+    return;
+}
+
 LOG.Logger.prototype.updateCommandEditorSize = function() {
     this.box.setChildSize(1, this.commandEditor.getHeight(), 'em');
 }
@@ -144,37 +208,48 @@ LOG.Logger.prototype.onKeyDown = function(event) {
     }
 }
 
-LOG.Logger.prototype.addPanel = function(panelName, content) {
-    if (this.panels[panelName]) {
-        return this.panels[panelName];
+LOG.Logger.prototype.addConsoleSection = function(sectionName) {
+    var console = new LOG.Console;
+    console.init(this.doc);
+    return this.addSection(sectionName, console);
+}
+
+LOG.Logger.prototype.getOrAddConsoleSection = function(sectionName) {
+    if (this.sections[sectionName]) {
+        return this.sections[sectionName];
+    } else {
+        return this.addConsoleSection(sectionName);
     }
-    
+}
+
+LOG.Logger.prototype.addSection = function(sectionName, content) {
     var panel = new LOG.LogPanel;
-    panel.init(this.doc, panelName);
+    panel.init(this.doc, sectionName);
     panel.contentElement.appendChild(content.element);
     this.panelManager.add(panel);
     
-    this.panels[panelName] = {
+    var section = {
         panel: panel,
         content: content
     };
     
-    return panel;
+    this.sections[sectionName] = section;
+    
+    return section;
 }
-
-// FIXME: unchecked - unimplemented
-
 
 LOG.Logger.prototype.onClearClick = function(event) {
     LOG.stopPropagation(event);
     LOG.preventDefault(event);
-    for (var panelName in this.panels) {
-        if (this.panels[panelName].panel.selected) {
-            this.panels[panelName].panel.setChanged(false);
-            this.panels[panelName].content.clear();
+    for (var sectionName in this.sections) {
+        if (this.sections[sectionName].panel.selected) {
+            this.sections[sectionName].panel.setChanged(false);
+            this.sections[sectionName].content.clear();
         }
     }
 }
+
+// FIXME: unchecked - unimplemented
 
 LOG.Logger.prototype.onCloseClick = function(event) {
     LOG.stopPropagation(event);

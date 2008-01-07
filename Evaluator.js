@@ -1,59 +1,16 @@
 LOG.Class('Evaluator');
 
-LOG.Evaluator.prototype.init = function(console) {
-    this.console = console;
-    this.stackedMode = true;
-}
-
-LOG.Evaluator.prototype.log = function(message, title, newLineAfterTitle, consoleName, dontOpen, stackedMode) {
-    /*
-        FIXME: what to do about this??
-        consoleName,
-        dontOpen
-    */
-    this.console.appendRow(
-        LOG.getValueAsHtmlElement(
-            this.console.doc,
-            message,
-            stackedMode == undefined ?
-            this.stackedMode :
-            stackedMode,
-            undefined,
-            true,
-            true
-        ),
-        title,
-        newLineAfterTitle,
-        null
-    );
-    return message;
-}
-
-LOG.Evaluator.prototype.logAndStore = function(value, source) {
-    var pos = LOG.indexOf(LOG.clickedMessages, value);
-    if (pos == -1) {
-        pos = LOG.clickedMessages.length;
-        LOG.clickedMessages[pos] = value;
-    }
-    
-    if (source) {
-        this.logObjectSource(value, null, this.stackedMode);
-    } else {
-        this.console.appendRow(LOG.getValueAsHtmlElement(document, value, this.stackedMode, undefined, true));
-    }
-    if (this.console.commandEditor.commandInput.element.value == '' || this.console.commandEditor.commandInput.element.value.match(/^\$[0-9]+$/)) {
-        this.console.commandEditor.commandInput.element.value = '$' + pos;
-    }
-    return;
+LOG.Evaluator.prototype.init = function(logger) {
+    this.logger = logger;
 }
 
 LOG.Evaluator.prototype.evalScriptAndPrintResults = function($script) {
     var result = this.evalScript($script);
     if (result !== LOG.dontLogResult) {
         if ($script.indexOf('\n') == -1) {
-            this.log(result, $script, true);
+            this.logger.log(result, $script, true);
         } else {
-            this.log(result, $script.substr(0, $script.indexOf('\n')) + '...', true);
+            this.logger.log(result, $script.substr(0, $script.indexOf('\n')) + '...', true);
         }
     }
 }
@@ -68,40 +25,26 @@ LOG.Evaluator.prototype.evaluate = function(code, additionalVariables) {
 LOG.Evaluator.prototype.evalScript = function($script) {
     var me = this;
     if ($script == 'help') {
-        this.console.appendRow(
-            this.ownerDocument.createTextNode(
-                '\n$0, $1 ... $n: clicked element' +
-                '\n$S(object, title): logObjectSource' +
-                '\n$P(object): getObjectProperties'
-            ), 'Help'
+        this.logger.logText(
+            '\n$0, $1 ... $n: clicked element' +
+            '\n$E(element): createOutlineFromElement' +
+            '\n$S(object, title): logObjectSource' +
+            '\n$P(object): getObjectProperties',
+            'Help'
         );
         return LOG.dontLogResult;
     }
     try {
         var vars = {
             '$P': LOG.getObjectProperties,
-            '$S': function(object, title) { return me.logObjectSource(object, title) }
+            '$S': function(object, title) { return me.logger.logObjectSource(object, title) }
         };
         for (var i = 0; i < LOG.clickedMessages.length; ++i) {
            vars['$' + i] = LOG.clickedMessages[i];
         }
         return this.evaluate($script, vars);
     } catch (e) {
-        var logItem = new LOG.ExceptionLogItem;
-        logItem.init(this.console.doc, e);
-        this.console.appendRow(
-            logItem.element,
-            'error ' + $script,
-            true,
-            'red'
-        );
+        this.logger.logException(e, 'error ' + $script);
         return LOG.dontLogResult;
     }
-}
-
-LOG.Evaluator.prototype.logObjectSource = function(object, title) {
-    var logItem = new LOG.ObjectLogItem;
-    logItem.init(this.console.doc, object, this.stackedMode);
-    this.console.appendRow(logItem.element, title);
-    return LOG.dontLogResult;
 }
