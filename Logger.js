@@ -57,22 +57,16 @@ LOG.Logger.prototype.init = function(doc, inNewWindow, historyManager, openSecti
     this.evaluator = new LOG.Evaluator;
     this.evaluator.init(this);
 
-    //~ var me = this;
+    var me = this;
     
-    //~ this.htmlPanel = new LOG.LogPanel;
-    //~ this.htmlPanel.init(doc, 'html', false);
-    //~ this.htmlPanel.onselect = function() {
-        //~ if (!me.htmlLogItem) {
-            //~ me.htmlLogItem = new LOG.HTMLElementLogItem;
-            //~ me.htmlLogItem.init(this.doc, document.getElementsByTagName('html')[0], false, [], true);
-            //~ me.htmlPanel.contentElement.appendChild(me.htmlLogItem.element);
-        //~ }
-    //~ }
-    
-    //~ this.consoles.html = {
-        //~ panel: this.htmlPanel,
-        //~ count: 0
-    //~ };
+    var htmlSection = this.addSection('html');
+    htmlSection.panel.onselect = function() {
+        if (!me.htmlLogItem) {
+            me.htmlLogItem = new LOG.HTMLElementLogItem;
+            me.htmlLogItem.init(me.doc, document.getElementsByTagName('html')[0], false, [], true);
+            htmlSection.panel.contentElement.appendChild(me.htmlLogItem.element);
+        }
+    }
     
     //~ this.pagePanel = new LOG.LogPanel;
     //~ this.pagePanel.init(doc, 'page', false);
@@ -192,10 +186,10 @@ LOG.Logger.prototype.logAndStore = function(value, source) {
     if (source) {
         this.logObjectSource(value, null, this.stackedMode);
     } else {
-        this.console.appendRow(LOG.getValueAsHtmlElement(document, value, this.stackedMode, undefined, true));
+        this.defaultConsole.appendRow(LOG.getValueAsHtmlElement(document, value, this.stackedMode, undefined, true));
     }
-    if (this.console.commandEditor.commandInput.element.value == '' || this.console.commandEditor.commandInput.element.value.match(/^\$[0-9]+$/)) {
-        this.console.commandEditor.commandInput.element.value = '$' + pos;
+    if (this.commandEditor.commandInput.element.value == '' || this.commandEditor.commandInput.element.value.match(/^\$[0-9]+$/)) {
+        this.commandEditor.commandInput.element.value = '$' + pos;
     }
     return;
 }
@@ -252,7 +246,9 @@ LOG.Logger.prototype.getOrAddConsoleSection = function(sectionName) {
 LOG.Logger.prototype.addSection = function(sectionName, content) {
     var panel = new LOG.LogPanel;
     panel.init(this.doc, sectionName);
-    panel.contentElement.appendChild(content.element);
+    if (content) {
+        panel.contentElement.appendChild(content.element);
+    }
     this.panelManager.add(panel);
     
     var section = {
