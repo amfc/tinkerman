@@ -19,15 +19,18 @@ LOG.CommandInput.prototype.init = function(doc, useTextArea, evaluator, historyM
                 fontSize: '13px',
                 fontWeight: 'normal'
             },
-            onkeypress: LOG.createEventHandler(doc, this, 'onInputKeyPress'),
-            mousedown: function(event) {
-                if (!event) {
-                    event = LOG.console.getWindow().event;
-                }
-                LOG.stopPropagation(event);
-            }
+            onmousedown: LOG.createEventHandler(doc, this, 'onInputMouseDown')
         }
     );
+    if (LOG.isIE) {
+        this.element.onkeydown = LOG.createEventHandler(doc, this, 'onInputKeyPressOrDown');
+    } else {
+        this.element.onkeypress = LOG.createEventHandler(doc, this, 'onInputKeyPressOrDown');
+    }
+}
+
+LOG.CommandInput.prototype.onInputMouseDown = function(event) {
+    LOG.stopPropagation(event);
 }
 
 LOG.CommandInput.prototype.getCurrentExpression = function() {
@@ -89,7 +92,7 @@ LOG.CommandInput.prototype.getCurrentWordAndPosition = function() {
     }
 }
 
-LOG.CommandInput.prototype.onInputKeyPress = function($event) {
+LOG.CommandInput.prototype.onInputKeyPressOrDown = function(event) {
     function getCommonStart(list) {
         var common = list[0];
         var j;
@@ -106,51 +109,9 @@ LOG.CommandInput.prototype.onInputKeyPress = function($event) {
         }
         return common;
     }
-    if ($event.keyCode == 13) {
-        if (!this.useTextArea || $event.ctrlKey) {
-            this.historyManager.add(this.element.value);
-            this.evaluator.evalScriptAndPrintResults(this.element.value);
-            LOG.stopPropagation($event);
-            LOG.preventDefault($event);
-            if (!this.useTextArea) {
-                this.element.value = '';
-            }
-        } else if (this.useTextArea) { // We keep indentation in enters
-            function getLineFromLeft(value, pos) {
-                var chr, line = '';
-                while (pos >= 0) {
-                    chr = value.charAt(pos);
-                    if (chr == '\n' || chr == '\r') {
-                        break;
-                    }
-                    line = chr + line;
-                    --pos;
-                }
-                return line;
-            }
-            function getIndentation(line) {
-                var chr;
-                var indentation = '';
-                for (var i = 0; i < line.length; ++i) {
-                    chr = line.charAt(i);
-                    if (chr != ' ' && chr != '\t') {
-                        break;
-                    }
-                    indentation += chr;
-                }
-                return indentation;
-            }
-            var pos = LOG.getTextInputSelection(this.element)[0];
-            var indentation = getIndentation(getLineFromLeft(this.element.value, pos - 1));
-            this.element.value = this.element.value.substring(0, pos) + '\n' + indentation + this.element.value.substring(pos);
-            pos += indentation.length + 1;
-            LOG.setTextInputSelection(this.element, [pos, pos]);
-            LOG.stopPropagation($event);
-            LOG.preventDefault($event);
-        }
-    } else if ($event.keyCode == 9) { // Tab
-        LOG.stopPropagation($event);
-        LOG.preventDefault($event);
+    if (event.keyCode == 9) { // Tab
+        LOG.stopPropagation(event);
+        LOG.preventDefault(event);
         var currentExpression = this.getCurrentExpression();
         var currentWordAndPosition = this.getCurrentWordAndPosition();
         var names;
@@ -189,14 +150,56 @@ LOG.CommandInput.prototype.onInputKeyPress = function($event) {
             var commonStartPos = currentWordAndPosition.end + commonStart.length - currentWordAndPosition.word.length;
             LOG.setTextInputSelection(this.element, [commonStartPos, commonStartPos]);
         }
-    } else if ($event.keyCode == 38 && (!this.useTextArea || $event.ctrlKey)) { // Up
+    } else if (event.keyCode == 38 && (!this.useTextArea || event.ctrlKey)) { // Up
         this.element.value = this.historyManager.up(this.element.value);
-        LOG.stopPropagation($event);
-        LOG.preventDefault($event);
-    } else if ($event.keyCode == 40 && (!this.useTextArea || $event.ctrlKey)) { // Down
+        LOG.stopPropagation(event);
+        LOG.preventDefault(event);
+    } else if (event.keyCode == 40 && (!this.useTextArea || event.ctrlKey)) { // Down
         this.element.value = this.historyManager.down();
-        LOG.stopPropagation($event);
-        LOG.preventDefault($event);
+        LOG.stopPropagation(event);
+        LOG.preventDefault(event);
+    } else if (event.keyCode == 13) {
+        if (!this.useTextArea || event.ctrlKey) {
+            this.historyManager.add(this.element.value);
+            this.evaluator.evalScriptAndPrintResults(this.element.value);
+            LOG.stopPropagation(event);
+            LOG.preventDefault(event);
+            if (!this.useTextArea) {
+                this.element.value = '';
+            }
+        } else if (this.useTextArea) { // We keep indentation in enters
+            function getLineFromLeft(value, pos) {
+                var chr, line = '';
+                while (pos >= 0) {
+                    chr = value.charAt(pos);
+                    if (chr == '\n' || chr == '\r') {
+                        break;
+                    }
+                    line = chr + line;
+                    --pos;
+                }
+                return line;
+            }
+            function getIndentation(line) {
+                var chr;
+                var indentation = '';
+                for (var i = 0; i < line.length; ++i) {
+                    chr = line.charAt(i);
+                    if (chr != ' ' && chr != '\t') {
+                        break;
+                    }
+                    indentation += chr;
+                }
+                return indentation;
+            }
+            var pos = LOG.getTextInputSelection(this.element)[0];
+            var indentation = getIndentation(getLineFromLeft(this.element.value, pos - 1));
+            this.element.value = this.element.value.substring(0, pos) + '\n' + indentation + this.element.value.substring(pos);
+            pos += indentation.length + 1;
+            LOG.setTextInputSelection(this.element, [pos, pos]);
+            LOG.stopPropagation(event);
+            LOG.preventDefault(event);
+        }
     }
 }
 

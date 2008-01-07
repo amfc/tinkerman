@@ -13,6 +13,18 @@ LOG.TypedObjectLogItem.prototype.init = function(doc, value, stackedMode, alread
     }
     var me = this;
     var outlineElement;
+    this.typeName = this.getTypeName();
+    var showProps;
+    var stringToShow;
+    if (this.typeName != 'HTMLDocument' && this.typeName != 'Window') {
+        stringToShow = (typeof value.toString == 'function' && value.toString != Object.prototype.toString) ? ' ' + value.toString() : null;
+        showProps = true;
+    } else {
+        stringToShow = null;
+        showProps = false;
+    }
+    
+    
     this.element = LOG.createElement(this.doc,
         'span',
         {},
@@ -47,12 +59,10 @@ LOG.TypedObjectLogItem.prototype.init = function(doc, value, stackedMode, alread
                     },
                     onclick: LOG.createEventHandler(this.doc, this, 'onNameLinkClick')
                 },
-                [
-                    this.getTypeName()
-                ]
+                [ this.typeName ]
             ),
-            ' ',
-            this.srcLink = LOG.createElement(this.doc, 'a',
+            showProps ? ' ' : null,
+            showProps ? this.srcLink = LOG.createElement(this.doc, 'a',
                 {
                     style: {
                         color: 'green',
@@ -71,10 +81,10 @@ LOG.TypedObjectLogItem.prototype.init = function(doc, value, stackedMode, alread
                 [
                     'src'
                 ]
-            ),
+            ) : null,
             LOG.getExtraInfoToLogAsHtmlElement(this.doc, value, stackedMode, alreadyLoggedContainers),
-            (typeof value.toString == 'function' && value.toString != Object.prototype.toString) ? ' ' + value.toString() : null,
-            this.srcElement = LOG.createElement(this.doc, 'span'),
+            stringToShow,
+            showProps ? this.srcElement = LOG.createElement(this.doc, 'span') : null,
             '»'
         ]
     );
@@ -82,9 +92,9 @@ LOG.TypedObjectLogItem.prototype.init = function(doc, value, stackedMode, alread
 
 LOG.TypedObjectLogItem.prototype.onNameLinkClick = function(event) {
     if (event.ctrlKey) {
-        LOG.openClassInEditor(value);
+        LOG.openClassInEditor(this.value);
     } else {
-        LogAndStore(value);
+        LogAndStore(this.value);
     }
     LOG.stopPropagation(event);
     LOG.preventDefault(event);
@@ -99,6 +109,17 @@ LOG.TypedObjectLogItem.prototype.onSrcLinkClick = function(event) {
 
 LOG.TypedObjectLogItem.prototype.getTypeName = function() {
     var value = this.value;
+    
+    if (LOG.instanceOfWindow(value)) {
+        return "Window";
+    } else if (LOG.instanceOfDocument(value)) {
+        if (LOG.instanceOfHTMLDocument(value)) {
+            return "HTMLDocument";
+        } else {
+            return "Document";
+        }
+    }
+    
     var txt = '';
     var objectToStringName = null;
     if (value.toString && value.toString && value.toString != Object.prototype.toString) {

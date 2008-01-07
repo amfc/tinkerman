@@ -80,6 +80,23 @@ LOG.getExtraInfoToLogAsHtmlElement = function(doc, value, stackedMode, alreadyLo
 }
 
 
+LOG.instanceOfDocument = function(value) {
+    if (LOG.isIE) {
+        return value.nodeType == 9;
+    } else {
+        return value instanceof Document;
+    }
+}
+
+LOG.instanceOfHTMLDocument = function(value) {
+    return LOG.instanceOfDocument(value) && document.body;
+}
+
+LOG.instanceOfWindow = function(value) {
+    return value.self == value && value == value.window;
+}
+
+
 LOG.getValueAsLogItem = function(doc, value, stackedMode, alreadyLoggedContainers, showFirstLevelObjectChildren, showExpandObjectChildren) {
     // Simple object (used as hash tables), array, html element and typed objects are special (since they are implemented as separate objects) and should be handled separately
     if (value != null && typeof value == 'object') {
@@ -91,7 +108,7 @@ LOG.getValueAsLogItem = function(doc, value, stackedMode, alreadyLoggedContainer
             var logItem = new LOG.ArrayLogItem;
             logItem.init(doc, value, stackedMode, alreadyLoggedContainers);
             return logItem;
-        } else if (value.getClassName || value instanceof String || value instanceof Date || value instanceof Number || value instanceof Boolean) { // an object we can Log
+        } else if (value.getClassName || value instanceof String || value instanceof Date || value instanceof Number || value instanceof Boolean || LOG.instanceOfWindow(value) || LOG.instanceOfDocument(value)) { // an object we can Log
             var logItem = new LOG.TypedObjectLogItem;
             logItem.init(doc, value, stackedMode, alreadyLoggedContainers);
             return logItem;
