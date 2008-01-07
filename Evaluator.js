@@ -6,6 +6,11 @@ LOG.Evaluator.prototype.init = function(console) {
 }
 
 LOG.Evaluator.prototype.log = function(message, title, newLineAfterTitle, consoleName, dontOpen, stackedMode) {
+    /*
+        FIXME: what to do about this??
+        consoleName,
+        dontOpen
+    */
     this.console.appendRow(
         LOG.getValueAsHtmlElement(
             this.console.doc,
@@ -19,9 +24,7 @@ LOG.Evaluator.prototype.log = function(message, title, newLineAfterTitle, consol
         ),
         title,
         newLineAfterTitle,
-        null,
-        consoleName,
-        dontOpen
+        null
     );
     return message;
 }
@@ -68,7 +71,6 @@ LOG.Evaluator.prototype.evalScript = function($script) {
         this.console.appendRow(
             this.ownerDocument.createTextNode(
                 '\n$0, $1 ... $n: clicked element' +
-                '\n$E(element): createOutlineFromElement' +
                 '\n$S(object, title): logObjectSource' +
                 '\n$P(object): getObjectProperties'
             ), 'Help'
@@ -78,8 +80,7 @@ LOG.Evaluator.prototype.evalScript = function($script) {
     try {
         var vars = {
             '$P': LOG.getObjectProperties,
-            '$S': function(object, title) { return me.logObjectSource(object, title) },
-            '$E': LOG.createOutlineFromElement
+            '$S': function(object, title) { return me.logObjectSource(object, title) }
         };
         for (var i = 0; i < LOG.clickedMessages.length; ++i) {
            vars['$' + i] = LOG.clickedMessages[i];

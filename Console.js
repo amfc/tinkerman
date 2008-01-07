@@ -19,7 +19,7 @@ LOG.Console.prototype.getWindow = function() {
     }
 }
 
-LOG.Console.prototype.appendRow = function(messageHtmlFragment, title, newLineAfterTitle, titleColor, dontOpen) {
+LOG.Console.prototype.appendRow = function(messageHtmlFragment, title, newLineAfterTitle, titleColor) {
     var newRow = this.doc.createElement('div');
     if (this.stopDebugging) {
         return;
