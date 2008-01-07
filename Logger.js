@@ -267,7 +267,9 @@ LOG.Logger.prototype.onClearClick = function(event) {
     for (var sectionName in this.sections) {
         if (this.sections[sectionName].panel.selected) {
             this.sections[sectionName].panel.setChanged(false);
-            this.sections[sectionName].content.clear();
+            if (this.sections[sectionName].content) {
+                this.sections[sectionName].content.clear();
+            }
         }
     }
 }
