@@ -104,12 +104,12 @@ LOG.getValueAsLogItem = function(doc, value, stackedMode, alreadyLoggedContainer
             var logItem = new LOG.HTMLElementLogItem;
             logItem.init(doc, value, stackedMode, alreadyLoggedContainers);
             return logItem;
-        }  else if (value instanceof Array || /* filter DOM Select elements */ !value.nodeType && value.item && typeof value.length != 'undefined') {
-            var logItem = new LOG.ArrayLogItem;
-            logItem.init(doc, value, stackedMode, alreadyLoggedContainers);
-            return logItem;
         } else if (value.getClassName || value instanceof String || value instanceof Date || value instanceof Number || value instanceof Boolean || LOG.instanceOfWindow(value) || LOG.instanceOfDocument(value)) { // an object we can Log
             var logItem = new LOG.TypedObjectLogItem;
+            logItem.init(doc, value, stackedMode, alreadyLoggedContainers);
+            return logItem;
+        }  else if (value instanceof Array || /* filter DOM Select elements */ !value.nodeType && value.item && typeof value.length != 'undefined') {
+            var logItem = new LOG.ArrayLogItem;
             logItem.init(doc, value, stackedMode, alreadyLoggedContainers);
             return logItem;
         } else {
