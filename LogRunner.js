@@ -10,7 +10,6 @@ LOG.LogRunner = function() {
     LOG.addEventListener(document, 'keydown', LOG.createEventHandler(document, this, 'onKeyDown'), true);
     //~ LOG.addEventListener(document, 'selectstart', this.caller('onDocumentSelectStart'), true);
     LOG.addEventListener(window, 'unload', this.caller('onUnload'));
-    
     if (LOG.getCookie('LOG_OPEN') == 'true') {
         this.createLogger();
     }
@@ -27,11 +26,18 @@ LOG.LogRunner.prototype.createLogger = function() {
     if (this.doc.body) {
         this.appendLogger();
     } else {
-        LOG.addEventListener(window, 'load', this.caller('appendLogger'));
+        if (!this.appendLoggerCaller) {
+            this.appendLoggerCaller = this.caller('appendLogger');
+        }
+        LOG.addEventListener(window, 'load', this.appendLoggerCaller);
     }
 }
 
 LOG.LogRunner.prototype.appendLogger = function() {
+    if (this.appendLoggerCaller) {
+        LOG.removeEventListener(window, 'load', this.appendLoggerCaller);
+        delete this.appendLoggerCaller;
+    }
     this.doc = this.prepareNewDocument();
     
     this.logger = new LOG.Logger(this.doc, this.willOpenInNewWindow, this.historyManager, this.loggerSavedOpenSections);
@@ -138,7 +144,7 @@ LOG.LogRunner.prototype.onUnload = function() {
         LOG.addCookie('LOG_SIZE', this.bodyWrapperSavedSize, 30);
     }
     LOG.addCookie('LOG_IN_NEW_WINDOW', this.willOpenInNewWindow ? 'true' : 'false', 30);
-    LOG.addCookie('LOG_OPEN', this.logger && !this.bodyWrapper.hidden ? "true" : "false", 30);
+    LOG.addCookie('LOG_OPEN', this.logger && (this.bodyWrapper && !this.bodyWrapper.hidden) ? "true" : "false", 30);
     if (this.logger) {
         LOG.addCookie('LOG_OPEN_SECTIONS', this.logger.serializeOpenSections(), 30);
     }
@@ -159,15 +165,6 @@ LOG.LogRunner.prototype.onLoggerEscPress = function() {
     //~ }
     //~ this.deleteElement();
     //~ this.stopDebugging = true;
-//~ }
-
-//~ LOG.LogRunner.prototype.onNewWindowClick = function(event) {
-    //~ LOG.stopPropagation(event);
-    //~ LOG.preventDefault(event);
-    //~ this.willOpenInNewWindow = !this.willOpenInNewWindow;
-    //~ this.deleteElement();
-    //~ this.prepareNewDocument();
-    //~ this.createLogger();
 //~ }
 
 LOG.onDocumentSelectStart = function(event) {

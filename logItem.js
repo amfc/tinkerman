@@ -29,7 +29,7 @@ LOG.getValueAsHtmlElement = function(doc, value, stackedMode, alreadyLoggedConta
 }
 
 LOG.getExtraInfoToLogAsHtmlElement = function(doc, value, stackedMode, alreadyLoggedContainers) {
-    if (!value.getExtraInfoToLog) {
+    if (!value || !value.getExtraInfoToLog) {
         return null;
     }
     var extraInfoToLog = value.getExtraInfoToLog();
@@ -111,45 +111,8 @@ LOG.getValueAsLogItem = function(doc, value, stackedMode, alreadyLoggedContainer
         }
     } else if (typeof value == 'function') {
         return new LOG.FunctionLogItem(doc, value, stackedMode, alreadyLoggedContainers);
+    } else {
+        return new LOG.BasicLogItem(doc, value, stackedMode, alreadyLoggedContainers);
     }
     
-    function appendExtraInfoToLog() {
-        var extraInfoElement = LOG.getExtraInfoToLogAsHtmlElement(doc, value, stackedMode, alreadyLoggedContainers);
-        if (extraInfoElement) {
-            fragment.appendChild(extraInfoElement);
-        }
-    }
-    
-    // We know the value is not a hash type object or an array or html element or a typed object
-    var i;
-    var fragment = doc.createDocumentFragment();
-    
-    var span = LOG.getGetPositionInVariablesElement(doc, value);
-    if (span) {
-        fragment.appendChild(span);
-    }
-    
-    if (!alreadyLoggedContainers) {
-        alreadyLoggedContainers = [];
-    }
-    if (typeof value == 'object') {
-        if (value == null) {
-            fragment.appendChild(doc.createTextNode('null'));
-        } else if (LOG.indexOf(alreadyLoggedContainers, value) != -1) {
-            fragment.appendChild(doc.createTextNode('<Ref>'));
-        } else if (typeof value == 'object' && value.nodeType == 8) { // 8 = comment
-            fragment.appendChild(doc.createTextNode('[Comment] '));
-            fragment.appendChild(LOG.getValueAsHtmlElement(doc, value.nodeValue, stackedMode, alreadyLoggedContainers));
-        } else if (typeof value == 'object' && value.nodeName == '#text') {
-            fragment.appendChild(doc.createTextNode('[NodeText] '));
-            fragment.appendChild(LOG.getValueAsHtmlElement(doc, value.nodeValue, stackedMode, alreadyLoggedContainers));
-        }
-    } else if (typeof value == 'string') {
-        fragment.appendChild(doc.createTextNode('"' + value.toString() + '"'));
-    } else if (typeof value != 'undefined' && typeof value.toString == 'function') {
-        fragment.appendChild(doc.createTextNode(value.toString()));
-    }
-    return {
-       element: fragment
-    };
 }
