@@ -101,21 +101,13 @@ LOG.getValueAsLogItem = function(doc, value, stackedMode, alreadyLoggedContainer
     // Simple object (used as hash tables), array, html element and typed objects are special (since they are implemented as separate objects) and should be handled separately
     if (value != null && typeof value == 'object') {
         if (value.nodeType && value.nodeType == 1) { // 1: element node
-            var logItem = new LOG.HTMLElementLogItem;
-            logItem.init(doc, value, stackedMode, alreadyLoggedContainers);
-            return logItem;
+            return new LOG.HTMLElementLogItem(doc, value, stackedMode, alreadyLoggedContainers);
         } else if (value.getClassName || value instanceof String || value instanceof Date || value instanceof Number || value instanceof Boolean || LOG.instanceOfWindow(value) || LOG.instanceOfDocument(value)) { // an object we can Log
-            var logItem = new LOG.TypedObjectLogItem;
-            logItem.init(doc, value, stackedMode, alreadyLoggedContainers);
-            return logItem;
+            return new LOG.TypedObjectLogItem(doc, value, stackedMode, alreadyLoggedContainers);
         }  else if (value instanceof Array || /* filter DOM Select elements */ !value.nodeType && value.item && typeof value.length != 'undefined') {
-            var logItem = new LOG.ArrayLogItem;
-            logItem.init(doc, value, stackedMode, alreadyLoggedContainers);
-            return logItem;
+            return new LOG.ArrayLogItem(doc, value, stackedMode, alreadyLoggedContainers);
         } else {
-            var logItem = new LOG.ObjectLogItem;
-            logItem.init(doc, value, stackedMode, alreadyLoggedContainers, showFirstLevelObjectChildren, showExpandObjectChildren);
-            return logItem;
+            return new LOG.ObjectLogItem(doc, value, stackedMode, alreadyLoggedContainers, showFirstLevelObjectChildren, showExpandObjectChildren);
         }
     }
     

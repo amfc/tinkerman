@@ -1,4 +1,5 @@
-LOG.Class('AbstractBox');
+LOG.AbstractBox = function() {
+}
 
 LOG.AbstractBox.prototype.init = function(doc) {
     this.doc = doc;
@@ -96,9 +97,8 @@ LOG.AbstractBox.prototype.add = function(element, size) { //  size: { size, size
     this.updateSizes();
 }
 
-if (!LOG.Hbox) {
-    LOG.Hbox = function() {
-    }
+LOG.Hbox = function(doc) {
+    this.init(doc);
 }
 
 
@@ -107,9 +107,8 @@ LOG.Hbox.prototype.sizeProperty = 'width';
 LOG.Hbox.prototype.reservedSpacePosition = 'Right';
 
 
-if (!LOG.Vbox) {
-    LOG.Vbox = function() {
-    }
+LOG.Vbox = function(doc) {
+    this.init(doc);
 }
 
 LOG.Vbox.prototype = new LOG.AbstractBox;

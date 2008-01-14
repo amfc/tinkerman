@@ -1,7 +1,5 @@
 // This works with JS and PHP exceptions traces
-LOG.Class('ExceptionLogItem');
-
-LOG.ExceptionLogItem.prototype.init = function(doc, value) {
+LOG.ExceptionLogItem = function(doc, value) {
     this.doc = doc;
     var link;
     var me = this;

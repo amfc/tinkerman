@@ -1,6 +1,4 @@
-LOG.Class('ArrayLogItem');
-
-LOG.ArrayLogItem.prototype.init = function(doc, value, stackedMode, alreadyLoggedContainers) {
+LOG.ArrayLogItem = function(doc, value, stackedMode, alreadyLoggedContainers) {
     this.doc = doc;
     if (typeof alreadyLoggedContainers == 'undefined') {
         alreadyLoggedContainers = [];

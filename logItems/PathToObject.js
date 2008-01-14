@@ -1,6 +1,4 @@
-LOG.Class('PathToObjectLogItem');
-
-LOG.PathToObjectLogItem.prototype.init = function(doc, value) {
+LOG.PathToObjectLogItem = function(doc, value) {
     this.doc = doc;
     var me = this;
     this.value = value;
@@ -11,16 +9,14 @@ LOG.PathToObjectLogItem.prototype.init = function(doc, value) {
     if (value) {
         var part, i;
         for (i = 0; i < value.pathToObject.length; ++i) {
-            part = new LOG.PathToObjectPart;
-            part.init(this.doc, value.pathToObject[i].obj, i == 0 ? value.pathToObject[i].name : LOG.getPropertyAccessor(value.pathToObject[i].name));
+            part = new LOG.PathToObjectPart(this.doc, value.pathToObject[i].obj, i == 0 ? value.pathToObject[i].name : LOG.getPropertyAccessor(value.pathToObject[i].name));
             this.element.appendChild(LOG.createElement(this.doc, 'span', { style: { fontSize: '0.1pt' } }, [ ' ' ]));
             this.element.appendChild(part.element);
         }
         var node = value.pathToObject[value.pathToObject.length - 1].obj;
         for (i = 0; i < value.pathToElement.length; ++i) {
-            part = new LOG.PathToObjectPart;
             node = node.childNodes[value.pathToElement[i]];
-            part.init(this.doc, node, '.childNodes[' + value.pathToElement[i] + ']');
+            part = new LOG.PathToObjectPart(this.doc, node, '.childNodes[' + value.pathToElement[i] + ']');
             this.element.appendChild(part.element);
         }
     } else {
@@ -28,9 +24,7 @@ LOG.PathToObjectLogItem.prototype.init = function(doc, value) {
     }
 }
 
-LOG.Class('PathToObjectPart');
-
-LOG.PathToObjectPart.prototype.init = function(doc, value, pathPartName) {
+LOG.PathToObjectPart = function(doc, value, pathPartName) {
     this.doc = doc;
     this.value = value;
     this.ctrlClick = false;

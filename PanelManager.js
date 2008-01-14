@@ -1,9 +1,6 @@
-LOG.Class('PanelManager');
-
-LOG.PanelManager.prototype.init = function(doc, rightToolbarElement) {
+LOG.PanelManager = function(doc, rightToolbarElement) {
     this.doc = doc;
-    var box = new LOG.Vbox;
-    box.init(doc);
+    var box = new LOG.Vbox(doc);
     this.element = box.element;
     this.scrollContainer = LOG.createElement(this.doc, 'div',
         {

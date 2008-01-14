@@ -1,6 +1,4 @@
-LOG.Class('CommandEditor');
-
-LOG.CommandEditor.prototype.init = function(doc, evalCallback, resizeCallback, historyManager) {
+LOG.CommandEditor = function(doc, evalCallback, resizeCallback, historyManager) {
     this.doc = doc;
     this.evalCallback = evalCallback;
     this.resizeCallback = resizeCallback;
@@ -82,8 +80,7 @@ LOG.CommandEditor.prototype.setIsBig = function(isBig, dontNotifyParent) {
     if (this.commandInput) {
         this.commandInput.element.parentNode.removeChild(this.commandInput.element);
     }
-    this.commandInput = new LOG.CommandInput;
-    this.commandInput.init(this.doc, this.textAreaBig, this.evalCallback, this.historyManager);
+    this.commandInput = new LOG.CommandInput(this.doc, this.textAreaBig, this.evalCallback, this.historyManager);
     this.inputTd.appendChild(this.commandInput.element);
     
     if (this.textAreaBig) {

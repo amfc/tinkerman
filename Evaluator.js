@@ -1,6 +1,4 @@
-LOG.Class('Evaluator');
-
-LOG.Evaluator.prototype.init = function(logger) {
+LOG.Evaluator = function(logger) {
     this.logger = logger;
 }
 

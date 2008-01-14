@@ -1,6 +1,4 @@
-LOG.Class('ObjectLogItem');
-
-LOG.ObjectLogItem.prototype.init = function(doc, value, stackedMode, alreadyLoggedContainers, showChildren, showToggleChildrenLink) {
+LOG.ObjectLogItem = function(doc, value, stackedMode, alreadyLoggedContainers, showChildren, showToggleChildrenLink) {
     if (typeof alreadyLoggedContainers == 'undefined') {
         alreadyLoggedContainers = [];
     }

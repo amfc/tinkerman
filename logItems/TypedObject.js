@@ -1,6 +1,4 @@
-LOG.Class('TypedObjectLogItem');
-
-LOG.TypedObjectLogItem.prototype.init = function(doc, value, stackedMode, alreadyLoggedContainers) {
+LOG.TypedObjectLogItem = function(doc, value, stackedMode, alreadyLoggedContainers) {
     this.doc = doc;
     this.showSource = false;
     this.value = value;
@@ -24,10 +22,8 @@ LOG.TypedObjectLogItem.prototype.init = function(doc, value, stackedMode, alread
         showProps = false;
     }
     
-    
     this.element = LOG.createElement(this.doc,
-        'span',
-        {},
+        'span', {},
         [
             LOG.getGetPositionInVariablesElement(this.doc, value),
             '«',
@@ -171,8 +167,7 @@ LOG.TypedObjectLogItem.prototype.setShowSource = function(showSource) {
     if (showSource) {
         this.srcLink.style.textDecoration = 'line-through';
         this.srcElement.appendChild(this.doc.createTextNode(' '));
-        this.objectLogItem = new LOG.ObjectLogItem;
-        this.objectLogItem.init(this.doc, this.value, this.stackedMode, this.alreadyLoggedContainers, true, false);
+        this.objectLogItem = new LOG.ObjectLogItem(this.doc, this.value, this.stackedMode, this.alreadyLoggedContainers, true, false);
         if (this.autoUpdate) {
             this.objectLogItem.setAutoUpdate(true);
         }

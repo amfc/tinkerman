@@ -1,6 +1,4 @@
-LOG.Class('HistoryManager');
-
-LOG.HistoryManager.prototype.init = function(serializedHistory) {
+LOG.HistoryManager = function(serializedHistory) {
     if (serializedHistory) {
         try {
             this.history = eval('(' + serializedHistory + ')');

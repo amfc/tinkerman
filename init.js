@@ -1,4 +1,3 @@
-LOG.logRunner = new LOG.LogRunner;
-LOG.logRunner.init(document);
+LOG.logRunner = new LOG.LogRunner(document);
 
 LOG.loaded = true;

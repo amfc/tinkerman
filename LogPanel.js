@@ -1,6 +1,4 @@
-LOG.Class('LogPanel');
-
-LOG.LogPanel.prototype.init = function(doc, name, selected) {
+LOG.LogPanel = function(doc, name, selected) {
     this.labelElement = LOG.createElement(doc, 'span',
         {
             style: {

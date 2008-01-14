@@ -1,6 +1,4 @@
-LOG.Class('Console');
-
-LOG.Console.prototype.init = function(doc) {
+LOG.Console = function(doc) {
     this.maxCount = 1000;
     this.append = true;
     this.stopDebugging = false;

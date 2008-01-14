@@ -1,6 +1,4 @@
-LOG.Class('BodyWrapper');
-
-LOG.BodyWrapper.prototype.init = function(ownerDocument, elementToWrap, initialSize) {
+LOG.BodyWrapper = function(ownerDocument, elementToWrap, initialSize) {
     this.dragging = false;
     this.ownerDocument = ownerDocument;
     var doc = this.ownerDocument;

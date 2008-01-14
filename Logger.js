@@ -1,14 +1,10 @@
-LOG.Class('Logger');
-
-LOG.Logger.prototype.init = function(doc, inNewWindow, historyManager, openSectionsStr) {
+LOG.Logger = function(doc, inNewWindow, historyManager, openSectionsStr) {
     this.doc = doc;
     this.sections = {};
     this.inNewWindow = inNewWindow;
-    this.box = new LOG.Vbox;
-    this.box.init(doc);
+    this.box = new LOG.Vbox(doc);
     
-    this.panelManager = new LOG.PanelManager;
-    this.panelManager.init(doc,
+    this.panelManager = new LOG.PanelManager(doc,
         LOG.createElement(doc, 'span', {},
             [
                 ', ',
@@ -54,22 +50,19 @@ LOG.Logger.prototype.init = function(doc, inNewWindow, historyManager, openSecti
     consoleSection.panel.setSelected(true);
     this.defaultConsole = consoleSection.content;
     
-    this.evaluator = new LOG.Evaluator;
-    this.evaluator.init(this);
+    this.evaluator = new LOG.Evaluator(this);
 
     var me = this;
     
     var htmlSection = this.addSection('html');
     htmlSection.panel.onselect = function() {
         if (!me.htmlLogItem) {
-            me.htmlLogItem = new LOG.HTMLElementLogItem;
-            me.htmlLogItem.init(me.doc, document.getElementsByTagName('html')[0], false, [], true);
+            me.htmlLogItem = new LOG.HTMLElementLogItem(me.doc, document.getElementsByTagName('html')[0], false, [], true);
             htmlSection.panel.contentElement.appendChild(me.htmlLogItem.element);
         }
     }
     
-    //~ this.pagePanel = new LOG.LogPanel;
-    //~ this.pagePanel.init(doc, 'page', false);
+    //~ this.pagePanel = new LOG.LogPanel(doc, 'page', false);
     //~ this.pagePanel.onselect = function() {
         //~ function createPageLogItem() {
             //~ if (!self[LOG.pageObjectName]) {
@@ -91,8 +84,7 @@ LOG.Logger.prototype.init = function(doc, inNewWindow, historyManager, openSecti
     
     this.historyManager = historyManager;
     
-    this.commandEditor = new LOG.CommandEditor;
-    this.commandEditor.init(doc, this.evaluator, function() { me.updateCommandEditorSize() }, this.historyManager);
+    this.commandEditor = new LOG.CommandEditor(doc, this.evaluator, function() { me.updateCommandEditorSize() }, this.historyManager);
     
     this.box.add(this.panelManager.element, { size: 100, sizeUnit: '%' });
     this.box.add(this.commandEditor.element, { size: this.commandEditor.getHeight(), sizeUnit: 'em' });
@@ -133,8 +125,7 @@ LOG.Logger.prototype.logText = function(text, title) {
 }
 
 LOG.Logger.prototype.logException = function(exception, title) {
-    var logItem = new LOG.ExceptionLogItem;
-    logItem.init(this.doc, exception);
+    var logItem = new LOG.ExceptionLogItem(this.doc, exception);
     this.defaultConsole.appendRow(
         logItem.element,
         title,
@@ -144,8 +135,7 @@ LOG.Logger.prototype.logException = function(exception, title) {
 }
 
 LOG.Logger.prototype.logObjectSource = function(object, title) {
-    var logItem = new LOG.ObjectLogItem;
-    logItem.init(this.doc, object, this.stackedMode);
+    var logItem = new LOG.ObjectLogItem(this.doc, object, this.stackedMode);
     this.defaultConsole.appendRow(logItem.element, title);
     return LOG.dontLogResult;
 }
@@ -230,8 +220,7 @@ LOG.Logger.prototype.onKeyDown = function(event) {
 }
 
 LOG.Logger.prototype.addConsoleSection = function(sectionName) {
-    var console = new LOG.Console;
-    console.init(this.doc);
+    var console = new LOG.Console(this.doc);
     return this.addSection(sectionName, console);
 }
 
@@ -244,8 +233,7 @@ LOG.Logger.prototype.getOrAddConsoleSection = function(sectionName) {
 }
 
 LOG.Logger.prototype.addSection = function(sectionName, content) {
-    var panel = new LOG.LogPanel;
-    panel.init(this.doc, sectionName);
+    var panel = new LOG.LogPanel(this.doc, sectionName);
     if (content) {
         panel.contentElement.appendChild(content.element);
     }
@@ -302,8 +290,7 @@ LOG.Logger.prototype.focusValue = function(value, dontLog) {
     var path = LOG.guessDomNodeOwnerName(value);
     if (!dontLog) {
         // Log the path into the console panel
-        var logItem = new LOG.PathToObjectLogItem;
-        logItem.init(this.doc, path);
+        var logItem = new LOG.PathToObjectLogItem(this.doc, path);
         this.appendRow(logItem.element);
     }
     if (path) {
@@ -325,4 +312,3 @@ LOG.Logger.prototype.focusValue = function(value, dontLog) {
         }
     }
 }
-

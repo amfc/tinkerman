@@ -1,12 +1,7 @@
-if (!LOG.LogRunner) {
-    LOG.LogRunner = function() {};
-}
-
-LOG.LogRunner.prototype.init = function() {
+LOG.LogRunner = function() {
     this.doc = document;
     this.willOpenInNewWindow = LOG.getCookie('LOG_IN_NEW_WINDOW') == 'true';
-    this.historyManager = new LOG.HistoryManager;
-    this.historyManager.init(LOG.getCookie('LOG_HISTORY'));
+    this.historyManager = new LOG.HistoryManager(LOG.getCookie('LOG_HISTORY'));
     this.bodyWrapperSavedSize = parseFloat(LOG.getCookie('LOG_SIZE'));
     this.loggerSavedOpenSections = LOG.getCookie('LOG_OPEN_SECTIONS');
     //~ LOG.addEventListener(document, 'mousedown', this.caller('onMouseDown'), true);
@@ -39,14 +34,12 @@ LOG.LogRunner.prototype.createLogger = function() {
 LOG.LogRunner.prototype.appendLogger = function() {
     this.doc = this.prepareNewDocument();
     
-    this.logger = new LOG.Logger;
-    this.logger.init(this.doc, this.willOpenInNewWindow, this.historyManager, this.loggerSavedOpenSections);
+    this.logger = new LOG.Logger(this.doc, this.willOpenInNewWindow, this.historyManager, this.loggerSavedOpenSections);
     this.logger.onnewwindowtoggleclick = this.caller('onLoggerNewWindowToggleClick');
     this.logger.onescpress = this.caller('onLoggerEscPress');
     
     if (!this.willOpenInNewWindow) {
-        this.bodyWrapper = new LOG.BodyWrapper;
-        this.bodyWrapper.init(this.doc, this.logger.element, this.bodyWrapperSavedSize);
+        this.bodyWrapper = new LOG.BodyWrapper(this.doc, this.logger.element, this.bodyWrapperSavedSize);
     } else {
         this.doc.body.appendChild(this.logger.element);
     }

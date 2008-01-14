@@ -1,6 +1,4 @@
-LOG.Class('CommandInput');
-
-LOG.CommandInput.prototype.init = function(doc, useTextArea, evaluator, historyManager) {
+LOG.CommandInput = function(doc, useTextArea, evaluator, historyManager) {
     this.doc = doc;
     this.evaluator = evaluator;
     this.useTextArea = useTextArea;

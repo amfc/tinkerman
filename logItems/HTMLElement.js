@@ -1,6 +1,4 @@
-LOG.Class('HTMLElementLogItem');
-
-LOG.HTMLElementLogItem.prototype.init = function(doc, value, stackedMode, alreadyLoggedContainers, dontShowParentLink) {
+LOG.HTMLElementLogItem = function(doc, value, stackedMode, alreadyLoggedContainers, dontShowParentLink) {
     this.doc = doc;
     var link;
     var showParentLink;
@@ -233,8 +231,7 @@ LOG.HTMLElementLogItem.prototype.setShowChildNodes = function(show, applyToChild
         for (var i = 0; i < childNodes.length; ++i) {
             childNode = childNodes[i];
             if (childNode.nodeType == 1) {
-                childNodeLogItem = new LOG.HTMLElementLogItem;
-                childNodeLogItem.init(this.doc, childNode, this.stackedMode, this.alreadyLoggedContainers, true);
+                childNodeLogItem = new LOG.HTMLElementLogItem(this.doc, childNode, this.stackedMode, this.alreadyLoggedContainers, true);
                 childNodeToAppend = childNodeLogItem.element;
                 if (applyToChildNodes) {
                     childNodeLogItem.setShowChildNodes(true, true);

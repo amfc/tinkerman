@@ -1,20 +1,8 @@
 // LOG
 
-if (typeof LOG != 'undefined') { // this file is being reloaded
-    LOG.wasOpen = LOG.console.elementCreated && !LOG.console.hidden;
-    LOG.console.close();
-    LOG.removeAllEventListeners();
-} else {
-    var LOG = {};
-    LOG.dontLogResult = {}; // This is used internally to avoid logging some things
-    LOG.clickedMessages = [];
-}
-
-LOG.Class = function(className) {
-    if (!LOG[className]) {
-        LOG[className] = function() {};
-    }
-}
+var LOG = {};
+LOG.dontLogResult = {}; // This is used internally to avoid logging some things
+LOG.clickedMessages = [];
 
 LOG.pageObjectName = 'page';
 
@@ -71,8 +59,7 @@ function LogE(expression) {
 }
 
 function LogError(e) {
-    var logItem = new LOG.ExceptionLogItem;
-    logItem.init(LOG.logRunner.getLogger().evaluator.console.doc, e);
+    var logItem = new LOG.ExceptionLogItem(LOG.logRunner.getLogger().evaluator.console.doc, e);
     LOG.logRunner.getLogger().evaluator.console.appendRow(
         logItem.element,
         'error',
