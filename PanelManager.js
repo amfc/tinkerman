@@ -1,7 +1,7 @@
 LOG.PanelManager = function(doc, rightToolbarElement) {
     this.doc = doc;
-    var box = new LOG.Vbox(doc);
-    this.element = box.element;
+    this.box = new LOG.Vbox(doc);
+    this.element = this.box.element;
     this.scrollContainer = LOG.createElement(this.doc, 'div',
         {
             style: {
@@ -53,13 +53,17 @@ LOG.PanelManager = function(doc, rightToolbarElement) {
         ]
     );
     
-    box.add(this.toolbarContainer, { size: 1.3, sizeUnit: 'em' });
-    box.add(this.scrollContainer, { size: 100, sizeUnit: '%' });
+    this.box.add(this.toolbarContainer, { size: 1.3, sizeUnit: 'em' });
+    this.box.add(this.scrollContainer, { size: 100, sizeUnit: '%' });
+}
+
+LOG.PanelManager.prototype.setBodyHidden = function(hidden) {
+    this.box.setChildHidden(1, hidden);
 }
 
 LOG.PanelManager.prototype.add = function(logPanel) {
     if (this.panelLabels.childNodes.length > 0) {
-        this.panelLabels.appendChild(this.doc.createTextNode(', '));
+        this.panelLabels.appendChild(this.doc.createTextNode(' '));
     }
     this.panelLabels.appendChild(logPanel.labelElement);
     this.panelElements.appendChild(logPanel.panelElement);

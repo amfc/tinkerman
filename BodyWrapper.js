@@ -1,4 +1,4 @@
-LOG.BodyWrapper = function(ownerDocument, elementToWrap, initialSize) {
+LOG.BodyWrapper = function(ownerDocument, elementToWrap, initialSize, startWithFixedSize) {
     this.dragging = false;
     this.ownerDocument = ownerDocument;
     var doc = this.ownerDocument;
@@ -60,7 +60,12 @@ LOG.BodyWrapper = function(ownerDocument, elementToWrap, initialSize) {
     document.body.style.overflow = 'hidden';
     document.body.style.margin = '0';
     
-    this.setSize(initialSize ? initialSize : 0.3333333);
+    if (startWithFixedSize) {
+        this.size = initialSize;
+        this.lock(startWithFixedSize);
+    } else {
+        this.setSize(initialSize ? initialSize : 0.3333333);
+    }
     
     var child;
     while (doc.body.firstChild) {
@@ -68,8 +73,8 @@ LOG.BodyWrapper = function(ownerDocument, elementToWrap, initialSize) {
         doc.body.removeChild(child);
         this.topElement.appendChild(child);
     }
-    doc.body.appendChild(this.element);
     this.hidden = false;
+    doc.body.appendChild(this.element);
     LOG.addObjEventListener(this, this.resizeHandle, 'mousedown', this.onResizeHandleMousedown);
 }
 
@@ -118,6 +123,9 @@ LOG.BodyWrapper.prototype.endDrag = function() {
     if (LOG.isIE) {
         LOG.removeObjEventListener(this, document, 'selectstart', this.onSelectstart);
     }
+    if (this.ondragend) {
+        this.ondragend();
+    }
 }
 
 LOG.BodyWrapper.prototype.onSelectstart = function(event) {
@@ -152,6 +160,23 @@ LOG.BodyWrapper.prototype.setSize = function(size) {
     this.bottomElement.style.height = size * 100 + '%';
 }
 
+LOG.BodyWrapper.prototype.lock = function(fixedSize) {
+    this.topElement.style.bottom = '0';
+    this.topElement.style.height = '100%';
+    this.topElement.style.paddingBottom = fixedSize;
+    this.bottomElement.style.top = '';
+    this.bottomElement.style.bottom = '0';
+    this.bottomElement.style.height = fixedSize;
+    this.fixedSize = fixedSize;
+}
+
+LOG.BodyWrapper.prototype.unlock = function() {
+    this.setSize(this.size);
+    this.topElement.style.paddingBottom = '';
+    this.bottomElement.style.bottom = '';
+    delete this.fixedSize;
+}
+
 LOG.BodyWrapper.prototype.hide = function() {
     this.hidden = true;
     if (this.bottomElement) {
@@ -164,6 +189,10 @@ LOG.BodyWrapper.prototype.show = function() {
     this.hidden = false;
     if (this.bottomElement) {
         this.bottomElement.style.display = '';
-        this.setSize(this.size);
+        if (this.fixedSize) {
+            this.lock(this.fixedSize);
+        } else {
+            this.setSize(this.size);
+        }
     }
 }

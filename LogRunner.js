@@ -10,9 +10,7 @@ LOG.LogRunner = function() {
     //~ LOG.addEventListener(document, 'mouseup', this.caller('onClick'), true);
     //~ LOG.addEventListener(document, 'click', this.caller('onClick'), true);
     LOG.addEventListener(window, 'unload', this.caller('onUnload'));
-    if (LOG.getCookie('LOG_OPEN') == 'true') {
-        this.createLogger();
-    }
+    this.createLogger();
 }
 
 LOG.LogRunner.prototype.caller = function(methodName) {
@@ -43,17 +41,36 @@ LOG.LogRunner.prototype.appendLogger = function() {
     this.logger = new LOG.Logger(this.doc, this.willOpenInNewWindow, this.historyManager, this.loggerSavedOpenSections);
     this.logger.onnewwindowtoggleclick = this.caller('onLoggerNewWindowToggleClick');
     this.logger.onescpress = this.caller('onLoggerEscPress');
-    this.logger.oncloseclick = this.caller('onLoggerCloseClick');
+    this.logger.oncollapsetoggleclick = this.caller('onLoggerCollapseToggleClick');
     
     if (!this.willOpenInNewWindow) {
-        this.bodyWrapper = new LOG.BodyWrapper(this.doc, this.logger.element, this.bodyWrapperSavedSize);
+        var collapsed = LOG.getCookie('LOG_OPEN') != 'true';
+        this.bodyWrapper = new LOG.BodyWrapper(this.doc, this.logger.element, this.bodyWrapperSavedSize, collapsed ? '1.3em' : undefined);
+        this.bodyWrapper.ondragend = this.caller('onBodyWrapperDragEnd');
+        this.setCollapsed(collapsed);
     } else {
         this.doc.body.appendChild(this.logger.element);
     }
 }
 
-LOG.LogRunner.prototype.onLoggerCloseClick = function() {
-    this.close();
+LOG.LogRunner.prototype.onBodyWrapperDragEnd = function() {
+    if (this.collapsed) {
+        this.setCollapsed(false);
+    }
+}
+
+LOG.LogRunner.prototype.setCollapsed = function(collapsed) {
+    if (collapsed) {
+        this.bodyWrapper.lock('1.3em');
+    } else {
+        this.bodyWrapper.unlock();
+    }
+    this.logger.setCollapsed(collapsed);
+    this.collapsed = collapsed;
+}
+
+LOG.LogRunner.prototype.onLoggerCollapseToggleClick = function() {
+    this.setCollapsed(!this.collapsed);
 }
 
 LOG.LogRunner.prototype.onLoggerNewWindowToggleClick = function() {
@@ -72,6 +89,7 @@ LOG.LogRunner.prototype.onLogWindowUnload = function() {
     delete this.window;
     this.willOpenInNewWindow = false;
     this.doc = document;
+    this.appendLogger();
 }
 
 LOG.LogRunner.prototype.prepareNewDocument = function() {
@@ -89,7 +107,11 @@ LOG.LogRunner.prototype.prepareNewDocument = function() {
         this.doc.write('<html><head><style> BODY { margin: 0em }</style></head><body></body></html>');
         this.doc.close();
         this.doc.title = 'Log: ' + window.document.title;
-        this.doc.body.onunload = this.caller('onLogWindowUnload');
+        if (LOG.isGecko) {
+            this.window.onunload = this.caller('onLogWindowUnload');
+        } else {
+            this.doc.body.onunload = this.caller('onLogWindowUnload');
+        }
         this.doc.body.onkeydown = LOG.createEventHandler(this.doc, this, 'onKeyDown');
         
         return this.window.document;
@@ -158,7 +180,7 @@ LOG.LogRunner.prototype.onUnload = function() {
         LOG.addCookie('LOG_SIZE', this.bodyWrapperSavedSize, 30);
     }
     LOG.addCookie('LOG_IN_NEW_WINDOW', this.willOpenInNewWindow ? 'true' : 'false', 30);
-    LOG.addCookie('LOG_OPEN', this.logger && (this.bodyWrapper && !this.bodyWrapper.hidden) ? "true" : "false", 30);
+    LOG.addCookie('LOG_OPEN', this.logger && (this.bodyWrapper && !this.bodyWrapper.hidden && !this.collapsed) ? "true" : "false", 30);
     if (this.logger) {
         LOG.addCookie('LOG_OPEN_SECTIONS', this.logger.serializeOpenSections(), 30);
     }

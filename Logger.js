@@ -3,7 +3,6 @@ LOG.Logger = function(doc, inNewWindow, historyManager, openSectionsStr) {
     this.sections = {};
     this.inNewWindow = inNewWindow;
     this.box = new LOG.Vbox(doc);
-    
     this.panelManager = new LOG.PanelManager(doc,
         LOG.createElement(doc, 'span', {},
             [
@@ -39,8 +38,7 @@ LOG.Logger = function(doc, inNewWindow, historyManager, openSectionsStr) {
                         LOG.createElement(doc, 'span',
                             { style: { fontWeight: 'bold' } },
                             [ 't' ]
-                        ),
-                        'ach'
+                        )
                     ]
                 ),
                 inNewWindow ? null : ' ',
@@ -50,13 +48,25 @@ LOG.Logger = function(doc, inNewWindow, historyManager, openSectionsStr) {
                         style: {
                             fontWeight: 'normal'
                         },
-                        onclick: LOG.createEventHandler(doc, this, 'onCloseClick'),
-                        title: 'close'
+                        onclick: LOG.createEventHandler(doc, this, 'onCollapseToggleClick'),
+                        title: 'toggle collapse'
                     },
-                    [ '[x]' ]
+                    [ '[', this.closeButtonTextNode = doc.createTextNode('x'), ']' ]
                 )
             ]
         )
+    );
+    
+    this.element = LOG.createElement(doc, 'div',
+        {
+            onkeydown: LOG.createEventHandler(doc, this, 'onKeyDown'),
+            style: {
+                borderTop: '1px solid gray'
+            }
+        },
+        [
+            this.box.element
+        ]
     );
     
     // create the default console
@@ -97,17 +107,10 @@ LOG.Logger = function(doc, inNewWindow, historyManager, openSectionsStr) {
     //~ };
     
     this.historyManager = historyManager;
-    
     this.commandEditor = new LOG.CommandEditor(doc, this.evaluator, function() { me.updateCommandEditorSize() }, this.historyManager);
-    
     this.box.add(this.panelManager.element, { size: 100, sizeUnit: '%' });
     this.box.add(this.commandEditor.element, { size: this.commandEditor.getHeight(), sizeUnit: 'em' });
-    this.element = this.box.element;
-    var me = this;
-    LOG.addEventListener(this.element, 'keydown', function(event) { me.onKeyDown(event) });
-    
     this.unserializeOpenSections(openSectionsStr);
-    
 }
 
 LOG.Logger.prototype.unserializeOpenSections = function(str) {
@@ -274,12 +277,25 @@ LOG.Logger.prototype.onClearClick = function(event) {
     }
 }
 
-LOG.Logger.prototype.onCloseClick = function(event) {
+LOG.Logger.prototype.setCollapsed = function(collapsed) {
+    if (collapsed) {
+        this.box.setChildHidden(1, true);
+        this.panelManager.setBodyHidden(true);
+        this.closeButtonTextNode.nodeValue = '|';
+    } else {
+        this.box.setChildHidden(1, false);
+        this.panelManager.setBodyHidden(false);
+        this.closeButtonTextNode.nodeValue = 'x';
+    }
+    this.collapsed = collapsed;
+}
+
+LOG.Logger.prototype.onCollapseToggleClick = function(event) {
+    if (this.oncollapsetoggleclick) {
+        this.oncollapsetoggleclick();
+    }
     LOG.stopPropagation(event);
     LOG.preventDefault(event);
-    if (this.oncloseclick) {
-        this.oncloseclick();
-    }
 }
 
 // FIXME: unchecked - unimplemented
