@@ -46,8 +46,8 @@ LOG.PanelManager = function(doc, rightToolbarElement) {
                     }
                 },
                 [
-                    this.panelLabels = LOG.createElement(this.doc, 'span'),
-                    rightToolbarElement
+                    LOG.createElement(this.doc, 'span', { style: 'float: right' }, [ rightToolbarElement ]),
+                    this.panelLabels = LOG.createElement(this.doc, 'span')
                 ]
             )
         ]

@@ -4,11 +4,11 @@ LOG.LogRunner = function() {
     this.historyManager = new LOG.HistoryManager(LOG.getCookie('LOG_HISTORY'));
     this.bodyWrapperSavedSize = parseFloat(LOG.getCookie('LOG_SIZE'));
     this.loggerSavedOpenSections = LOG.getCookie('LOG_OPEN_SECTIONS');
+    LOG.addEventListener(document, 'keydown', LOG.createEventHandler(document, this, 'onKeyDown'), true);
+    //~ LOG.addEventListener(document, 'selectstart', this.caller('onDocumentSelectStart'), true);
     //~ LOG.addEventListener(document, 'mousedown', this.caller('onMouseDown'), true);
     //~ LOG.addEventListener(document, 'mouseup', this.caller('onClick'), true);
     //~ LOG.addEventListener(document, 'click', this.caller('onClick'), true);
-    LOG.addEventListener(document, 'keydown', LOG.createEventHandler(document, this, 'onKeyDown'), true);
-    //~ LOG.addEventListener(document, 'selectstart', this.caller('onDocumentSelectStart'), true);
     LOG.addEventListener(window, 'unload', this.caller('onUnload'));
     if (LOG.getCookie('LOG_OPEN') == 'true') {
         this.createLogger();
@@ -125,8 +125,12 @@ LOG.LogRunner.prototype.onKeyDown = function(event) {
                 this.createLogger();
             }
             this.showLogger();
-        } else if (chr == 'i') {
+            LOG.preventDefault(event);
+            LOG.stopPropagation(event);
+        } else if (chr == 't') {
             this.onLoggerNewWindowToggleClick(event);
+            LOG.preventDefault(event);
+            LOG.stopPropagation(event);
         }
     }
 }
@@ -171,11 +175,11 @@ LOG.LogRunner.prototype.close = function() {
     this.stopDebugging = true;
 }
 
-// Unmigrated stuff
-
 LOG.LogRunner.prototype.onLoggerEscPress = function() {
     this.hide();
 }
+
+// Unmigrated stuff
 
 LOG.onDocumentSelectStart = function(event) {
     if (LOG.nextClickShouldBeStopped) {

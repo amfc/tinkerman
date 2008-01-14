@@ -7,40 +7,54 @@ LOG.Logger = function(doc, inNewWindow, historyManager, openSectionsStr) {
     this.panelManager = new LOG.PanelManager(doc,
         LOG.createElement(doc, 'span', {},
             [
-                ', ',
                 LOG.createElement(doc, 'a',
                     {
                         href: '#',
                         style: {
                             fontWeight: 'normal'
                         },
+                        title: 'ctrl-shift-c: clear visible panels',
                         onclick: LOG.createEventHandler(doc, this, 'onClearClick')
                     },
-                    [ 'clear' ]
+                    [
+                        LOG.createElement(doc, 'span',
+                            { style: { fontWeight: 'bold' } },
+                            [ 'c' ]
+                        ),
+                        'lr'
+                    ]
                 ),
-                ' (alt-c), ',
+                ' ',
                 LOG.createElement(doc, 'a',
                     {
                         href: '#',
                         style: {
                             fontWeight: 'normal'
                         },
-                        onclick: LOG.createEventHandler(doc, this, 'onCloseClick')
-                    },
-                    [ 'close' ]
-                ),
-                ' (alt-k), ',
-                LOG.createElement(doc, 'a',
-                    {
-                        href: '#',
-                        style: {
-                            fontWeight: 'normal'
-                        },
+                        title: 'ctrl-shift-t: attach / detach window',
                         onclick: LOG.createEventHandler(doc, this, 'onNewWindowClick')
                     },
-                    [ this.inNewWindow ? 'same window' : 'new window' ]
+                    [
+                        inNewWindow ? 'at' : 'de',
+                        LOG.createElement(doc, 'span',
+                            { style: { fontWeight: 'bold' } },
+                            [ 't' ]
+                        ),
+                        'ach'
+                    ]
                 ),
-                ' (alt-i) '
+                inNewWindow ? null : ' ',
+                inNewWindow ? null : LOG.createElement(doc, 'a',
+                    {
+                        href: '#',
+                        style: {
+                            fontWeight: 'normal'
+                        },
+                        onclick: LOG.createEventHandler(doc, this, 'onCloseClick'),
+                        title: 'close'
+                    },
+                    [ '[x]' ]
+                )
             ]
         )
     );
@@ -212,8 +226,6 @@ LOG.Logger.prototype.onKeyDown = function(event) {
         if (event.altKey && event.shiftKey) {
             if (chr == 'c') {
                 this.onClearClick(event);
-            } else if (chr == 'k') {
-                this.onCloseClick(event);
             }
         }
     }
