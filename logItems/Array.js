@@ -3,9 +3,11 @@ LOG.ArrayLogItem = function(doc, value, stackedMode, alreadyLoggedContainers) {
     if (typeof alreadyLoggedContainers == 'undefined') {
         alreadyLoggedContainers = [];
     }
+    
     this.value = value;
     this.stackedMode = stackedMode;
     this.alreadyLoggedContainers = alreadyLoggedContainers;
+    this.alreadyLoggedContainers.push(value);
     var me = this;
     var link;
     this.element = LOG.createElement(

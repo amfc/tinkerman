@@ -13,7 +13,7 @@ LOG.ObjectLogItem = function(doc, value, stackedMode, alreadyLoggedContainers, s
     
     this.stackedMode = stackedMode;
     this.alreadyLoggedContainers = alreadyLoggedContainers;
-    alreadyLoggedContainers.push(this);
+    alreadyLoggedContainers.push(value);
     
     this.value = value;
     
@@ -186,7 +186,7 @@ LOG.ObjectLogItem.prototype.onUpdateLinkClick = function(event) {
 LOG.ObjectLogItem.prototype.onStartObjectLinkClick = function(event) {
     LOG.preventDefault(event);
     LOG.stopPropagation(event);
-    LogAndStore(value);
+    LogAndStore(this.value);
 }
 
 LOG.ObjectLogItem.prototype.onElementClick = function(event) {

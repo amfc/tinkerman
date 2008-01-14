@@ -99,7 +99,12 @@ LOG.instanceOfWindow = function(value) {
 
 LOG.getValueAsLogItem = function(doc, value, stackedMode, alreadyLoggedContainers, showFirstLevelObjectChildren, showExpandObjectChildren) {
     // Simple object (used as hash tables), array, html element and typed objects are special (since they are implemented as separate objects) and should be handled separately
-    if (value != null && typeof value == 'object') {
+    if (!alreadyLoggedContainers) {
+        alreadyLoggedContainers = [];
+    }
+    if (LOG.indexOf(alreadyLoggedContainers, value) != -1) {
+        return new LOG.RefLogItem(doc, value, stackedMode, alreadyLoggedContainers);
+    } else if (value != null && typeof value == 'object') {
         if (value.nodeType && value.nodeType == 1) { // 1: element node
             return new LOG.HTMLElementLogItem(doc, value, stackedMode, alreadyLoggedContainers);
         } else if (value.getClassName || value instanceof String || value instanceof Date || value instanceof Number || value instanceof Boolean || LOG.instanceOfWindow(value) || LOG.instanceOfDocument(value)) { // an object we can Log
