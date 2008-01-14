@@ -109,6 +109,8 @@ LOG.getValueAsLogItem = function(doc, value, stackedMode, alreadyLoggedContainer
         } else {
             return new LOG.ObjectLogItem(doc, value, stackedMode, alreadyLoggedContainers, showFirstLevelObjectChildren, showExpandObjectChildren);
         }
+    } else if (typeof value == 'function') {
+        return new LOG.FunctionLogItem(doc, value, stackedMode, alreadyLoggedContainers);
     }
     
     function appendExtraInfoToLog() {
@@ -144,69 +146,6 @@ LOG.getValueAsLogItem = function(doc, value, stackedMode, alreadyLoggedContainer
         }
     } else if (typeof value == 'string') {
         fragment.appendChild(doc.createTextNode('"' + value.toString() + '"'));
-    } else if (typeof value == 'function') {
-        var result = /function[^(]*(\([^)]*\))/.exec(value.toString());
-        var text;
-        if (!result) {
-            text = doc.createTextNode(value.toString());
-        } else {
-            text = 'f' + result[1];
-        }
-        
-        fragment.appendChild(doc.createTextNode('«'));
-        
-        
-        var link = doc.createElement('a');
-        link.style.textDecoration = 'none';
-        link.style.color = 'gray';
-        link.appendChild(doc.createTextNode(text));
-        fragment.appendChild(link);
-        link.href = '#';
-        LOG.addEventListener(link, 'mouseover',
-            function() {
-                link.style.textDecoration = 'underline';
-            }
-        );
-        LOG.addEventListener(link, 'mouseout',
-            function() {
-                link.style.textDecoration = 'none';
-            }
-        );
-        LOG.addEventListener(link, 'click',
-            function(event) {
-                LOG.preventDefault(event);
-                LOG.stopPropagation(event);
-                LogAndStore(value);
-            }
-        );
-        
-        fragment.appendChild(doc.createTextNode(' '));
-        var srcLink = doc.createElement('a');
-        srcLink.style.textDecoration = 'none';
-        srcLink.style.color = 'green';
-        srcLink.style.fontSize = '8pt';
-        srcLink.appendChild(doc.createTextNode('src'));
-        
-        LOG.addEventListener(srcLink, 'mouseover',
-            function() {
-                srcLink.style.textDecoration = 'underline';
-            }
-        );
-        LOG.addEventListener(srcLink, 'mouseout',
-            function() {
-                srcLink.style.textDecoration = 'none';
-            }
-        );
-        LOG.addEventListener(srcLink, 'click',
-            function(event) {
-                LOG.console.appendRow(doc.createTextNode('\n' + value.toString()));
-                LOG.preventDefault(event);
-                LOG.stopPropagation(event);
-            }
-        );
-        fragment.appendChild(srcLink);
-        appendExtraInfoToLog();
-        fragment.appendChild(doc.createTextNode('»'));
     } else if (typeof value != 'undefined' && typeof value.toString == 'function') {
         fragment.appendChild(doc.createTextNode(value.toString()));
     }
