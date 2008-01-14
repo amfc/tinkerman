@@ -262,8 +262,6 @@ LOG.Logger.prototype.onClearClick = function(event) {
     }
 }
 
-// FIXME: unchecked - unimplemented
-
 LOG.Logger.prototype.onCloseClick = function(event) {
     LOG.stopPropagation(event);
     LOG.preventDefault(event);
@@ -271,6 +269,8 @@ LOG.Logger.prototype.onCloseClick = function(event) {
         this.oncloseclick();
     }
 }
+
+// FIXME: unchecked - unimplemented
 
 // This searchs for some value in all the selected panels and focuses it
 LOG.Logger.prototype.focusValue = function(value, dontLog) {

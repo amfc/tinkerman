@@ -43,12 +43,17 @@ LOG.LogRunner.prototype.appendLogger = function() {
     this.logger = new LOG.Logger(this.doc, this.willOpenInNewWindow, this.historyManager, this.loggerSavedOpenSections);
     this.logger.onnewwindowtoggleclick = this.caller('onLoggerNewWindowToggleClick');
     this.logger.onescpress = this.caller('onLoggerEscPress');
+    this.logger.oncloseclick = this.caller('onLoggerCloseClick');
     
     if (!this.willOpenInNewWindow) {
         this.bodyWrapper = new LOG.BodyWrapper(this.doc, this.logger.element, this.bodyWrapperSavedSize);
     } else {
         this.doc.body.appendChild(this.logger.element);
     }
+}
+
+LOG.LogRunner.prototype.onLoggerCloseClick = function() {
+    this.close();
 }
 
 LOG.LogRunner.prototype.onLoggerNewWindowToggleClick = function() {
@@ -104,6 +109,11 @@ LOG.LogRunner.prototype.deleteElement = function() {
         this.bodyWrapper.uninit();
         delete this.bodyWrapper;
     }
+    if (this.window) {
+        this.window.close();
+        delete this.window;
+    }
+    delete this.logger;
 }
 
 LOG.LogRunner.prototype.onKeyDown = function(event) {
@@ -153,19 +163,19 @@ LOG.LogRunner.prototype.onUnload = function() {
     }
 }
 
+LOG.LogRunner.prototype.close = function() {
+    if (!this.logger || this.stopDebugging) {
+        return;
+    }
+    this.deleteElement();
+    this.stopDebugging = true;
+}
+
 // Unmigrated stuff
 
 LOG.LogRunner.prototype.onLoggerEscPress = function() {
     this.hide();
 }
-
-//~ LOG.LogRunner.prototype.close = function() {
-    //~ if (!this.logger || this.stopDebugging) {
-        //~ return;
-    //~ }
-    //~ this.deleteElement();
-    //~ this.stopDebugging = true;
-//~ }
 
 LOG.onDocumentSelectStart = function(event) {
     if (LOG.nextClickShouldBeStopped) {
