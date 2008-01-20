@@ -15,6 +15,7 @@ add var;
 add extra;
 add guess;
 add diff;
+add HistoryManager;
 add BodyWrapper;
 add CommandInput;
 add CommandEditor;

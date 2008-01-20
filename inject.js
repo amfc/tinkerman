@@ -1,0 +1,1 @@
+javascript:void((function() { if (!document.getElementById('tinkermanScript')) { var e = document.createElement('script'); e.src = 'http://tinkerman.afdez.no-ip.org/log.js'; e.id = 'tinkermanScript'; e.type = 'text/javascript'; document.getElementsByTagName('head')[0].appendChild(e); } })())
