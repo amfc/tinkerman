@@ -25,7 +25,7 @@ LOG.getGetPositionInVariablesElement = function(doc, value) {
 }
 
 LOG.getValueAsHtmlElement = function(doc, value, stackedMode, alreadyLoggedContainers, showFirstLevelObjectChildren, showExpandObjectChildren) {
-   return LOG.getValueAsLogItem(doc, value, stackedMode, alreadyLoggedContainers, showFirstLevelObjectChildren, showExpandObjectChildren).element;
+    return LOG.getValueAsLogItem(doc, value, stackedMode, alreadyLoggedContainers, showFirstLevelObjectChildren, showExpandObjectChildren).element;
 }
 
 LOG.getExtraInfoToLogAsHtmlElement = function(doc, value, stackedMode, alreadyLoggedContainers) {
@@ -105,19 +105,19 @@ LOG.getValueAsLogItem = function(doc, value, stackedMode, alreadyLoggedContainer
     if (LOG.indexOf(alreadyLoggedContainers, value) != -1) {
         return new LOG.RefLogItem(doc, value, stackedMode, alreadyLoggedContainers);
     } else if (value != null && typeof value == 'object') {
-        if (value.nodeType && value.nodeType == 1) { // 1: element node
-            return new LOG.HTMLElementLogItem(doc, value, stackedMode, alreadyLoggedContainers);
-        } else if (value.getClassName || value instanceof String || value instanceof Date || value instanceof Number || value instanceof Boolean || LOG.instanceOfWindow(value) || LOG.instanceOfDocument(value)) { // an object we can Log
+        if (value.nodeType) { // DOM node
+            if (value.nodeType == 1) { // 1: element node
+                return new LOG.HTMLElementLogItem(doc, value, stackedMode, alreadyLoggedContainers);
+            } // else -> go to default
+        } else if (value.getClassName || value instanceof Date || LOG.instanceOfWindow(value) || LOG.instanceOfDocument(value)) {
             return new LOG.TypedObjectLogItem(doc, value, stackedMode, alreadyLoggedContainers);
-        }  else if (value instanceof Array || /* filter DOM Select elements */ !value.nodeType && value.item && typeof value.length != 'undefined') {
+        }  else if (value instanceof Array || value.item && typeof value.length != 'undefined') {
             return new LOG.ArrayLogItem(doc, value, stackedMode, alreadyLoggedContainers);
         } else {
             return new LOG.ObjectLogItem(doc, value, stackedMode, alreadyLoggedContainers, showFirstLevelObjectChildren, showExpandObjectChildren);
         }
     } else if (typeof value == 'function') {
         return new LOG.FunctionLogItem(doc, value, stackedMode, alreadyLoggedContainers);
-    } else {
-        return new LOG.BasicLogItem(doc, value, stackedMode, alreadyLoggedContainers);
     }
-    
+    return new LOG.BasicLogItem(doc, value, stackedMode, alreadyLoggedContainers);
 }
