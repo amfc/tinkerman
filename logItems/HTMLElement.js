@@ -239,7 +239,7 @@ LOG.HTMLElementLogItem.prototype.setShowChildNodes = function(show, applyToChild
             } else if (childNode.nodeName == '#text') {
                 childNodeToAppend = LOG.createElement(this.doc, 'span', { style: { color: '#999' } },
                     [
-                        LOG.isWhitespace(childNode.nodeValue) ? childNode.nodeValue : ('\u00A0' + childNode.nodeValue)
+                        LOG.isWhitespace(childNode.nodeValue) ? ' ' : ('\u00A0' + childNode.nodeValue)
                     ]
                 );
             } else if (childNode.nodeName == '#comment') {
