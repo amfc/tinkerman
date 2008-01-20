@@ -236,14 +236,19 @@ LOG.HTMLElementLogItem.prototype.setShowChildNodes = function(show, applyToChild
                 if (applyToChildNodes) {
                     childNodeLogItem.setShowChildNodes(true, true);
                 }
-                this.childNodeItems[i] = childNodeLogItem;
             } else if (childNode.nodeName == '#text') {
-                childNodeToAppend = LOG.createElement(this.doc, 'span', { style: { color: 'gray' } }, [ '\u00A0' + childNode.nodeValue ] );
-                this.childNodeItems[i] = childNodeToAppend;
+                childNodeToAppend = LOG.createElement(this.doc, 'span', { style: { color: '#999' } },
+                    [
+                        LOG.isWhitespace(childNode.nodeValue) ? childNode.nodeValue : ('\u00A0' + childNode.nodeValue)
+                    ]
+                );
+            } else if (childNode.nodeName == '#comment') {
+                childNodeToAppend = LOG.createElement(this.doc, 'span', { style: { color: '#bc7' } }, [ '<!--' + childNode.nodeValue + '-->' ] );
             } else {
                 childNodeToAppend = LOG.getValueAsLogItem(this.doc, childNode).element;
-                this.childNodeItems[i] = childNodeToAppend;
             }
+            
+            this.childNodeItems.push(childNodeToAppend);
             if (!this.onlyTextNodeChildren) {
                 childNodeToAppend.style.display = 'block';
             }
