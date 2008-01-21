@@ -79,3 +79,13 @@ LOG.Console.prototype.clear = function() {
 LOG.Console.prototype.focus = function() {
     this.commandEditor.focus();
 }
+
+LOG.Console.prototype.newLogItem = function(type, params) {
+    var doc = this.doc;
+    function subtype() {
+        type.apply(this, [doc].concat(params));
+    }
+    subtype.prototype = type.prototype;
+    var obj = new subtype;
+    return obj;
+}

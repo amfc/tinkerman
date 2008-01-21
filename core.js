@@ -59,8 +59,8 @@ function LogE(expression) {
 }
 
 function LogError(e) {
-    var logItem = new LOG.ExceptionLogItem(LOG.logRunner.getLogger().evaluator.console.doc, e);
-    LOG.logRunner.getLogger().evaluator.console.appendRow(
+    var logItem = new LOG.ExceptionLogItem(LOG.logRunner.getLogger().defaultConsole.doc, e);
+    LOG.logRunner.getLogger().defaultConsole.appendRow(
         logItem.element,
         'error',
         true,

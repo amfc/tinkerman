@@ -21,13 +21,20 @@ LOG.LogRunner.prototype.caller = function(methodName) {
 }
 
 LOG.LogRunner.prototype.createLogger = function() {
-    if (this.doc.body) {
-        this.appendLogger();
-    } else {
-        if (!this.appendLoggerCaller) {
-            this.appendLoggerCaller = this.caller('appendLogger');
+    this.doc = this.prepareNewDocument();
+    this.logger = new LOG.Logger(this.doc, this.willOpenInNewWindow, this.historyManager, this.loggerSavedOpenSections);
+    this.logger.onnewwindowtoggleclick = this.caller('onLoggerNewWindowToggleClick');
+    this.logger.onescpress = this.caller('onLoggerEscPress');
+    this.logger.oncollapsetoggleclick = this.caller('onLoggerCollapseToggleClick');
+    if (!this.willOpenInNewWindow) {
+        if (this.doc.body) {
+            this.appendLogger();
+        } else {
+            if (!this.appendLoggerCaller) {
+                this.appendLoggerCaller = this.caller('appendLogger');
+            }
+            LOG.addEventListener(window, 'load', this.appendLoggerCaller);
         }
-        LOG.addEventListener(window, 'load', this.appendLoggerCaller);
     }
 }
 
@@ -36,13 +43,6 @@ LOG.LogRunner.prototype.appendLogger = function() {
         LOG.removeEventListener(window, 'load', this.appendLoggerCaller);
         delete this.appendLoggerCaller;
     }
-    this.doc = this.prepareNewDocument();
-    
-    this.logger = new LOG.Logger(this.doc, this.willOpenInNewWindow, this.historyManager, this.loggerSavedOpenSections);
-    this.logger.onnewwindowtoggleclick = this.caller('onLoggerNewWindowToggleClick');
-    this.logger.onescpress = this.caller('onLoggerEscPress');
-    this.logger.oncollapsetoggleclick = this.caller('onLoggerCollapseToggleClick');
-    
     if (!this.willOpenInNewWindow) {
         var collapsed = LOG.getCookie('LOG_OPEN') != 'true';
         this.bodyWrapper = new LOG.BodyWrapper(this.doc, this.logger.element, this.bodyWrapperSavedSize, collapsed ? '1.3em' : undefined);

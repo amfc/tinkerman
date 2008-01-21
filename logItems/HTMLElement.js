@@ -192,7 +192,7 @@ LOG.HTMLElementLogItem.prototype.hideElementOutline = function() {
 }
 
 LOG.HTMLElementLogItem.prototype.getChildNodes = function() { // FIXME: Hack, works directly with BodyWrapper
-    if (LOG.logRunner.bodyWrapper && this.value == document.body) { // Hide LOG's wrapper elements in the DOM
+    if (LOG.logRunner && LOG.logRunner.bodyWrapper && this.value == document.body) { // Hide LOG's wrapper elements in the DOM
         return LOG.logRunner.bodyWrapper.topElement.childNodes;
     } else {
         return this.value.childNodes;
