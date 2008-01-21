@@ -61,7 +61,8 @@ LOG.Logger = function(doc, inNewWindow, historyManager, openSectionsStr) {
         {
             onkeydown: LOG.createEventHandler(doc, this, 'onKeyDown'),
             style: {
-                borderTop: '1px solid gray'
+                borderTop: '1px solid gray',
+                height: '100%'
             }
         },
         [
