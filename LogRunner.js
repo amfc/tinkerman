@@ -23,18 +23,17 @@ LOG.LogRunner.prototype.caller = function(methodName) {
 LOG.LogRunner.prototype.createLogger = function() {
     this.doc = this.prepareNewDocument();
     this.logger = new LOG.Logger(this.doc, this.willOpenInNewWindow, this.historyManager, this.loggerSavedOpenSections);
+    this.loggerAppended = false;
     this.logger.onnewwindowtoggleclick = this.caller('onLoggerNewWindowToggleClick');
     this.logger.onescpress = this.caller('onLoggerEscPress');
     this.logger.oncollapsetoggleclick = this.caller('onLoggerCollapseToggleClick');
-    if (!this.willOpenInNewWindow) {
-        if (this.doc.body) {
-            this.appendLogger();
-        } else {
-            if (!this.appendLoggerCaller) {
-                this.appendLoggerCaller = this.caller('appendLogger');
-            }
-            LOG.addEventListener(window, 'load', this.appendLoggerCaller);
+    if (this.doc.body) {
+        this.appendLogger();
+    } else {
+        if (!this.appendLoggerCaller) {
+            this.appendLoggerCaller = this.caller('appendLogger');
         }
+        LOG.addEventListener(window, 'load', this.appendLoggerCaller);
     }
 }
 
@@ -51,6 +50,7 @@ LOG.LogRunner.prototype.appendLogger = function() {
     } else {
         this.doc.body.appendChild(this.logger.element);
     }
+    this.loggerAppended = true;
 }
 
 LOG.LogRunner.prototype.onBodyWrapperDragEnd = function() {
@@ -74,10 +74,12 @@ LOG.LogRunner.prototype.onLoggerCollapseToggleClick = function() {
 }
 
 LOG.LogRunner.prototype.onLoggerNewWindowToggleClick = function() {
-    this.deleteElement();
-    this.willOpenInNewWindow = !this.willOpenInNewWindow;
-    this.appendLogger();
-    this.logger.focus();
+    if (this.loggerAppended) {
+        this.deleteElement();
+        this.willOpenInNewWindow = !this.willOpenInNewWindow;
+        this.createLogger();
+        this.logger.focus();
+    }
 }
 
 LOG.LogRunner.prototype.getLogger = function() {
@@ -85,11 +87,9 @@ LOG.LogRunner.prototype.getLogger = function() {
 }
 
 LOG.LogRunner.prototype.onLogWindowUnload = function() {
-    delete this.logger;
-    delete this.window;
+    this.deleteElement();
     this.willOpenInNewWindow = false;
-    this.doc = document;
-    this.appendLogger();
+    this.createLogger();
 }
 
 LOG.LogRunner.prototype.prepareNewDocument = function() {
