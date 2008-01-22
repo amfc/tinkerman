@@ -126,6 +126,9 @@ LOG.LogRunner.prototype.prepareNewDocument = function() {
 }
 
 LOG.LogRunner.prototype.deleteElement = function() {
+    if (this.logger) {
+        this.loggerSavedOpenSections = this.logger.serializeOpenSections();
+    }
     if (this.bodyWrapper) {
         this.bodyWrapperSavedSize = this.bodyWrapper.getSize();
         this.bodyWrapper.uninit();
