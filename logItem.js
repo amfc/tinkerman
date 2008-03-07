@@ -105,13 +105,13 @@ LOG.getValueAsLogItem = function(doc, value, stackedMode, alreadyLoggedContainer
     if (LOG.indexOf(alreadyLoggedContainers, value) != -1) {
         return new LOG.RefLogItem(doc, value, stackedMode, alreadyLoggedContainers);
     } else if (value != null && typeof value == 'object') {
-        if (value.nodeType) { // DOM node
+        if (LOG.instanceOfWindow(value) || LOG.instanceOfDocument(value) || value instanceof Date || value.getClassName) {
+            return new LOG.TypedObjectLogItem(doc, value, stackedMode, alreadyLoggedContainers);
+        } else if (value.nodeType) { // DOM node
             if (value.nodeType == 1) { // 1: element node
                 return new LOG.HTMLElementLogItem(doc, value, stackedMode, alreadyLoggedContainers);
             } // else -> go to default
-        } else if (value.getClassName || value instanceof Date || LOG.instanceOfWindow(value) || LOG.instanceOfDocument(value)) {
-            return new LOG.TypedObjectLogItem(doc, value, stackedMode, alreadyLoggedContainers);
-        }  else if (value instanceof Array || value.item && typeof value.length != 'undefined') {
+        } if (value instanceof Array || value.item && typeof value.length != 'undefined') {
             return new LOG.ArrayLogItem(doc, value, stackedMode, alreadyLoggedContainers);
         } else {
             return new LOG.ObjectLogItem(doc, value, stackedMode, alreadyLoggedContainers, showFirstLevelObjectChildren, showExpandObjectChildren);
