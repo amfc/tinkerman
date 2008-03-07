@@ -4,7 +4,11 @@ var LOG = {};
 LOG.dontLogResult = {}; // This is used internally to avoid logging some things
 LOG.clickedMessages = [];
 
-LOG.pageObjectName = 'page';
+LOG.setTypeName = function(constructor, name) {
+    constructor.prototype.getTypeName = function() {
+        return name;
+    }
+}
 
 LOG.focusAndBlinkElement = function(element) {
     element.scrollIntoView();

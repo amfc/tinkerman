@@ -86,6 +86,8 @@ LOG.TypedObjectLogItem = function(doc, value, stackedMode, alreadyLoggedContaine
     );
 }
 
+LOG.setTypeName(LOG.TypedObjectLogItem, 'LOG.TypedObjectLogItem');
+
 LOG.TypedObjectLogItem.prototype.onNameLinkClick = function(event) {
     if (event.ctrlKey) {
         LOG.openClassInEditor(this.value);
@@ -133,8 +135,8 @@ LOG.TypedObjectLogItem.prototype.getTypeName = function() {
         txt += value.constructor.name.toString();
     } else if (objectToStringName) {
         txt += objectToStringName;
-    } else if (value.getClassName) {
-        txt += value.getClassName();
+    } else if (value.getTypeName) {
+        txt += value.getTypeName();
     } else {
         txt += 'Anonymous';
     }

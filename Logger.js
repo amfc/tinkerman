@@ -87,32 +87,14 @@ LOG.Logger = function(doc, inNewWindow, historyManager, openSectionsStr) {
         }
     }
     
-    //~ this.pagePanel = new LOG.LogPanel(doc, 'page', false);
-    //~ this.pagePanel.onselect = function() {
-        //~ function createPageLogItem() {
-            //~ if (!self[LOG.pageObjectName]) {
-                //~ setTimeout(createPageLogItem, 1000);
-                //~ return;
-            //~ }
-            //~ if (!me.pageLogItem) {
-                //~ me.pageLogItem = LOG.getValueAsLogItem(doc, self[LOG.pageObjectName], true, []);
-                //~ me.pagePanel.contentElement.appendChild(me.pageLogItem.element);
-            //~ }
-        //~ }
-        //~ createPageLogItem();
-    //~ }
-    
-    //~ this.consoles.page = {
-        //~ panel: this.pagePanel,
-        //~ count: 0
-    //~ };
-    
     this.historyManager = historyManager;
     this.commandEditor = new LOG.CommandEditor(doc, this.evaluator, function() { me.updateCommandEditorSize() }, this.historyManager);
     this.box.add(this.panelManager.element, { size: 100, sizeUnit: '%' });
     this.box.add(this.commandEditor.element, { size: this.commandEditor.getHeight(), sizeUnit: 'em' });
     this.unserializeOpenSections(openSectionsStr);
 }
+
+LOG.setTypeName(LOG.Logger, 'LOG.Logger');
 
 LOG.Logger.prototype.unserializeOpenSections = function(str) {
     if (str) {
@@ -297,6 +279,10 @@ LOG.Logger.prototype.onCollapseToggleClick = function(event) {
     }
     LOG.stopPropagation(event);
     LOG.preventDefault(event);
+}
+
+LOG.Logger.prototype.getValueAsLogItem = function(value, stackedMode, alreadyLoggedContainers, showFirstLevelObjectChildren, showExpandObjectChildren) {
+    return LOG.getValueAsLogItem(this.doc, value, stackedMode, alreadyLoggedContainers, showFirstLevelObjectChildren, showExpandObjectChildren);
 }
 
 // FIXME: unchecked - unimplemented

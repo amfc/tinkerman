@@ -1,3 +1,5 @@
+// FIXME: This should take the object from where to start
+
 LOG.guessNameAsArray = function(objToFind) {
     function getPath(item) {
         var path = [];
@@ -10,7 +12,7 @@ LOG.guessNameAsArray = function(objToFind) {
     
     var checkedObjects = [];
     var objectsToCheck = [
-        { obj: page, name: LOG.pageObjectName, parent: null }
+        { obj: page, name: LOG.pageObjectName, parent: null } // FIXME: remove pageObjectName
     ];
     for (var i = 0; i < objectsToCheck.length; ++i) {
         if (objectsToCheck[i].obj == objToFind) {

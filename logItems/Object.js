@@ -114,7 +114,7 @@ LOG.ObjectLogItem = function(doc, value, stackedMode, alreadyLoggedContainers, s
                     },
                     onclick: function(event) {
                         if (!event) {
-                            event = LOG.console.getWindow().event;
+                            event = LOG.console.getWindow().event; // FIXME: LOG.console doesn't exist anymore
                         }
                         LOG.preventDefault(event);
                         LOG.stopPropagation(event);
@@ -142,7 +142,7 @@ LOG.ObjectLogItem = function(doc, value, stackedMode, alreadyLoggedContainers, s
                     },
                     onclick: function(event) {
                         if (!event) {
-                            event = LOG.console.getWindow().event;
+                            event = LOG.console.getWindow().event; // FIXME: LOG.console doesn't exist anymore
                         }
                         LOG.preventDefault(event);
                         LOG.stopPropagation(event);
@@ -321,7 +321,7 @@ LOG.ObjectLogItem.prototype.updateAndMarkDifferences = function() {
         while (propertyValueElement.firstChild) {
             propertyValueElement.removeChild(propertyValueElement.firstChild);
         }
-        me.properties[key].logItem = LOG.getValueAsLogItem(LOG.console.ownerDocument, me.value[key], me.stackedMode, me.alreadyLoggedContainers);
+        me.properties[key].logItem = LOG.getValueAsLogItem(LOG.console.ownerDocument, me.value[key], me.stackedMode, me.alreadyLoggedContainers); // FIXME: LOG.console doesn't exist anymore
         me.properties[key].element = me.properties[key].logItem.element;
         if (wasShowingChildren) {
             me.properties[key].logItem.setShowChildren(wasShowingChildren);

@@ -9,6 +9,8 @@ LOG.Console = function(doc) {
     this.element = LOG.createElement(doc, 'div');
 }
 
+LOG.setTypeName(LOG.Console, 'LOG.Console');
+
 LOG.Console.prototype.getWindow = function() {
     if (this.window) {
         return this.window;
