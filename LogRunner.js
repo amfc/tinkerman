@@ -13,10 +13,12 @@ LOG.LogRunner = function() {
     this.createLogger();
 }
 
+LOG.setTypeName(LOG.LogRunner, 'LOG.LogRunner');
+
 LOG.LogRunner.prototype.caller = function(methodName) {
     var me = this;
     return function() {
-        me[methodName].apply(me, arguments);
+        return me[methodName].apply(me, arguments);
     }
 }
 
@@ -26,15 +28,13 @@ LOG.LogRunner.prototype.createLogger = function() {
     this.logger.onnewwindowtoggleclick = this.caller('onLoggerNewWindowToggleClick');
     this.logger.onescpress = this.caller('onLoggerEscPress');
     this.logger.oncollapsetoggleclick = this.caller('onLoggerCollapseToggleClick');
-    if (!this.willOpenInNewWindow) {
-        if (this.doc.body) {
-            this.appendLogger();
-        } else {
-            if (!this.appendLoggerCaller) {
-                this.appendLoggerCaller = this.caller('appendLogger');
-            }
-            LOG.addEventListener(window, 'load', this.appendLoggerCaller);
+    if (this.doc.body) {
+        this.appendLogger();
+    } else {
+        if (!this.appendLoggerCaller) {
+            this.appendLoggerCaller = this.caller('appendLogger');
         }
+        LOG.addEventListener(window, 'load', this.appendLoggerCaller);
     }
 }
 
@@ -86,7 +86,7 @@ LOG.LogRunner.prototype.getLogger = function() {
 
 LOG.LogRunner.prototype.onLogWindowUnload = function() {
     delete this.logger;
-    delete this.window;
+    delete this.logWindow;
     this.willOpenInNewWindow = false;
     this.doc = document;
     this.appendLogger();
@@ -94,35 +94,24 @@ LOG.LogRunner.prototype.onLogWindowUnload = function() {
 
 LOG.LogRunner.prototype.prepareNewDocument = function() {
     if (this.willOpenInNewWindow) {
-        if (!this.window || this.window.closed) {
-            this.window = window.open('', 'LOG_logWindow', 'resizable=yes,scrollbars=yes,status=yes');
-            if (!this.window) {
-                this.willOpenInNewWindow = false;
-                this.doc = document;
-                return document;
-            }
+        try {
+            this.logWindow = new LOG.LogWindow();
+        } catch (e) {
+            delete this.logWindow;
         }
-        this.doc = this.window.document;
-        this.doc.open();
-        this.doc.write('<html><head><style> BODY { margin: 0em }</style></head><body></body></html>');
-        this.doc.close();
-        this.doc.title = 'Log: ' + window.document.title;
-        if (LOG.isGecko) {
-            this.window.onunload = this.caller('onLogWindowUnload');
+        if (this.logWindow) {
+            this.logWindow.onkeydown = this.caller('onKeyDown');
+            this.logWindow.onunload = this.caller('onLogWindowUnload');
+            return this.logWindow.doc;
         } else {
-            this.doc.body.onunload = this.caller('onLogWindowUnload');
+            this.willOpenInNewWindow = false;
         }
-        this.doc.body.onkeydown = LOG.createEventHandler(this.doc, this, 'onKeyDown');
-        
-        return this.window.document;
-    } else {
-        if (this.window) {
-            this.window.close();
-        }
-        delete this.window;
-        this.doc = document;
-        return document;
     }
+    if (this.logWindow) {
+        this.logWindow.close();
+        delete this.logWindow;
+    }
+    return document;
 }
 
 LOG.LogRunner.prototype.deleteElement = function() {
@@ -131,9 +120,9 @@ LOG.LogRunner.prototype.deleteElement = function() {
         this.bodyWrapper.uninit();
         delete this.bodyWrapper;
     }
-    if (this.window) {
-        this.window.close();
-        delete this.window;
+    if (this.logWindow) {
+        this.logWindow.close();
+        delete this.logWindow;
     }
     delete this.logger;
 }
@@ -161,7 +150,7 @@ LOG.LogRunner.prototype.showLogger = function() {
     if (this.bodyWrapper) {
         this.bodyWrapper.show();
     } else {
-        this.window.focus();
+        this.logWindow.focus();
     }
     this.logger.focus();
 }
@@ -224,7 +213,7 @@ LOG.LogRunner.prototype.onMouseDown = function(event) {
         if (path && path.pathToObject) {
             var i = 0;
             for (var i = path.pathToObject.length - 1; i >= 0; --i) {
-                if (path.pathToObject[i].obj instanceof window.Reloadable) {
+                if (path.pathToObject[i].obj instanceof window.Reloadable) { // FIXME
                     LOG.openClassInEditor(path.pathToObject[i].obj);
                     break;
                 }

@@ -17,6 +17,7 @@ add guess;
 add diff;
 add HistoryManager;
 add BodyWrapper;
+add LogWindow;
 add CommandInput;
 add CommandEditor;
 add Evaluator;

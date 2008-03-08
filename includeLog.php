@@ -6,6 +6,7 @@
 <script src="<?=$tinkermanPath?>guess.js" type="text/javascript"></script>
 <script src="<?=$tinkermanPath?>diff.js" type="text/javascript"></script>
 <script src="<?=$tinkermanPath?>BodyWrapper.js" type="text/javascript"></script>
+<script src="<?=$tinkermanPath?>LogWindow.js" type="text/javascript"></script>
 <script src="<?=$tinkermanPath?>HistoryManager.js" type="text/javascript"></script>
 <script src="<?=$tinkermanPath?>CommandInput.js" type="text/javascript"></script>
 <script src="<?=$tinkermanPath?>CommandEditor.js" type="text/javascript"></script>
