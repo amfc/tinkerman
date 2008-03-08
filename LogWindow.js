@@ -21,7 +21,7 @@ LOG.setTypeName(LOG.LogWindow, 'LOG.LogWindow');
 LOG.LogWindow.prototype.caller = function(methodName) {
     var me = this;
     return function() {
-        me[methodName].apply(me, arguments);
+       return me[methodName].apply(me, arguments);
     }
 }
 
