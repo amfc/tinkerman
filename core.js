@@ -12,7 +12,7 @@ LOG.setTypeName = function(constructor, name) {
 
 LOG.logAsSection = function(sectionName, object) {
     var logger = LOG.logRunner.getLogger();
-    var pageSection = logger.addSection('page');
+    var pageSection = logger.getOrAddConsoleSection('page');
     var logItem;
     pageSection.panel.onselect = function() {
         if (!logItem) {
