@@ -76,7 +76,7 @@ LOG.LogRunner.prototype.onLoggerCollapseToggleClick = function() {
 LOG.LogRunner.prototype.onLoggerNewWindowToggleClick = function() {
     this.deleteElement();
     this.willOpenInNewWindow = !this.willOpenInNewWindow;
-    this.appendLogger();
+    this.createLogger();
     this.logger.focus();
 }
 
@@ -89,7 +89,7 @@ LOG.LogRunner.prototype.onLogWindowUnload = function() {
     delete this.logWindow;
     this.willOpenInNewWindow = false;
     this.doc = document;
-    this.appendLogger();
+    this.createLogger();
 }
 
 LOG.LogRunner.prototype.prepareNewDocument = function() {
