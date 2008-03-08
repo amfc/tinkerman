@@ -10,6 +10,18 @@ LOG.setTypeName = function(constructor, name) {
     }
 }
 
+LOG.logAsSection = function(sectionName, object) {
+    var logger = LOG.logRunner.getLogger();
+    var pageSection = logger.addSection('page');
+    var logItem;
+    pageSection.panel.onselect = function() {
+        if (!logItem) {
+            logItem = logger.getValueAsLogItem(object, false, [], true);
+            pageSection.panel.contentElement.appendChild(logItem.element);
+        }
+    }
+}
+
 LOG.focusAndBlinkElement = function(element) {
     element.scrollIntoView();
     element.style.backgroundColor = 'yellow';
