@@ -120,6 +120,8 @@ LOG.Logger.prototype.serializeOpenSections = function() {
     return out;
 }
 
+LOG.setTypeName(LOG.Logger, 'LOG.Logger');
+
 LOG.Logger.prototype.logText = function(text, title) {
     this.defaultConsole.appendRow(this.doc.createTextNode(text), title);
 }
