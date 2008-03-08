@@ -285,8 +285,6 @@ LOG.Logger.prototype.getValueAsLogItem = function(value, stackedMode, alreadyLog
     return LOG.getValueAsLogItem(this.doc, value, stackedMode, alreadyLoggedContainers, showFirstLevelObjectChildren, showExpandObjectChildren);
 }
 
-// FIXME: unchecked - unimplemented
-
 // This searchs for some value in all the selected panels and focuses it
 LOG.Logger.prototype.focusValue = function(value, dontLog) {
     // this takes into account the extra elements which the LOG could have added and ignores them
@@ -296,7 +294,7 @@ LOG.Logger.prototype.focusValue = function(value, dontLog) {
         while (node && node != htmlNode) {
             path.unshift(LOG.getChildNodeNumber(node));
             node = node.parentNode;
-            if (node == LOG.console.wrapperTopElement) {
+            if (node == LOG.console.wrapperTopElement) { // FIXME: This doesn't exist any more as this
                 node = document.body;
             }
         }
@@ -306,24 +304,24 @@ LOG.Logger.prototype.focusValue = function(value, dontLog) {
     if (!dontLog) {
         // Log the path into the console panel
         var logItem = new LOG.PathToObjectLogItem(this.doc, path);
-        this.appendRow(logItem.element);
-    }
-    if (path) {
-        if (value.nodeType) {
-            // Focus the element in the html panel
-            if (this.htmlLogItem) {
-                this.htmlLogItem.focusChild(getPathToNodeFromHtmlNode(value));
-            }
-        }
+        this.defaultConsole.appendRow(logItem.element);
+    } // FIXME: the html and page parts aren't implemented yet
+    //~ if (path) {
+        //~ if (value.nodeType) {
+            //~ // Focus the element in the html panel
+            //~ if (this.htmlLogItem) {
+                //~ this.htmlLogItem.focusChild(getPathToNodeFromHtmlNode(value));
+            //~ }
+        //~ }
         
-        // Focus the element in the page panel
-        if (this.pageLogItem) {
-            path.pathToObject.shift(); // remove the 'page' part
-            if (path.pathToObject.length == 0) {
-                LOG.focusAndBlinkElement(this.pageLogItem.element);
-            } else {
-                this.pageLogItem.focusProperty(path.pathToObject);
-            }
-        }
-    }
+        //~ // Focus the element in the page panel
+        //~ if (this.pageLogItem) {
+            //~ path.pathToObject.shift(); // remove the 'page' part
+            //~ if (path.pathToObject.length == 0) {
+                //~ LOG.focusAndBlinkElement(this.pageLogItem.element);
+            //~ } else {
+                //~ this.pageLogItem.focusProperty(path.pathToObject);
+            //~ }
+        //~ }
+    //~ }
 }

@@ -5,10 +5,10 @@ LOG.LogRunner = function() {
     this.bodyWrapperSavedSize = parseFloat(LOG.getCookie('LOG_SIZE'));
     this.loggerSavedOpenSections = LOG.getCookie('LOG_OPEN_SECTIONS');
     LOG.addEventListener(document, 'keydown', LOG.createEventHandler(document, this, 'onKeyDown'), true);
-    //~ LOG.addEventListener(document, 'selectstart', this.caller('onDocumentSelectStart'), true);
-    //~ LOG.addEventListener(document, 'mousedown', this.caller('onMouseDown'), true);
-    //~ LOG.addEventListener(document, 'mouseup', this.caller('onClick'), true);
-    //~ LOG.addEventListener(document, 'click', this.caller('onClick'), true);
+    LOG.addEventListener(document, 'selectstart', this.caller('onDocumentSelectStart'), true);
+    LOG.addEventListener(document, 'mousedown', this.caller('onMouseDown'), true);
+    LOG.addEventListener(document, 'mouseup', this.caller('onClick'), true);
+    LOG.addEventListener(document, 'click', this.caller('onClick'), true);
     LOG.addEventListener(window, 'unload', this.caller('onUnload'));
     this.createLogger();
 }
@@ -201,23 +201,21 @@ LOG.LogRunner.prototype.onLoggerEscPress = function() {
     this.hide();
 }
 
-// Unmigrated stuff
-
-LOG.onDocumentSelectStart = function(event) {
+LOG.LogRunner.prototype.onDocumentSelectStart = function() {
     if (LOG.nextClickShouldBeStopped) {
         LOG.preventDefault(event);
         LOG.stopPropagation(event);
     }
 }
 
-LOG.onMouseDown = function(event) {
+LOG.LogRunner.prototype.onMouseDown = function(event) {
     if (LOG.getButtonFromEvent(event) == 'left' && event.ctrlKey && event.shiftKey) {
         LOG.nextClickShouldBeStopped = true;
         var element = LOG.getElementFromEvent(event);
-        LOG.console.focusValue(element);
+        this.getLogger().focusValue(element);
         LOG.preventDefault(event);
         LOG.stopPropagation(event);
-    } else if (LOG.getButtonFromEvent(event) == 'left' && event.altKey && event.ctrlKey) {
+    } else if (LOG.getButtonFromEvent(event) == 'left' && event.altKey && event.ctrlKey) { // FIXME: iats dependancy, unmigrated
         if (!window.Reloadable) {
             return;
         }
@@ -240,7 +238,7 @@ LOG.onMouseDown = function(event) {
     }
 }
 
-LOG.onClick = function(event) {
+LOG.LogRunner.prototype.onClick = function(event) {
     if (LOG.nextClickShouldBeStopped) {
         LOG.preventDefault(event);
         LOG.stopPropagation(event);

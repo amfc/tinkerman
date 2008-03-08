@@ -12,7 +12,7 @@ LOG.guessNameAsArray = function(objToFind) {
     
     var checkedObjects = [];
     var objectsToCheck = [
-        { obj: page, name: LOG.pageObjectName, parent: null } // FIXME: remove pageObjectName
+        { obj: page, name: 'page', parent: null } // FIXME: remove dependancy on "page" object
     ];
     for (var i = 0; i < objectsToCheck.length; ++i) {
         if (objectsToCheck[i].obj == objToFind) {
