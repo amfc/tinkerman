@@ -80,10 +80,6 @@ LOG.LogRunner.prototype.onLoggerNewWindowToggleClick = function() {
     LOG.logger.focus();
 }
 
-LOG.LogRunner.prototype.getLogger = function() {
-    return LOG.logger;
-}
-
 LOG.LogRunner.prototype.onLogWindowUnload = function() {
     delete LOG.logger;
     delete this.logWindow;
@@ -201,7 +197,7 @@ LOG.LogRunner.prototype.onMouseDown = function(event) {
     if (LOG.getButtonFromEvent(event) == 'left' && event.ctrlKey && event.shiftKey) {
         LOG.nextClickShouldBeStopped = true;
         var element = LOG.getElementFromEvent(event);
-        this.getLogger().focusValue(element);
+        LOG.logger.focusValue(element);
         LOG.preventDefault(event);
         LOG.stopPropagation(event);
     } else if (LOG.getButtonFromEvent(event) == 'left' && event.altKey && event.ctrlKey) { // FIXME: iats dependancy, unmigrated

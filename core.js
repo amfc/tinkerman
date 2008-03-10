@@ -11,12 +11,11 @@ LOG.setTypeName = function(constructor, name) {
 }
 
 LOG.logAsSection = function(sectionName, object) {
-    var logger = LOG.logRunner.getLogger();
-    var pageSection = logger.getOrAddConsoleSection('page');
+    var pageSection = LOG.logger.getOrAddConsoleSection('page');
     var logItem;
     pageSection.panel.onselect = function() {
         if (!logItem) {
-            logItem = logger.getValueAsLogItem(object, false, [], true);
+            logItem = LOG.logger.getValueAsLogItem(object, false, [], true);
             pageSection.panel.contentElement.appendChild(logItem.element);
         }
     }
@@ -54,11 +53,11 @@ LOG.createOutlineFromElement = function(element) {
 }
 
 function Log(message, title, section, dontOpen, stackedMode) {
-    return LOG.logRunner.getLogger().log(message, title, true, section, dontOpen, stackedMode);
+    return LOG.logger.log(message, title, true, section, dontOpen, stackedMode);
 }
 
 function LogAndStore(value, source) {
-    return LOG.logRunner.getLogger().logAndStore(value, source);
+    return LOG.logger.logAndStore(value, source);
 }
 
 function LogX(str) { // Log in external window
@@ -75,8 +74,8 @@ function LogE(expression) {
 }
 
 function LogError(e) {
-    var logItem = new LOG.ExceptionLogItem(LOG.logRunner.getLogger().defaultConsole.doc, e);
-    LOG.logRunner.getLogger().defaultConsole.appendRow(
+    var logItem = new LOG.ExceptionLogItem(LOG.logger.doc, e);
+    LOG.logger.defaultConsole.appendRow(
         logItem.element,
         'error',
         true,
