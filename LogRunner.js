@@ -24,10 +24,10 @@ LOG.LogRunner.prototype.caller = function(methodName) {
 
 LOG.LogRunner.prototype.createLogger = function() {
     this.doc = this.prepareNewDocument();
-    this.logger = new LOG.Logger(this.doc, this.willOpenInNewWindow, this.historyManager, this.loggerSavedOpenSections);
-    this.logger.onnewwindowtoggleclick = this.caller('onLoggerNewWindowToggleClick');
-    this.logger.onescpress = this.caller('onLoggerEscPress');
-    this.logger.oncollapsetoggleclick = this.caller('onLoggerCollapseToggleClick');
+    LOG.logger = new LOG.Logger(this.doc, this.willOpenInNewWindow, this.historyManager, this.loggerSavedOpenSections);
+    LOG.logger.onnewwindowtoggleclick = this.caller('onLoggerNewWindowToggleClick');
+    LOG.logger.onescpress = this.caller('onLoggerEscPress');
+    LOG.logger.oncollapsetoggleclick = this.caller('onLoggerCollapseToggleClick');
     if (this.doc.body) {
         this.appendLogger();
     } else {
@@ -45,11 +45,11 @@ LOG.LogRunner.prototype.appendLogger = function() {
     }
     if (!this.willOpenInNewWindow) {
         var collapsed = LOG.getCookie('LOG_OPEN') != 'true';
-        this.bodyWrapper = new LOG.BodyWrapper(this.doc, this.logger.element, this.bodyWrapperSavedSize, collapsed ? '1.3em' : undefined);
+        this.bodyWrapper = new LOG.BodyWrapper(this.doc, LOG.logger.element, this.bodyWrapperSavedSize, collapsed ? '1.3em' : undefined);
         this.bodyWrapper.ondragend = this.caller('onBodyWrapperDragEnd');
         this.setCollapsed(collapsed);
     } else {
-        this.doc.body.appendChild(this.logger.element);
+        this.doc.body.appendChild(LOG.logger.element);
     }
 }
 
@@ -65,7 +65,7 @@ LOG.LogRunner.prototype.setCollapsed = function(collapsed) {
     } else {
         this.bodyWrapper.unlock();
     }
-    this.logger.setCollapsed(collapsed);
+    LOG.logger.setCollapsed(collapsed);
     this.collapsed = collapsed;
 }
 
@@ -77,15 +77,15 @@ LOG.LogRunner.prototype.onLoggerNewWindowToggleClick = function() {
     this.deleteElement();
     this.willOpenInNewWindow = !this.willOpenInNewWindow;
     this.createLogger();
-    this.logger.focus();
+    LOG.logger.focus();
 }
 
 LOG.LogRunner.prototype.getLogger = function() {
-    return this.logger;
+    return LOG.logger;
 }
 
 LOG.LogRunner.prototype.onLogWindowUnload = function() {
-    delete this.logger;
+    delete LOG.logger;
     delete this.logWindow;
     this.willOpenInNewWindow = false;
     this.doc = document;
@@ -124,14 +124,14 @@ LOG.LogRunner.prototype.deleteElement = function() {
         this.logWindow.close();
         delete this.logWindow;
     }
-    delete this.logger;
+    delete LOG.logger;
 }
 
 LOG.LogRunner.prototype.onKeyDown = function(event) {
     var chr = String.fromCharCode(event.keyCode).toLowerCase();
     if (event.altKey && event.shiftKey) {
         if (chr == 'm') {
-            if (!this.logger) {
+            if (!LOG.logger) {
                 this.stopDebugging = false;
                 this.createLogger();
             }
@@ -152,7 +152,7 @@ LOG.LogRunner.prototype.showLogger = function() {
     } else {
         this.logWindow.focus();
     }
-    this.logger.focus();
+    LOG.logger.focus();
 }
 
 LOG.LogRunner.prototype.hide = function() {
@@ -169,9 +169,9 @@ LOG.LogRunner.prototype.onUnload = function() {
         LOG.addCookie('LOG_SIZE', this.bodyWrapperSavedSize, 30);
     }
     LOG.addCookie('LOG_IN_NEW_WINDOW', this.willOpenInNewWindow ? 'true' : 'false', 30);
-    LOG.addCookie('LOG_OPEN', this.logger && (this.bodyWrapper && !this.bodyWrapper.hidden && !this.collapsed) ? "true" : "false", 30);
-    if (this.logger) {
-        LOG.addCookie('LOG_OPEN_SECTIONS', this.logger.serializeOpenSections(), 30);
+    LOG.addCookie('LOG_OPEN', LOG.logger && (this.bodyWrapper && !this.bodyWrapper.hidden && !this.collapsed) ? "true" : "false", 30);
+    if (LOG.logger) {
+        LOG.addCookie('LOG_OPEN_SECTIONS', LOG.logger.serializeOpenSections(), 30);
     }
     if (LOG.isGecko) {
         LOG.removeAllEventListeners();
@@ -179,7 +179,7 @@ LOG.LogRunner.prototype.onUnload = function() {
 }
 
 LOG.LogRunner.prototype.close = function() {
-    if (!this.logger || this.stopDebugging) {
+    if (!LOG.logger || this.stopDebugging) {
         return;
     }
     this.deleteElement();
