@@ -2,7 +2,7 @@ LOG.LogRunner = function() {
     this.doc = document;
     this.willOpenInNewWindow = LOG.getCookie('LOG_IN_NEW_WINDOW') == 'true';
     this.historyManager = new LOG.HistoryManager(LOG.getCookie('LOG_HISTORY'));
-    this.bodyWrapperSavedSize = parseFloat(LOG.getCookie('LOG_SIZE'));
+    this.containerSavedSize = parseFloat(LOG.getCookie('LOG_SIZE'));
     this.loggerSavedOpenSections = LOG.getCookie('LOG_OPEN_SECTIONS');
     LOG.addEventListener(document, 'keydown', LOG.createEventHandler(document, this, 'onKeyDown'), true);
     LOG.addEventListener(document, 'selectstart', this.caller('onDocumentSelectStart'), true);
@@ -10,7 +10,7 @@ LOG.LogRunner = function() {
     LOG.addEventListener(document, 'mouseup', this.caller('onClick'), true);
     LOG.addEventListener(document, 'click', this.caller('onClick'), true);
     LOG.addEventListener(window, 'unload', this.caller('onUnload'));
-    this.createLogger();
+    this.createAndAppendLogger();
 }
 
 LOG.setTypeName(LOG.LogRunner, 'LOG.LogRunner');
@@ -22,105 +22,112 @@ LOG.LogRunner.prototype.caller = function(methodName) {
     }
 }
 
+LOG.LogRunner.prototype.createAndAppendLogger = function() {
+    this.createLogger();
+    this.appendLogger();
+}
+
 LOG.LogRunner.prototype.createLogger = function() {
-    this.doc = this.prepareNewDocument();
-    LOG.logger = new LOG.Logger(this.doc, this.willOpenInNewWindow, this.historyManager, this.loggerSavedOpenSections);
+    LOG.logger = new LOG.Logger(document, this.willOpenInNewWindow, this.historyManager, this.loggerSavedOpenSections);
     LOG.logger.onnewwindowtoggleclick = this.caller('onLoggerNewWindowToggleClick');
     LOG.logger.onescpress = this.caller('onLoggerEscPress');
     LOG.logger.oncollapsetoggleclick = this.caller('onLoggerCollapseToggleClick');
-    if (this.doc.body) {
-        this.appendLogger();
+}
+
+LOG.LogRunner.prototype.createWindowContainer = function() {
+    var container;
+    try {
+        container = new LOG.LogWindow();
+    } catch (e) {
+        return null;
+    }
+    container.onkeydown = this.caller('onKeyDown');
+    container.onunload = this.caller('onLogWindowUnload');
+    return container;
+}
+
+LOG.LogRunner.prototype.createBodyWrapperContainer = function() {
+    var collapsed = LOG.getCookie('LOG_OPEN') != 'true';
+    var container = new LOG.BodyWrapper(this.doc, LOG.logger.element, this.containerSavedSize, collapsed ? '1.3em' : undefined);
+    container.ondragend = this.caller('onBodyWrapperDragEnd');
+    this.setCollapsed(container, collapsed);
+    return container;
+}
+
+LOG.LogRunner.prototype.createContainer = function() {
+    var container;
+    if (this.willOpenInNewWindow && (container = this.createWindowContainer())) {
+        this.container = container;
     } else {
-        if (!this.appendLoggerCaller) {
-            this.appendLoggerCaller = this.caller('appendLogger');
+        this.willOpenInNewWindow = false;
+        if (this.container) { // there is an old window or BodyWrapper left
+            this.container.uninit();
         }
-        LOG.addEventListener(window, 'load', this.appendLoggerCaller);
+        this.container = this.createBodyWrapperContainer();
+        
     }
 }
 
-LOG.LogRunner.prototype.appendLogger = function() {
-    if (this.appendLoggerCaller) {
-        LOG.removeEventListener(window, 'load', this.appendLoggerCaller);
-        delete this.appendLoggerCaller;
+LOG.LogRunner.prototype.appendLoggerNow = function() {
+    if (this.appendLoggerNowCaller) {
+        LOG.removeEventListener(window, 'load', this.appendLoggerNowCaller);
+        delete this.appendLoggerNowCaller;
     }
-    if (!this.willOpenInNewWindow) {
-        var collapsed = LOG.getCookie('LOG_OPEN') != 'true';
-        this.bodyWrapper = new LOG.BodyWrapper(this.doc, LOG.logger.element, this.bodyWrapperSavedSize, collapsed ? '1.3em' : undefined);
-        this.bodyWrapper.ondragend = this.caller('onBodyWrapperDragEnd');
-        this.setCollapsed(collapsed);
+    this.createContainer();
+    this.container.appendChild(LOG.logger.element);
+}
+
+LOG.LogRunner.prototype.appendLogger = function() {
+    if (document.body) {
+        this.appendLoggerNow();
     } else {
-        this.doc.body.appendChild(LOG.logger.element);
+        if (!this.appendLoggerNowCaller) {
+            this.appendLoggerNowCaller = this.caller('appendLoggerNow');
+        }
+        LOG.addEventListener(window, 'load', this.appendLoggerNowCaller);
     }
 }
 
 LOG.LogRunner.prototype.onBodyWrapperDragEnd = function() {
     if (this.collapsed) {
-        this.setCollapsed(false);
+        this.setCollapsed(this.container, false);
     }
 }
 
-LOG.LogRunner.prototype.setCollapsed = function(collapsed) {
+LOG.LogRunner.prototype.setCollapsed = function(bodyWrapper, collapsed) {
     if (collapsed) {
-        this.bodyWrapper.lock('1.3em');
+        bodyWrapper.lock('1.3em');
     } else {
-        this.bodyWrapper.unlock();
+        bodyWrapper.unlock();
     }
     LOG.logger.setCollapsed(collapsed);
     this.collapsed = collapsed;
 }
 
 LOG.LogRunner.prototype.onLoggerCollapseToggleClick = function() {
-    this.setCollapsed(!this.collapsed);
+    this.setCollapsed(this.container, !this.collapsed);
 }
 
 LOG.LogRunner.prototype.onLoggerNewWindowToggleClick = function() {
-    this.deleteElement();
+    this.deleteContainer();
     this.willOpenInNewWindow = !this.willOpenInNewWindow;
-    this.createLogger();
+    this.appendLogger();
     LOG.logger.focus();
 }
 
 LOG.LogRunner.prototype.onLogWindowUnload = function() {
-    delete LOG.logger;
     delete this.logWindow;
     this.willOpenInNewWindow = false;
     this.doc = document;
-    this.createLogger();
+    this.appendLogger();
 }
 
-LOG.LogRunner.prototype.prepareNewDocument = function() {
-    if (this.willOpenInNewWindow) {
-        try {
-            this.logWindow = new LOG.LogWindow();
-        } catch (e) {
-            delete this.logWindow;
-        }
-        if (this.logWindow) {
-            this.logWindow.onkeydown = this.caller('onKeyDown');
-            this.logWindow.onunload = this.caller('onLogWindowUnload');
-            return this.logWindow.doc;
-        } else {
-            this.willOpenInNewWindow = false;
-        }
+LOG.LogRunner.prototype.deleteContainer = function() {
+    if (this.container && this.container.getSize) {
+        this.containerSavedSize = this.container.getSize();
     }
-    if (this.logWindow) {
-        this.logWindow.close();
-        delete this.logWindow;
-    }
-    return document;
-}
-
-LOG.LogRunner.prototype.deleteElement = function() {
-    if (this.bodyWrapper) {
-        this.bodyWrapperSavedSize = this.bodyWrapper.getSize();
-        this.bodyWrapper.uninit();
-        delete this.bodyWrapper;
-    }
-    if (this.logWindow) {
-        this.logWindow.close();
-        delete this.logWindow;
-    }
-    delete LOG.logger;
+    this.container.uninit();
+    delete this.container;
 }
 
 LOG.LogRunner.prototype.onKeyDown = function(event) {
@@ -129,7 +136,7 @@ LOG.LogRunner.prototype.onKeyDown = function(event) {
         if (chr == 'm') {
             if (!LOG.logger) {
                 this.stopDebugging = false;
-                this.createLogger();
+                this.createAndAppendLogger();
             }
             this.showLogger();
             LOG.preventDefault(event);
@@ -143,18 +150,12 @@ LOG.LogRunner.prototype.onKeyDown = function(event) {
 }
 
 LOG.LogRunner.prototype.showLogger = function() {
-    if (this.bodyWrapper) {
-        this.bodyWrapper.show();
-    } else {
-        this.logWindow.focus();
-    }
+    this.container.show();
     LOG.logger.focus();
 }
 
 LOG.LogRunner.prototype.hide = function() {
-    if (this.bodyWrapper) {
-        this.bodyWrapper.hide();
-    }
+    this.container.hide();
 }
 
 LOG.LogRunner.prototype.onUnload = function() {
@@ -162,7 +163,7 @@ LOG.LogRunner.prototype.onUnload = function() {
     if (this.bodyWrapper) {
         LOG.addCookie('LOG_SIZE', this.bodyWrapper.getSize(), 30);
     } else {
-        LOG.addCookie('LOG_SIZE', this.bodyWrapperSavedSize, 30);
+        LOG.addCookie('LOG_SIZE', this.containerSavedSize, 30);
     }
     LOG.addCookie('LOG_IN_NEW_WINDOW', this.willOpenInNewWindow ? 'true' : 'false', 30);
     LOG.addCookie('LOG_OPEN', LOG.logger && (this.bodyWrapper && !this.bodyWrapper.hidden && !this.collapsed) ? "true" : "false", 30);
@@ -178,7 +179,7 @@ LOG.LogRunner.prototype.close = function() {
     if (!LOG.logger || this.stopDebugging) {
         return;
     }
-    this.deleteElement();
+    this.deleteContainer();
     this.stopDebugging = true;
 }
 

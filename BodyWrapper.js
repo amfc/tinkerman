@@ -50,7 +50,7 @@ LOG.BodyWrapper = function(ownerDocument, elementToWrap, initialSize, startWithF
                             }
                         }
                     ),
-                    elementToWrap
+                    this.elementToWrapContainer = LOG.createElement(doc, 'div')
                 ]
             )
         ]
@@ -195,4 +195,9 @@ LOG.BodyWrapper.prototype.show = function() {
             this.setSize(this.size);
         }
     }
+}
+
+LOG.BodyWrapper.prototype.appendChild = function(elementToWrap) {
+    this.elementToWrapContainer.ownerDocument.importNode(elementToWrap, true);
+    this.elementToWrapContainer.appendChild(elementToWrap);
 }

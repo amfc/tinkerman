@@ -25,11 +25,14 @@ LOG.LogWindow.prototype.caller = function(methodName) {
     }
 }
 
-LOG.LogWindow.prototype.focus = function() {
+LOG.LogWindow.prototype.show = function() {
     this.window.focus();
 }
 
-LOG.LogWindow.prototype.close = function() {
+LOG.LogWindow.prototype.hide = function() {
+}
+
+LOG.LogWindow.prototype.uninit = function() {
     this.window.close();
 }
 
@@ -43,4 +46,9 @@ LOG.LogWindow.prototype.onUnload = function(event) {
     if (this.onunload) {
         return this.onunload(event);
     }
+}
+
+LOG.LogWindow.prototype.appendChild = function(elementToWrap) {
+    this.doc.importNode(elementToWrap, true);
+    this.doc.body.appendChild(elementToWrap);
 }
