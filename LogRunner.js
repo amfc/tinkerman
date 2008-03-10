@@ -75,6 +75,7 @@ LOG.LogRunner.prototype.appendLoggerNow = function() {
     }
     this.createContainer();
     this.container.appendChild(LOG.logger.element);
+    LOG.logger.setInNewWindow(this.willOpenInNewWindow);
 }
 
 LOG.LogRunner.prototype.appendLogger = function() {

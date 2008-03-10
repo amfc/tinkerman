@@ -1,7 +1,6 @@
 LOG.Logger = function(doc, inNewWindow, historyManager, openSectionsStr) {
     this.doc = doc;
     this.sections = {};
-    this.inNewWindow = inNewWindow;
     this.box = new LOG.Vbox(doc);
     this.panelManager = new LOG.PanelManager(doc,
         LOG.createElement(doc, 'span', {},
@@ -34,24 +33,31 @@ LOG.Logger = function(doc, inNewWindow, historyManager, openSectionsStr) {
                         onclick: LOG.createEventHandler(doc, this, 'onNewWindowClick')
                     },
                     [
-                        inNewWindow ? 'at' : 'de',
+                        this.inNewWindowAttachDetachPrefix = doc.createTextNode(inNewWindow ? 'at' : 'de'),
                         LOG.createElement(doc, 'span',
                             { style: { fontWeight: 'bold' } },
                             [ 't' ]
                         )
                     ]
                 ),
-                inNewWindow ? null : ' ',
-                inNewWindow ? null : LOG.createElement(doc, 'a',
+                this.collapseButton = LOG.createElement(doc, 'span',
                     {
-                        href: '#',
-                        style: {
-                            fontWeight: 'normal'
-                        },
-                        onclick: LOG.createEventHandler(doc, this, 'onCollapseToggleClick'),
-                        title: 'toggle collapse'
+                        style: { display: inNewWindow ? 'none' : '' }
                     },
-                    [ '[', this.closeButtonTextNode = doc.createTextNode('x'), ']' ]
+                    [
+                        ' ',
+                        LOG.createElement(doc, 'a',
+                            {
+                                href: '#',
+                                style: {
+                                    fontWeight: 'normal'
+                                },
+                                onclick: LOG.createEventHandler(doc, this, 'onCollapseToggleClick'),
+                                title: 'toggle collapse'
+                            },
+                            [ '[', this.closeButtonTextNode = doc.createTextNode('x'), ']' ]
+                        )
+                        ]
                 )
             ]
         )
@@ -95,6 +101,11 @@ LOG.Logger = function(doc, inNewWindow, historyManager, openSectionsStr) {
 }
 
 LOG.setTypeName(LOG.Logger, 'LOG.Logger');
+
+LOG.Logger.prototype.setInNewWindow = function(inNewWindow) {
+    this.inNewWindowAttachDetachPrefix.nodeValue = inNewWindow ? 'at' : 'de';
+    this.collapseButton.style.display = inNewWindow ? 'none' : '';
+}
 
 LOG.Logger.prototype.unserializeOpenSections = function(str) {
     if (str) {
