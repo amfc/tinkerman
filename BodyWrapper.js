@@ -49,8 +49,7 @@ LOG.BodyWrapper = function(ownerDocument, elementToWrap, initialSize, startWithF
                                 cursor: 'n-resize'
                             }
                         }
-                    ),
-                    this.elementToWrapContainer = LOG.createElement(doc, 'div')
+                    )
                 ]
             )
         ]
@@ -198,6 +197,6 @@ LOG.BodyWrapper.prototype.show = function() {
 }
 
 LOG.BodyWrapper.prototype.appendChild = function(elementToWrap) {
-    this.elementToWrapContainer.ownerDocument.importNode(elementToWrap, true);
-    this.elementToWrapContainer.appendChild(elementToWrap);
+    this.bottomElement.ownerDocument.importNode(elementToWrap, true);
+    this.bottomElement.appendChild(elementToWrap);
 }
