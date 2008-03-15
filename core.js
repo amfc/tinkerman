@@ -11,12 +11,12 @@ LOG.setTypeName = function(constructor, name) {
 }
 
 LOG.logAsSection = function(sectionName, object) {
-    var pageSection = LOG.logger.getOrAddConsoleSection('page');
+    var section = LOG.logger.getOrAddConsoleSection('page');
     var logItem;
-    pageSection.panel.onselect = function() {
+    section.panel.onselect = function() {
         if (!logItem) {
-            logItem = LOG.logger.getValueAsLogItem(object, false, [], true);
-            pageSection.panel.contentElement.appendChild(logItem.element);
+            logItem = LOG.logger.getValueAsLogItem(object, true, [], true);
+            section.panel.contentElement.appendChild(logItem.element);
         }
     }
 }
