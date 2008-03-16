@@ -85,14 +85,13 @@ LOG.Logger = function(doc, inNewWindow, historyManager, openSectionsStr) {
 
     var me = this;
     
-    var htmlSection = this.addSection('html');
-    htmlSection.panel.onselect = function() {
+    this.htmlSection = this.addSection('html');
+    this.htmlSection.panel.onselect = function() {
         if (!me.htmlLogItem) {
             me.htmlLogItem = new LOG.HTMLElementLogItem(me.doc, document.getElementsByTagName('html')[0], false, [], true);
-            htmlSection.panel.contentElement.appendChild(me.htmlLogItem.element);
+            me.htmlSection.panel.contentElement.appendChild(me.htmlLogItem.element);
         }
     }
-    
     this.historyManager = historyManager;
     this.commandEditor = new LOG.CommandEditor(doc, this.evaluator, function() { me.updateCommandEditorSize() }, this.historyManager);
     this.box.add(this.panelManager.element, { size: 100, sizeUnit: '%' });
@@ -318,7 +317,11 @@ LOG.Logger.prototype.focusValue = function(value, dontLog) {
         if (value.nodeType) {
             // Focus the element in the html panel
             if (this.htmlLogItem) {
-                this.htmlLogItem.focusChild(getPathToNodeFromHtmlNode(value));
+                var elementLogItem = this.htmlLogItem.expandChild(getPathToNodeFromHtmlNode(value));
+                if (elementLogItem) {
+                    this.htmlSection.panel.scrollElementIntoView(elementLogItem.element);
+                    LOG.blinkElement(elementLogItem.element);
+                }
             }
         }
         

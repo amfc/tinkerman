@@ -166,19 +166,19 @@ LOG.HTMLElementLogItem.prototype.onShowChildNodesLinkClick = function(event) {
     LOG.preventDefault(event);
 }
 
-LOG.HTMLElementLogItem.prototype.focusChild = function(pathToChild) {
-    if (pathToChild.length == 0) {
-        LOG.focusAndBlinkElement(this.element);
-    } else {
+LOG.HTMLElementLogItem.prototype.expandChild = function(pathToChild) {
+    if (pathToChild.length > 0) {
         if (!this.showChildNodes) {
             this.setShowChildNodes(true, false);
         }
         var i = pathToChild.shift();
-        if (this.childNodeItems[i].focusChild) {
-            this.childNodeItems[i].focusChild(pathToChild);
+        if (this.childNodeItems[i].expandChild) {
+            return this.childNodeItems[i].expandChild(pathToChild);
         } else {
-            Log('focus something which is not an htmlelementlogitem');
+            Log('expanding something which is not an htmlelementlogitem');
         }
+    } else {
+        return this;
     }
 }
 

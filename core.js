@@ -28,6 +28,10 @@ LOG.logAsSection = function(sectionName, object) {
 
 LOG.focusAndBlinkElement = function(element) {
     element.scrollIntoView();
+    LOG.blinkElement(element);
+}
+
+LOG.blinkElement = function(element) {
     element.style.backgroundColor = 'yellow';
     setTimeout(
         function() {
