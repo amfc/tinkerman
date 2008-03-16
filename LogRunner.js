@@ -64,7 +64,6 @@ LOG.LogRunner.prototype.createContainer = function() {
             this.container.uninit();
         }
         this.container = this.createBodyWrapperContainer();
-        
     }
 }
 
@@ -87,6 +86,7 @@ LOG.LogRunner.prototype.appendLogger = function() {
         }
         LOG.addEventListener(window, 'load', this.appendLoggerNowCaller);
     }
+    this.loggerAppended = true;
 }
 
 LOG.LogRunner.prototype.onBodyWrapperDragEnd = function() {
@@ -119,8 +119,7 @@ LOG.LogRunner.prototype.onLoggerNewWindowToggleClick = function() {
 LOG.LogRunner.prototype.onLogWindowUnload = function() {
     delete this.logWindow;
     this.willOpenInNewWindow = false;
-    this.doc = document;
-    this.appendLogger();
+    this.createLogger();
 }
 
 LOG.LogRunner.prototype.deleteContainer = function() {
