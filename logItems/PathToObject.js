@@ -65,9 +65,9 @@ LOG.PathToObjectPart.prototype.onLinkMouseDown = function(event) {
 LOG.PathToObjectPart.prototype.onLinkClick = function(event) {
     if (!this.ctrlClick) {
         LogAndStore(this.value);
-        LOG.console.focusValue(value, true);
-    } else if (window.Reloadable && value instanceof window.Reloadable) {
-        LOG.openClassInEditor(value);
+        LOG.logger.focusValue(this.value, true);
+    } else if (window.Reloadable && this.value instanceof window.Reloadable) {
+        LOG.openClassInEditor(this.value);
     }
     LOG.stopPropagation(event);
     LOG.preventDefault(event);
