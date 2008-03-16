@@ -220,41 +220,43 @@ LOG.HTMLElementLogItem.prototype.setShowChildNodes = function(show, applyToChild
     this.withChildNodesEnd.style.display = show ? '' : 'none';
     this.showChildNodesLink.firstChild.nodeValue = show ? '-' : '+';
     this.startTagEnd.nodeValue = show ? '>' : '/>';
-    var childNodeLogItem;
     if (show) {
         if (!this.onlyTextNodeChildren) {
             this.childNodesContainer.style.display = 'block';
             this.childNodesContainer.style.marginLeft = '1em';
         }
+        var childNodeLogItem;
         var childNode;
-        var childNodeToAppend;
         var childNodes = this.getChildNodes();
         this.childNodeItems = [];
         for (var i = 0; i < childNodes.length; ++i) {
             childNode = childNodes[i];
             if (childNode.nodeType == 1) {
                 childNodeLogItem = new LOG.HTMLElementLogItem(this.doc, childNode, this.stackedMode, this.alreadyLoggedContainers, true);
-                childNodeToAppend = childNodeLogItem.element;
                 if (applyToChildNodes) {
                     childNodeLogItem.setShowChildNodes(true, true);
                 }
             } else if (childNode.nodeName == '#text') {
-                childNodeToAppend = LOG.createElement(this.doc, 'span', { style: { color: '#999' } },
-                    [
-                        LOG.isWhitespace(childNode.nodeValue) ? ' ' : ('\u00A0' + childNode.nodeValue)
-                    ]
-                );
+                childNodeLogItem = {
+                    element: LOG.createElement(this.doc, 'span', { style: { color: '#999' } },
+                        [
+                            LOG.isWhitespace(childNode.nodeValue) ? ' ' : ('\u00A0' + childNode.nodeValue)
+                        ]
+                    )
+                };
             } else if (childNode.nodeName == '#comment') {
-                childNodeToAppend = LOG.createElement(this.doc, 'span', { style: { color: '#bc7' } }, [ '<!--' + childNode.nodeValue + '-->' ] );
+                childNodeLogItem = {
+                    element: LOG.createElement(this.doc, 'span', { style: { color: '#bc7' } }, [ '<!--' + childNode.nodeValue + '-->' ] )
+                };
             } else {
-                childNodeToAppend = LOG.getValueAsLogItem(this.doc, childNode).element;
+                childNodeLogItem = LOG.getValueAsLogItem(this.doc, childNode);
             }
             
-            this.childNodeItems.push(childNodeToAppend);
+            this.childNodeItems.push(childNodeLogItem);
             if (!this.onlyTextNodeChildren) {
-                childNodeToAppend.style.display = 'block';
+                childNodeLogItem.element.style.display = 'block';
             }
-            this.childNodesContainer.appendChild(childNodeToAppend);
+            this.childNodesContainer.appendChild(childNodeLogItem.element);
         }
         
     } else {

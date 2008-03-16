@@ -310,8 +310,7 @@ LOG.Logger.prototype.focusValue = function(value, dontLog) {
         return path;
     }
     var path = LOG.guessDomNodeOwnerName(value);
-    if (!dontLog) {
-        // Log the path into the console panel
+    if (!dontLog) { // Log the path into the console panel
         var logItem = new LOG.PathToObjectLogItem(this.doc, path);
         this.defaultConsole.appendRow(logItem.element);
     }
