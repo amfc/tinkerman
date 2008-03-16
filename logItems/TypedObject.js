@@ -169,7 +169,7 @@ LOG.TypedObjectLogItem.prototype.setShowSource = function(showSource) {
     if (showSource) {
         this.srcLink.style.textDecoration = 'line-through';
         this.srcElement.appendChild(this.doc.createTextNode(' '));
-        this.objectLogItem = new LOG.ObjectLogItem(this.doc, this.value, this.stackedMode, this.alreadyLoggedContainers, true, false);
+        this.objectLogItem = new LOG.ObjectLogItem(this.doc, this.value, true, this.alreadyLoggedContainers, true, false);
         if (this.autoUpdate) {
             this.objectLogItem.setAutoUpdate(true);
         }
