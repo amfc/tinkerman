@@ -160,11 +160,7 @@ LOG.getPosition = function(obj) {
 
 // Takes into account if the LOG wrapper element is active and either returns the true document's body or LOG's
 LOG.getBody = function(element) {
-    if (LOG.logRunner.bodyWrapper) {
-        return LOG.logRunner.bodyWrapper.topElement;
-    } else {
-        return document.body;
-    }
+    return LOG.logRunner.getBody();
 }
 
 // This works both with <input type=text>s and <textarea>s

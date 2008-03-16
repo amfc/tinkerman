@@ -160,13 +160,13 @@ LOG.LogRunner.prototype.hide = function() {
 
 LOG.LogRunner.prototype.onUnload = function() {
     LOG.addCookie('LOG_HISTORY', this.historyManager.serialize(), 30);
-    if (this.bodyWrapper) {
-        LOG.addCookie('LOG_SIZE', this.bodyWrapper.getSize(), 30);
+    if (this.container && this.container.getSize) {
+        LOG.addCookie('LOG_SIZE', this.container.getSize(), 30);
     } else {
         LOG.addCookie('LOG_SIZE', this.containerSavedSize, 30);
     }
     LOG.addCookie('LOG_IN_NEW_WINDOW', this.willOpenInNewWindow ? 'true' : 'false', 30);
-    LOG.addCookie('LOG_OPEN', LOG.logger && (this.bodyWrapper && !this.bodyWrapper.hidden && !this.collapsed) ? "true" : "false", 30);
+    LOG.addCookie('LOG_OPEN', LOG.logger && (this.container && !this.container.hidden && !this.collapsed) ? "true" : "false", 30);
     if (LOG.logger) {
         LOG.addCookie('LOG_OPEN_SECTIONS', LOG.logger.serializeOpenSections(), 30);
     }
@@ -228,5 +228,13 @@ LOG.LogRunner.prototype.onClick = function(event) {
     if (LOG.nextClickShouldBeStopped) {
         LOG.preventDefault(event);
         LOG.stopPropagation(event);
+    }
+}
+
+LOG.LogRunner.prototype.getBody = function() {
+    if (this.container && this.container.getBody) {
+        return this.container.getBody();
+    } else {
+        return document.body;
     }
 }

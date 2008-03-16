@@ -202,3 +202,7 @@ LOG.BodyWrapper.prototype.appendChild = function(elementToWrap) {
     this.bottomElement.ownerDocument.importNode(elementToWrap, true);
     this.bottomElement.appendChild(elementToWrap);
 }
+
+LOG.BodyWrapper.prototype.getBody = function() {
+    return this.topElement;
+}
