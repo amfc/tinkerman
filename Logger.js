@@ -300,16 +300,12 @@ LOG.Logger.prototype.getValueAsLogItem = function(value, stackedMode, alreadyLog
 
 // This searchs for some value in all the selected panels and focuses it
 LOG.Logger.prototype.focusValue = function(value, dontLog) {
-    // this takes into account the extra elements which the LOG could have added and ignores them
     function getPathToNodeFromHtmlNode(node) {
         var htmlNode = document.getElementsByTagName('html')[0];
         var path = [];
         while (node && node != htmlNode) {
             path.unshift(LOG.getChildNodeNumber(node));
-            node = node.parentNode;
-            if (node == LOG.console.wrapperTopElement) { // FIXME: This doesn't exist any more as this
-                node = document.body;
-            }
+            node = LOG.logRunner.getParentNodeHidingContainer(node); // this takes into account the extra elements which the LOG could have added and ignores them
         }
         return path;
     }
@@ -318,15 +314,16 @@ LOG.Logger.prototype.focusValue = function(value, dontLog) {
         // Log the path into the console panel
         var logItem = new LOG.PathToObjectLogItem(this.doc, path);
         this.defaultConsole.appendRow(logItem.element);
-    } // FIXME: the html and page parts aren't implemented yet
-    //~ if (path) {
-        //~ if (value.nodeType) {
-            //~ // Focus the element in the html panel
-            //~ if (this.htmlLogItem) {
-                //~ this.htmlLogItem.focusChild(getPathToNodeFromHtmlNode(value));
-            //~ }
-        //~ }
+    }
+    if (path) {
+        if (value.nodeType) {
+            // Focus the element in the html panel
+            if (this.htmlLogItem) {
+                this.htmlLogItem.focusChild(getPathToNodeFromHtmlNode(value));
+            }
+        }
         
+        //~ // FIXME: the page part isn't implemented yet
         //~ // Focus the element in the page panel
         //~ if (this.pageLogItem) {
             //~ path.pathToObject.shift(); // remove the 'page' part
@@ -336,5 +333,5 @@ LOG.Logger.prototype.focusValue = function(value, dontLog) {
                 //~ this.pageLogItem.focusProperty(path.pathToObject);
             //~ }
         //~ }
-    //~ }
+    }
 }

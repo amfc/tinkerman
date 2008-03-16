@@ -206,3 +206,20 @@ LOG.BodyWrapper.prototype.appendChild = function(elementToWrap) {
 LOG.BodyWrapper.prototype.getBody = function() {
     return this.topElement;
 }
+
+LOG.BodyWrapper.prototype.getParentNodeHidingMe = function(node) {
+    var parentNode = node.parentNode;
+    if (parentNode == this.topElement) {
+        return this.ownerDocument.body;
+    } else {
+        return parentNode;
+    }
+}
+
+LOG.BodyWrapper.prototype.getChildNodesHidingMe = function(node) {
+    if (node == this.ownerDocument.body) {
+        return this.topElement.childNodes;
+    } else {
+        return node.childNodes;
+    }
+}

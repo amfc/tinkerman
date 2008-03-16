@@ -238,3 +238,19 @@ LOG.LogRunner.prototype.getBody = function() {
         return document.body;
     }
 }
+
+LOG.LogRunner.prototype.getParentNodeHidingContainer = function(node) {
+    if (this.container.getParentNodeHidingMe) {
+        return this.container.getParentNodeHidingMe(node);
+    } else {
+        return node.parentNode;
+    }
+}
+
+LOG.LogRunner.prototype.getChildNodesHidingContainer = function(node) {
+    if (this.container.getChildNodesHidingMe) {
+        return this.container.getChildNodesHidingMe(node);
+    } else {
+        return node.childNodes;
+    }
+}
