@@ -56,6 +56,8 @@ LOG.PathToObjectPart = function(doc, value, pathPartName) {
     );
 }
 
+LOG.setTypeName(LOG.PathToObjectPart, 'LOG.PathToObjectPart');
+
 LOG.PathToObjectPart.prototype.onLinkMouseDown = function(event) {
     this.ctrlClick = LOG.getButtonFromEvent(event) == 'left' && event.ctrlKey;
 }
