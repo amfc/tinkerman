@@ -5,7 +5,7 @@ LOG.LogWindow = function() {
     }
     this.doc = this.window.document;
     this.doc.open();
-    this.doc.write('<html><head><style> BODY { margin: 0em }</style></head><body></body></html>');
+    this.doc.write('<html><head><style> BODY { margin: 0em; overflow: hidden; }</style></head><body></body></html>');
     this.doc.close();
     this.doc.title = 'Log: ' + window.document.title;
     if (LOG.isGecko) {
