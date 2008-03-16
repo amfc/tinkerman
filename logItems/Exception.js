@@ -78,7 +78,7 @@ LOG.ExceptionLogItem.prototype.onShowMoreLinkClick = function(event) {
 
 
 LOG.ExceptionLogItem.prototype.onNameLinkClick = function(event) {
-    LogAndStore(value);
+    LogAndStore(this.value);
     LOG.stopPropagation(event);
     LOG.preventDefault(event);
 }

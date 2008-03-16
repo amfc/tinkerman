@@ -62,7 +62,7 @@ LOG.PathToObjectPart.prototype.onLinkMouseDown = function(event) {
 
 LOG.PathToObjectPart.prototype.onLinkClick = function(event) {
     if (!this.ctrlClick) {
-        LogAndStore(value);
+        LogAndStore(this.value);
         LOG.console.focusValue(value, true);
     } else if (window.Reloadable && value instanceof window.Reloadable) {
         LOG.openClassInEditor(value);
