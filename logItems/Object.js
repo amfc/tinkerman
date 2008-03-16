@@ -177,6 +177,8 @@ LOG.ObjectLogItem = function(doc, value, stackedMode, alreadyLoggedContainers, s
     this.setShowChildren(showChildren);
 }
 
+LOG.setTypeName(LOG.ObjectLogItem, 'LOG.ObjectLogItem');
+
 LOG.ObjectLogItem.prototype.onUpdateLinkClick = function(event) {
     LOG.preventDefault(event);
     LOG.stopPropagation(event);

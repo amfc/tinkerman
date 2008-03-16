@@ -77,6 +77,8 @@ LOG.BodyWrapper = function(ownerDocument, elementToWrap, initialSize, startWithF
     LOG.addObjEventListener(this, this.resizeHandle, 'mousedown', this.onResizeHandleMousedown);
 }
 
+LOG.setTypeName(LOG.BodyWrapper, 'LOG.BodyWrapper');
+
 LOG.BodyWrapper.prototype.uninit = function() {
     var doc = this.ownerDocument;
     doc.body.removeChild(this.element);

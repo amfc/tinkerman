@@ -2,6 +2,8 @@ LOG.Evaluator = function(logger) {
     this.logger = logger;
 }
 
+LOG.setTypeName(LOG.Evaluator, 'LOG.Evaluator');
+
 LOG.Evaluator.prototype.evalScriptAndPrintResults = function($script) {
     var result = this.evalScript($script);
     if (result !== LOG.dontLogResult) {

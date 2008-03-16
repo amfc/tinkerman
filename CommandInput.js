@@ -27,6 +27,8 @@ LOG.CommandInput = function(doc, useTextArea, evaluator, historyManager) {
     }
 }
 
+LOG.setTypeName(LOG.CommandInput, 'LOG.CommandInput');
+
 LOG.CommandInput.prototype.onInputMouseDown = function(event) {
     LOG.stopPropagation(event);
 }

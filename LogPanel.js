@@ -58,6 +58,8 @@ LOG.LogPanel = function(doc, name, selected) {
     this.setSelected(selected);
 }
 
+LOG.setTypeName(LOG.LogPanel, 'LOG.LogPanel');
+
 LOG.LogPanel.prototype.onLabelClick = function(selected) {
     this.setSelected(!this.selected);
 }

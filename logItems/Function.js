@@ -60,6 +60,8 @@ LOG.FunctionLogItem = function(doc, value, stackedMode, alreadyLoggedContainers)
     );
 }
 
+LOG.setTypeName(LOG.FunctionLogItem, 'LOG.FunctionLogItem');
+
 LOG.FunctionLogItem.prototype.onSrcClick = function(event) {
     LOG.preventDefault(event);
     LOG.stopPropagation(event);

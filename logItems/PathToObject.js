@@ -24,6 +24,8 @@ LOG.PathToObjectLogItem = function(doc, value) {
     }
 }
 
+LOG.setTypeName(LOG.PathToObjectLogItem, 'LOG.PathToObjectLogItem');
+
 LOG.PathToObjectPart = function(doc, value, pathPartName) {
     this.doc = doc;
     this.value = value;

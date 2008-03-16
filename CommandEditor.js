@@ -64,6 +64,8 @@ LOG.CommandEditor = function(doc, evalCallback, resizeCallback, historyManager) 
     this.setIsBig(false, true);
 }
 
+LOG.setTypeName(LOG.CommandEditor, 'LOG.CommandEditor');
+
 LOG.CommandEditor.prototype.setHeight = function(height, dontNotifyParent) {
     this.height = height;
     if (!dontNotifyParent) {

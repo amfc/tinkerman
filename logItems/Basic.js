@@ -23,3 +23,5 @@ LOG.BasicLogItem = function(doc, value, stackedMode, alreadyLoggedContainers) {
         LOG.getExtraInfoToLogAsHtmlElement(doc, value, stackedMode, alreadyLoggedContainers)
     ]);
 }
+
+LOG.setTypeName(LOG.BasicLogItem, 'LOG.BasicLogItem');

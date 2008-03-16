@@ -131,6 +131,8 @@ LOG.ArrayLogItem = function(doc, value, stackedMode, alreadyLoggedContainers) {
     }
 }
 
+LOG.setTypeName(LOG.ArrayLogItem, 'LOG.ArrayLogItem');
+
 LOG.ArrayLogItem.prototype.setShowChildren = function(showChildren, applyToChildren) {
     if (!showChildren || !applyToChildren) {
         return;

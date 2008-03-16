@@ -68,6 +68,8 @@ LOG.ExceptionLogItem = function(doc, value) {
     );
 }
 
+LOG.setTypeName(LOG.ExceptionLogItem, 'LOG.ExceptionLogItem');
+
 LOG.ExceptionLogItem.prototype.onShowMoreLinkClick = function(event) {
     LOG.preventDefault(event);
     LOG.stopPropagation(event);

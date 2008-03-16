@@ -27,6 +27,8 @@ LOG.RefLogItem = function(doc, value, stackedMode, alreadyLoggedContainers) {
     );
 }
 
+LOG.setTypeName(LOG.RefLogItem, 'LOG.RefLogItem');
+
 LOG.RefLogItem.prototype.onNameClick = function(event) {
     LOG.preventDefault(event);
     LOG.stopPropagation(event);

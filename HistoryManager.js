@@ -16,6 +16,8 @@ LOG.HistoryManager = function(serializedHistory) {
     this.currentValue = '';
 }
 
+LOG.setTypeName(LOG.HistoryManager, 'LOG.HistoryManager');
+
 LOG.HistoryManager.prototype.serialize = function() {
     var maxLength = 2000; // since all the log's history will be kept in a cookie
     var strLength = 3; // since we count both square brackets and the comma of the next element

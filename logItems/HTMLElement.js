@@ -146,6 +146,8 @@ LOG.HTMLElementLogItem = function(doc, value, stackedMode, alreadyLoggedContaine
     }
 }
 
+LOG.setTypeName(LOG.HTMLElementLogItem, 'LOG.HTMLElementLogItem');
+
 LOG.HTMLElementLogItem.prototype.onShowParentLinkClick = function(event) {
     this.showParent();
     LOG.stopPropagation(event);

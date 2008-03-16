@@ -57,6 +57,8 @@ LOG.PanelManager = function(doc, rightToolbarElement) {
     this.box.add(this.scrollContainer, { size: 100, sizeUnit: '%' });
 }
 
+LOG.setTypeName(LOG.PanelManager, 'LOG.PanelManager');
+
 LOG.PanelManager.prototype.setBodyHidden = function(hidden) {
     this.box.setChildHidden(1, hidden);
 }

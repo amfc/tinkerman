@@ -1,6 +1,8 @@
 LOG.AbstractBox = function() {
 }
 
+LOG.setTypeName(LOG.AbstractBox, 'LOG.AbstractBox');
+
 LOG.AbstractBox.prototype.init = function(doc) {
     this.doc = doc;
     this.element = LOG.createElement(
@@ -108,6 +110,7 @@ LOG.Hbox = function(doc) {
     this.init(doc);
 }
 
+LOG.setTypeName(LOG.Hbox, 'LOG.Hbox');
 
 LOG.Hbox.prototype = new LOG.AbstractBox;
 LOG.Hbox.prototype.sizeProperty = 'width';
@@ -117,6 +120,8 @@ LOG.Hbox.prototype.reservedSpacePosition = 'Right';
 LOG.Vbox = function(doc) {
     this.init(doc);
 }
+
+LOG.setTypeName(LOG.Vbox, 'LOG.Vbox');
 
 LOG.Vbox.prototype = new LOG.AbstractBox;
 LOG.Vbox.prototype.sizeProperty = 'height';
