@@ -64,6 +64,10 @@ LOG.LogPanel.prototype.onLabelClick = function(selected) {
     this.setSelected(!this.selected);
 }
 
+LOG.LogPanel.prototype.getSelected = function() {
+    return this.selected;
+}
+
 LOG.LogPanel.prototype.setSelected = function(selected) {
     if (selected) {
         this.labelElement.style.textDecoration = 'underline';
