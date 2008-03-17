@@ -1,6 +1,6 @@
 LOG.Logger = function(doc, inNewWindow, historyManager, openSectionsStr) {
     this.doc = doc;
-    this.sections = {};
+    this.panels = {};
     this.box = new LOG.Vbox(doc);
     this.panelManager = new LOG.PanelManager(doc,
         LOG.createElement(doc, 'span', {},
@@ -78,20 +78,14 @@ LOG.Logger = function(doc, inNewWindow, historyManager, openSectionsStr) {
     
     // create the default console
     var consoleSection = this.addConsoleSection('console');
-    consoleSection.panel.setSelected(true);
+    consoleSection.setSelected(true);
     this.defaultConsole = consoleSection.content;
     
     this.evaluator = new LOG.Evaluator(this);
 
     var me = this;
     
-    this.htmlSection = this.addSection('html');
-    this.htmlSection.panel.onselect = function() {
-        if (!me.htmlLogItem) {
-            me.htmlLogItem = new LOG.HTMLElementLogItem(me.doc, document.getElementsByTagName('html')[0], false, [], true);
-            me.htmlSection.panel.contentElement.appendChild(me.htmlLogItem.element);
-        }
-    }
+    this.htmlSection = this.addSection('html', new LOG.HtmlSection(doc));
     this.historyManager = historyManager;
     this.commandEditor = new LOG.CommandEditor(doc, this.evaluator, function() { me.updateCommandEditorSize() }, this.historyManager);
     this.box.add(this.panelManager.element, { size: 100, sizeUnit: '%' });
@@ -108,19 +102,19 @@ LOG.Logger.prototype.setInNewWindow = function(inNewWindow) {
 
 LOG.Logger.prototype.unserializeOpenSections = function(str) {
     if (str) {
-        this.sections.console.panel.setSelected(false);
+        this.panels.console.setSelected(false);
         var openSections = str.split(',');
         for (var i = 0; i < openSections.length; ++i) {
-            this.getOrAddConsoleSection(openSections[i]).panel.setSelected(true);
+            this.getOrAddConsoleSection(openSections[i]).setSelected(true);
         }
     }
 }
 
 LOG.Logger.prototype.serializeOpenSections = function() {
     var out = '';
-    var sections = this.sections;
-    for (var sectionName in sections) {
-        if (sections[sectionName].panel.selected) {
+    var panels = this.panels;
+    for (var sectionName in panels) {
+        if (panels[sectionName].selected) {
             if (out) {
                 out += ',';
             }
@@ -171,9 +165,9 @@ LOG.Logger.prototype.log = function(message, title, newLineAfterTitle, sectionNa
         null
     );
     if (!dontOpen) {
-        section.panel.setSelected(true);
-    } else if (!section.panel.selected) {
-        section.panel.setChanged(true);
+        section.setSelected(true);
+    } else if (!section.selected) {
+        section.setChanged(true);
     }
     return message;
 }
@@ -230,43 +224,44 @@ LOG.Logger.prototype.onKeyDown = function(event) {
 }
 
 LOG.Logger.prototype.addConsoleSection = function(sectionName) {
-    var console = new LOG.Console(this.doc);
-    return this.addSection(sectionName, console);
+    return this.addSection(sectionName, new LOG.Console(this.doc));
 }
 
 LOG.Logger.prototype.getOrAddConsoleSection = function(sectionName) {
-    if (this.sections[sectionName]) {
-        return this.sections[sectionName];
+    if (this.panels[sectionName]) {
+        return this.panels[sectionName];
     } else {
         return this.addConsoleSection(sectionName);
     }
 }
 
-LOG.Logger.prototype.addSection = function(sectionName, content) {
-    var panel = new LOG.LogPanel(this.doc, sectionName);
-    if (content) {
-        panel.contentElement.appendChild(content.element);
+LOG.Logger.prototype.getOrAddSection = function(sectionName, content) {
+    if (this.panels[sectionName]) {
+        // if content is set the old panel will have the content replaced
+        if (content) {
+            this.panels[sectionName].setContent(content);
+        }
+        return this.panels[sectionName];
+    } else {
+        return this.addSection(sectionName, content);
     }
+}
+
+LOG.Logger.prototype.addSection = function(sectionName, content) {
+    var panel = new LOG.LogPanel(this.doc, sectionName, false, content);
     this.panelManager.add(panel);
-    
-    var section = {
-        panel: panel,
-        content: content
-    };
-    
-    this.sections[sectionName] = section;
-    
-    return section;
+    this.panels[sectionName] = panel;
+    return panel;
 }
 
 LOG.Logger.prototype.onClearClick = function(event) {
     LOG.stopPropagation(event);
     LOG.preventDefault(event);
-    for (var sectionName in this.sections) {
-        if (this.sections[sectionName].panel.selected) {
-            this.sections[sectionName].panel.setChanged(false);
-            if (this.sections[sectionName].content) {
-                this.sections[sectionName].content.clear();
+    for (var sectionName in this.panels) {
+        if (this.panels[sectionName].selected) {
+            this.panels[sectionName].setChanged(false);
+            if (this.panels[sectionName].content) {
+                this.panels[sectionName].content.clear();
             }
         }
     }
@@ -299,41 +294,10 @@ LOG.Logger.prototype.getValueAsLogItem = function(value, stackedMode, alreadyLog
 
 // This searchs for some value in all the selected panels and focuses it
 LOG.Logger.prototype.focusValue = function(value, dontLog) {
-    function getPathToNodeFromHtmlNode(node) {
-        var htmlNode = document.getElementsByTagName('html')[0];
-        var path = [];
-        while (node && node != htmlNode) {
-            path.unshift(LOG.getChildNodeNumber(node));
-            node = LOG.logRunner.getParentNodeHidingContainer(node); // this takes into account the extra elements which the LOG could have added and ignores them
+    for (var sectionName in this.panels) {
+        var section = this.panels[sectionName].content;
+        if (section.focusValue) {
+            section.focusValue(value, dontLog, this.panels[sectionName]);
         }
-        return path;
-    }
-    var path = LOG.guessDomNodeOwnerName(value);
-    if (!dontLog) { // Log the path into the console panel
-        var logItem = new LOG.PathToObjectLogItem(this.doc, path);
-        this.defaultConsole.appendRow(logItem.element);
-    }
-    if (path) {
-        if (value.nodeType) {
-            // Focus the element in the html panel
-            if (this.htmlLogItem) {
-                var elementLogItem = this.htmlLogItem.expandChild(getPathToNodeFromHtmlNode(value));
-                if (elementLogItem) {
-                    this.htmlSection.panel.scrollElementIntoView(elementLogItem.element);
-                    LOG.blinkElement(elementLogItem.element);
-                }
-            }
-        }
-        
-        //~ // FIXME: the page part isn't implemented yet
-        //~ // Focus the element in the page panel
-        //~ if (this.pageLogItem) {
-            //~ path.pathToObject.shift(); // remove the 'page' part
-            //~ if (path.pathToObject.length == 0) {
-                //~ LOG.focusAndBlinkElement(this.pageLogItem.element);
-            //~ } else {
-                //~ this.pageLogItem.focusProperty(path.pathToObject);
-            //~ }
-        //~ }
     }
 }

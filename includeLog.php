@@ -18,6 +18,8 @@
 <script src="<?=$tinkermanPath?>Logger.js" type="text/javascript"></script>
 <script src="<?=$tinkermanPath?>LogRunner.js" type="text/javascript"></script>
 <script src="<?=$tinkermanPath?>Box.js" type="text/javascript"></script>
+<script src="<?=$tinkermanPath?>SingleLogItemSection.js" type="text/javascript"></script>
+<script src="<?=$tinkermanPath?>HtmlSection.js" type="text/javascript"></script>
 <script src="<?=$tinkermanPath?>logItems/Array.js" type="text/javascript"></script>
 <script src="<?=$tinkermanPath?>logItems/Exception.js" type="text/javascript"></script>
 <script src="<?=$tinkermanPath?>logItems/HTMLElement.js" type="text/javascript"></script>

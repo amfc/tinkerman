@@ -1,4 +1,4 @@
-LOG.LogPanel = function(doc, name, selected) {
+LOG.LogPanel = function(doc, name, selected, content) {
     this.labelElement = LOG.createElement(doc, 'span',
         {
             style: {
@@ -28,7 +28,7 @@ LOG.LogPanel = function(doc, name, selected) {
                     }
                 },
                 [
-                    this.contentElement = LOG.createElement(doc, 'div',
+                    this.contentElementContainer = LOG.createElement(doc, 'div',
                         {
                             style: {
                                 left: '0',
@@ -56,9 +56,20 @@ LOG.LogPanel = function(doc, name, selected) {
     );
     
     this.setSelected(selected);
+    if (content) {
+        this.setContent(content);
+    }
 }
 
 LOG.setTypeName(LOG.LogPanel, 'LOG.LogPanel');
+
+LOG.LogPanel.prototype.setContent = function(content) {
+    if (this.contentElementContainer.firstChild) {
+        this.contentElementContainer.removeChild(this.contentElementContainer.firstChild);
+    }
+    this.contentElementContainer.appendChild(content.element);
+    this.content = content;
+}
 
 LOG.LogPanel.prototype.onLabelClick = function(selected) {
     this.setSelected(!this.selected);
@@ -83,6 +94,9 @@ LOG.LogPanel.prototype.setSelected = function(selected) {
         this.panelElement.style.display = 'none';
     }
     this.selected = selected;
+    if (this.content && this.content.setSelected) {
+        this.content.setSelected(selected);
+    }
 }
 
 LOG.LogPanel.prototype.setChanged = function(changed) {
@@ -98,19 +112,19 @@ LOG.LogPanel.prototype.scrollElementIntoView = function(element) {
     var y0 = elementPos.y;
     var y1 = y0 + element.offsetHeight;
     if (y0 < containerY0 || y1 > containerY1) {
-        var scrollToTop = y0 + this.contentElement.scrollTop - containerY0;
+        var scrollToTop = y0 + this.contentElementContainer.scrollTop - containerY0;
         var scrollToCenter = scrollToTop - this.panelElement.offsetHeight / 2 - element.offsetHeight / 2;
         if (scrollToCenter < 0) {
             scrollToCenter = 0;
         }
-        this.contentElement.scrollTop = scrollToCenter;
+        this.contentElementContainer.scrollTop = scrollToCenter;
     }
     var containerX0 = containerPos.x;
     var containerX1 = containerX0 + this.panelElement.offsetWidth;
     var x0 = elementPos.x;
     var x1 = x0 + element.offsetWidth;
     if (x0 < containerX0 || x1 > containerX1) {
-        this.contentElement.scrollLeft = x0 + this.contentElement.scrollLeft - containerX0;
+        this.contentElementContainer.scrollLeft = x0 + this.contentElementContainer.scrollLeft - containerX0;
     }
 }
 

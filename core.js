@@ -11,19 +11,7 @@ LOG.setTypeName = function(constructor, name) {
 }
 
 LOG.logAsSection = function(sectionName, object) {
-    function addLogItem() {
-        var logItem = LOG.logger.getValueAsLogItem(object, true, [], true);
-        section.panel.contentElement.appendChild(logItem.element);
-    }
-    var section = LOG.logger.getOrAddConsoleSection('page');
-    if (section.panel.getSelected()) {
-        addLogItem();
-    } else {
-        section.panel.onselect = function() {
-            addLogItem();
-            delete section.panel.onselect;
-        }
-    }
+    return LOG.logger.getOrAddSection('page', new LOG.SingleLogItemSection(LOG.logger.doc, LOG.logger.getValueAsLogItem(object)));
 }
 
 LOG.focusAndBlinkElement = function(element) {
