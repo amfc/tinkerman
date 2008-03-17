@@ -119,7 +119,7 @@ LOG.guessDomNodeOwnerName = function(domNode, objectsToStartWith) {
     } else {
         var path = LOG.guessNameAsArray(domNode, objectsToStartWith);
         if (path == null) {
-            var returnValue = LOG.guessDomNodeOwnerName(domNode.parentNode);
+            var returnValue = LOG.guessDomNodeOwnerName(domNode.parentNode, objectsToStartWith);
             if (returnValue == null) {
                 return null;
             }
