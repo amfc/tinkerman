@@ -28,7 +28,9 @@ LOG.SingleLogItemSection.prototype.focusValue = function(value, dontLog, panel) 
                 panel.scrollElementIntoView(this.logItem.element);
                 LOG.blinkElement(this.logItem.element);
             } else {
-                this.logItem.focusProperty(path.pathToObject);
+                var propertyLogItem = this.logItem.expandProperty(path.pathToObject);
+                panel.scrollElementIntoView(propertyLogItem.element);
+                LOG.blinkElement(propertyLogItem.element);
             }
         }
     }

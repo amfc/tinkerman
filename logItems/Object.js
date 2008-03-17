@@ -493,17 +493,17 @@ LOG.ObjectLogItem.prototype.toggleMethodsVisible = function() {
     }
 }
 
-LOG.ObjectLogItem.prototype.focusProperty = function(pathToProperty) {
+LOG.ObjectLogItem.prototype.expandProperty = function(pathToProperty) {
     var property = pathToProperty.shift().name;
     if (typeof this.value[property] == 'function') {
         this.toggleMethodsVisible(true);
     }
     this.setShowChildren(true);
     if (pathToProperty.length == 0) {
-        LOG.focusAndBlinkElement(this.properties[property].logItem.element);
+        return this.properties[property].logItem;
     } else {
-        if (this.properties[property].logItem.focusProperty) {
-            this.properties[property].logItem.focusProperty(pathToProperty);
+        if (this.properties[property].logItem.expandProperty) {
+            return this.properties[property].logItem.expandProperty(pathToProperty);
         }
     }
 }

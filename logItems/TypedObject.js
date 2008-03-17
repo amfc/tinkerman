@@ -143,11 +143,11 @@ LOG.TypedObjectLogItem.prototype.getTypeName = function() {
     return txt;
 }
 
-LOG.TypedObjectLogItem.prototype.focusProperty = function(pathToProperty) {
+LOG.TypedObjectLogItem.prototype.expandProperty = function(pathToProperty) {
     if (!this.showSource) {
         this.setShowSource(true);
     }
-    this.objectLogItem.focusProperty(pathToProperty);
+    return this.objectLogItem.expandProperty(pathToProperty);
 }
 
 LOG.TypedObjectLogItem.prototype.setAutoUpdate = function(enabled) {
