@@ -1,6 +1,6 @@
 // FIXME: This should take the object from where to start
-
-LOG.guessNameAsArray = function(objToFind) {
+// example for objectsToStartWith: [ { obj: page, name: 'page', parent: null } ]
+LOG.guessNameAsArray = function(objToFind, objectsToStartWith) {
     function getPath(item) {
         var path = [];
         while (item) {
@@ -11,9 +11,7 @@ LOG.guessNameAsArray = function(objToFind) {
     }
     
     var checkedObjects = [];
-    var objectsToCheck = [
-        { obj: page, name: 'page', parent: null } // FIXME: remove dependancy on "page" object
-    ];
+    var objectsToCheck = objectsToStartWith;
     for (var i = 0; i < objectsToCheck.length; ++i) {
         if (objectsToCheck[i].obj == objToFind) {
             return getPath(objectsToCheck[i]);
@@ -90,7 +88,7 @@ LOG.getPropertyAccessor = function(propertyName) {
     }
 }
 
-LOG.guessName = function(objToFind) {
+LOG.guessName = function(objToFind, objectsToStartWith) {
     function pathToString(pathElements) {
         var out = pathElements[0];
         for (var i = 1; i < pathElements.length; ++i) {
@@ -98,7 +96,7 @@ LOG.guessName = function(objToFind) {
         }
         return out;
     }
-    var path = LOG.guessNameAsArray(objToFind);
+    var path = LOG.guessNameAsArray(objToFind, objectsToStartWith);
     if (path) {
         return pathToString(path);
     }
@@ -115,11 +113,11 @@ LOG.getChildNodeNumber = function(domNode) {
     return null;
 }
 
-LOG.guessDomNodeOwnerName = function(domNode) {
+LOG.guessDomNodeOwnerName = function(domNode, objectsToStartWith) {
     if (domNode == null) {
         return null;
     } else {
-        var path = LOG.guessNameAsArray(domNode);
+        var path = LOG.guessNameAsArray(domNode, objectsToStartWith);
         if (path == null) {
             var returnValue = LOG.guessDomNodeOwnerName(domNode.parentNode);
             if (returnValue == null) {

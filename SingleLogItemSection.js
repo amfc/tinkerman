@@ -1,7 +1,8 @@
-LOG.SingleLogItemSection = function(doc, logItem) {
+LOG.SingleLogItemSection = function(doc, logItem, objectName) {
     this.doc = doc;
     this.element = LOG.createElement(this.doc, 'div', {}, [ logItem.element ]);
     this.logItem = logItem;
+    this.objectName = objectName;
 }
 
 LOG.setTypeName(LOG.SingleLogItemSection, 'LOG.SingleLogItemSection');
@@ -15,7 +16,10 @@ LOG.SingleLogItemSection.prototype.getSelected = function() {
 }
 
 LOG.SingleLogItemSection.prototype.focusValue = function(value, dontLog, panel) {
-    var path = LOG.guessDomNodeOwnerName(value);
+    if (!this.objectName) {
+        return;
+    }
+    var path = LOG.guessDomNodeOwnerName(value, [ { obj: this.logItem.value, name: this.objectName, parent: null } ]);
     if (!dontLog) {
         // Log the path into the console panel
         var logItem = new LOG.PathToObjectLogItem(this.doc, path);
