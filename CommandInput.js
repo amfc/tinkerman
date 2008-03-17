@@ -12,7 +12,8 @@ LOG.CommandInput = function(doc, useTextArea, evaluator, historyManager) {
             style: {
                 width: '100%',
                 height: '100%',
-                border: '1px solid gray',
+                border: 'none',
+                padding: '0',
                 fontFamily: 'terminus, monospace',
                 fontSize: '13px',
                 fontWeight: 'normal'

@@ -8,7 +8,8 @@ LOG.CommandEditor = function(doc, evalCallback, resizeCallback, historyManager) 
         {
             style: {
                 height: '100%',
-                backgroundColor: '#f0f0f0'
+                backgroundColor: 'white',
+                padding: '1px'
             }
         },
         [
@@ -25,10 +26,20 @@ LOG.CommandEditor = function(doc, evalCallback, resizeCallback, historyManager) 
                         [
                             LOG.createElement(this.doc, 'tr', {},
                                 [
+                                    LOG.createElement(this.doc, 'td', {
+                                            style: {
+                                                width: '10px',
+                                                verticalAlign: 'top',
+                                                paddingTop: '3px'
+                                            },
+                                        },
+                                        [ '>>>' ]
+                                    ),
                                     this.inputTd = LOG.createElement(this.doc, 'td', {
                                             style: {
                                                 width: '100%',
-                                                verticalAlign: 'bottom'
+                                                verticalAlign: 'bottom',
+                                                paddingBottom: '4px'
                                             }
                                         }
                                     ),
@@ -36,7 +47,8 @@ LOG.CommandEditor = function(doc, evalCallback, resizeCallback, historyManager) 
                                         {
                                             style: {
                                                 width: '10px',
-                                                verticalAlign: 'bottom'
+                                                verticalAlign: 'bottom',
+                                                paddingBottom: '4px'
                                             }
                                         },
                                         [
@@ -45,11 +57,12 @@ LOG.CommandEditor = function(doc, evalCallback, resizeCallback, historyManager) 
                                                     href: '#',
                                                     style: {
                                                         fontWeight: 'normal',
-                                                        fontSize: '12px'
+                                                        fontSize: '12px',
+                                                        textDecoration: 'none'
                                                     },
                                                     onclick: LOG.createEventHandler(this.doc, this, 'onToggleTextAreaClick')
                                                 },
-                                                [ 'big' ]
+                                                [ '[big]' ]
                                             )
                                         ]
                                     )
@@ -87,10 +100,10 @@ LOG.CommandEditor.prototype.setIsBig = function(isBig, dontNotifyParent) {
     
     if (this.textAreaBig) {
         this.setHeight(4, dontNotifyParent);
-        this.toggleTextAreaLink.firstChild.data = 'small';
+        this.toggleTextAreaLink.firstChild.data = '[sml]';
     } else {
-        this.setHeight(1.2, dontNotifyParent);
-        this.toggleTextAreaLink.firstChild.data = 'big';
+        this.setHeight(1.5, dontNotifyParent);
+        this.toggleTextAreaLink.firstChild.data = '[big]';
     }
 }
 
