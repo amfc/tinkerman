@@ -67,8 +67,13 @@ LOG.LogPanel.prototype.setContent = function(content) {
     if (this.contentElementContainer.firstChild) {
         this.contentElementContainer.removeChild(this.contentElementContainer.firstChild);
     }
-    this.contentElementContainer.appendChild(content.element);
     this.content = content;
+    if (this.content) {
+        this.contentElementContainer.appendChild(content.element);
+        if (this.content.setSelected) {
+            this.content.setSelected(this.selected);
+        }
+    }
 }
 
 LOG.LogPanel.prototype.onLabelClick = function(selected) {

@@ -21,8 +21,8 @@ LOG.SingleLogItemSection.prototype.focusValue = function(value, dontLog, panel) 
         var logItem = new LOG.PathToObjectLogItem(this.doc, path);
         LOG.logger.defaultConsole.appendRow(logItem.element);
     }
-    if (path) {
-        if (this.logItem && this.logItem.value == path.pathToObject[0].obj) {
+    if (path && this.selected) {
+        if (this.logItem.value == path.pathToObject[0].obj) {
             path.pathToObject.shift(); // remove the 'page' part
             if (path.pathToObject.length == 0) {
                 panel.scrollElementIntoView(this.logItem.element);
