@@ -6,6 +6,14 @@ LOG.HtmlSection = function(doc) {
 
 LOG.setTypeName(LOG.HtmlSection, 'LOG.HtmlSection');
 
+LOG.HtmlSection.prototype.setSelected = function(isSelected) {
+    this.selected = isSelected;
+}
+
+LOG.HtmlSection.prototype.getSelected = function() {
+    return this.selected;
+}
+
 LOG.HtmlSection.prototype.focusValue = function(value, dontLog, panel) {
     function getPathToNodeFromHtmlNode(node) {
         var htmlNode = document.getElementsByTagName('html')[0];
@@ -16,7 +24,7 @@ LOG.HtmlSection.prototype.focusValue = function(value, dontLog, panel) {
         }
         return path;
     }
-    if (value.nodeType) {
+    if (this.selected && value.nodeType) {
         // Focus the element in the html panel
         if (this.logItem) {
             var elementLogItem = this.logItem.expandChild(getPathToNodeFromHtmlNode(value));
