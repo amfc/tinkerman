@@ -31,7 +31,7 @@ LOG.CommandEditor = function(doc, evalCallback, resizeCallback, historyManager) 
                                                 width: '10px',
                                                 verticalAlign: 'top',
                                                 paddingTop: '3px'
-                                            },
+                                            }
                                         },
                                         [ '>>>' ]
                                     ),
