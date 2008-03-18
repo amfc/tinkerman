@@ -57,7 +57,7 @@ LOG.Logger = function(doc, inNewWindow, historyManager, openSectionsStr) {
                             },
                             [ '[', this.closeButtonTextNode = doc.createTextNode('x'), ']' ]
                         )
-                        ]
+                    ]
                 )
             ]
         )
