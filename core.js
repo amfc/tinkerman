@@ -11,7 +11,7 @@ LOG.setTypeName = function(constructor, name) {
 }
 
 LOG.logAsSection = function(sectionName, object, objectName) {
-    return LOG.logger.getOrAddSection('page', new LOG.SingleLogItemSection(LOG.logger.doc, LOG.logger.getValueAsLogItem(object), objectName));
+    return LOG.logger.getOrAddSection(sectionName, new LOG.SingleLogItemSection(LOG.logger.doc, LOG.logger.getValueAsLogItem(object), objectName));
 }
 
 LOG.focusAndBlinkElement = function(element) {
