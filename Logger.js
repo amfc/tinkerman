@@ -260,7 +260,7 @@ LOG.Logger.prototype.onClearClick = function(event) {
     for (var sectionName in this.panels) {
         if (this.panels[sectionName].selected) {
             this.panels[sectionName].setChanged(false);
-            if (this.panels[sectionName].content) {
+            if (this.panels[sectionName].content && this.panels[sectionName].content.clear) {
                 this.panels[sectionName].content.clear();
             }
         }
