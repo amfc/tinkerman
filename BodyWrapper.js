@@ -199,7 +199,7 @@ LOG.BodyWrapper.prototype.show = function() {
 }
 
 LOG.BodyWrapper.prototype.appendChild = function(elementToWrap) {
-    this.bottomElement.ownerDocument.importNode(elementToWrap, true);
+    //~ this.bottomElement.ownerDocument.importNode(elementToWrap, true);
     this.bottomElement.appendChild(elementToWrap);
 }
 
