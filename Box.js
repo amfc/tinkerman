@@ -1,136 +1,3 @@
-if (LOG.isIE7) { // (no box-sizing available)
-    LOG.BoxItem = function(doc, sizeProperty, reservedSpacePosition, element, size) { //  size: { size, sizeUnit: %|px|em }
-        this.doc = doc;
-        this.reservedSpacePosition = reservedSpacePosition;
-        this.sizeProperty = sizeProperty;
-        this.size = size;
-        this.element = LOG.createElement(
-            this.doc, 'div',
-            {
-                style: {
-                    height: '100%',
-                    width: '100%',
-                    borderWidth: '0',
-                    padding: 0,
-                    borderSpacing: 0
-                }
-            },
-            [
-                LOG.createElement(
-                    this.doc, 'table',
-                    {
-                        style: {
-                            height: '100%',
-                            width: '100%',
-                            borderWidth: '0',
-                            padding: 0,
-                            borderSpacing: 0
-                        }
-                    },
-                    [
-                        LOG.createElement(
-                            this.doc, 'tbody', {},
-                            [
-                                LOG.createElement(
-                                    this.doc, 'tr', {},
-                                    [
-                                        LOG.createElement(
-                                            this.doc, 'td', { style: { height: '100%', padding: 0 }},
-                                            [
-                                                element
-                                            ]
-                                        )
-                                    ]
-                                ),
-                                LOG.createElement(
-                                    this.doc, 'tr', {},
-                                    [
-                                        this.secondTd = LOG.createElement(
-                                            this.doc, 'td', { style: {padding: 0} }
-                                        )
-                                    ]
-                                )
-                            ]
-                        )
-                    ]
-                )
-            ]
-        );
-    }
-
-    LOG.BoxItem.prototype.updateSize = function(fixedSize) {
-        this.element.style[this.sizeProperty] = this.size.size + this.size.sizeUnit;
-        if (this.size.sizeUnit == '%') {
-            var marginSize = fixedSize.size * this.size.size / 100;
-            var margin = marginSize + (fixedSize.name ? fixedSize.name : '');
-            this.element.style['margin' + this.reservedSpacePosition] = '-' + margin;
-            this.secondTd.style[this.sizeProperty] = margin;
-            this.secondTd.style.display = '';
-        } else {
-            this.secondTd.style.display = 'none';
-        }
-    }
-} else {
-    LOG.BoxItem = function(doc, sizeProperty, reservedSpacePosition, element, size) { //  size: { size, sizeUnit: %|px|em }
-        this.doc = doc;
-        this.reservedSpacePosition = reservedSpacePosition;
-        this.sizeProperty = sizeProperty;
-        this.size = size;
-        
-        this.element = LOG.createElement(
-            this.doc, 'div',
-            { // opera 9.25 doesn't understand border-box if set as as an attribute of .style
-                style: 'position: relative; -moz-box-sizing: border-box; box-sizing: border-box'
-            },
-            [
-            
-                LOG.createElement(
-                    this.doc, 'div',
-                    {
-                        style: {
-                            height: '100%',
-                            overflow: 'hidden'
-                        }
-                    },
-                    [
-                        element
-                    ]
-                )
-            ]
-        );
-    }
-
-    LOG.BoxItem.prototype.updateSize = function(fixedSize) {
-        this.element.style[this.sizeProperty] = this.size.size + this.size.sizeUnit;
-        if (this.size.sizeUnit == '%') {
-            var marginSize = fixedSize.size * this.size.size / 100;
-            var margin = marginSize + (fixedSize.name ? fixedSize.name : '');
-            this.element.style['margin' + this.reservedSpacePosition] = '-' + margin;
-            this.element.style['padding' + this.reservedSpacePosition] = margin;
-        }
-    }
-}
-
-LOG.setTypeName(LOG.BoxItem, 'LOG.BoxItem');
-
-LOG.BoxItem.prototype.getSize = function(size) {
-    return this.size;
-}
-
-LOG.BoxItem.prototype.setSize = function(size) {
-    this.size = size;
-}
-
-LOG.BoxItem.prototype.setHidden = function(hidden) {
-    this.hidden = hidden;
-    this.element.style.display = hidden ? 'none' : '';
-}
-
-LOG.BoxItem.prototype.getHidden = function() {
-    return this.hidden;
-}
-
-
 LOG.AbstractBox = function() {
 }
 
@@ -154,40 +21,54 @@ LOG.AbstractBox.prototype.init = function(doc) {
 }
 
 LOG.AbstractBox.prototype.getFixedSize = function() {
-    var totalFixedSize = 0, fixedSizeUnit, unitName, item, size;
+    var totalFixedSize = 0, fixedSizeUnit, unitName, item;
     for (var i = 0; i < this.sizes.length; ++i) {
         item = this.sizes[i];
-        if (item.getHidden()) {
+        if (item.hidden) {
             continue;
         }
-        size = item.size;
-        unitName = size.sizeUnit; 
+        unitName = item.sizeUnit; 
         if (unitName != '%') {
             if (!fixedSizeUnit) {
                 fixedSizeUnit = unitName;
             } else if (fixedSizeUnit != unitName) {
                 throw "Inconsistent units (all non percentage units should be of the same type)";
             }
-            totalFixedSize += size.size;
+            totalFixedSize += item.size;
         }
     }
     return { size: totalFixedSize, name: fixedSizeUnit };
 }
 
 LOG.AbstractBox.prototype.updateSizes = function() {
+    function setStyle(element, property, value) {
+        element.style[property] = value;
+    }
+    
     var fixedSize = this.getFixedSize();
+    var item, node, marginSize;
     for (var i = 0; i < this.sizes.length; ++i) {
-        this.sizes[i].updateSize(fixedSize);
+        item = this.sizes[i];
+        node = this.element.childNodes[i];
+        setStyle(node, this.sizeProperty.toLowerCase(), item.size + item.sizeUnit);
+        if (item.sizeUnit == '%') {
+            marginSize = fixedSize.size * item.size / 100;
+            var margin = marginSize + (fixedSize.name ? fixedSize.name : '');
+            setStyle(node, 'margin' + this.reservedSpacePosition, '-' + margin);
+            setStyle(node, 'padding' + this.reservedSpacePosition, margin);
+        }
     }
 }
 
 LOG.AbstractBox.prototype.setChildSize = function(childNumber, size, sizeUnit) {
-    this.sizes[childNumber].setSize(size, sizeUnit);
+    this.sizes[childNumber].size = size;
+    this.sizes[childNumber].sizeUnit = sizeUnit;
     this.updateSizes();
 }
 
 LOG.AbstractBox.prototype.setChildHidden = function(childNumber, hidden) {
-    this.sizes[childNumber].setHidden(hidden);
+    this.sizes[childNumber].hidden = hidden;
+    this.sizes[childNumber].element.style.display = hidden ? 'none': '';
     this.updateSizes();
 }
 
@@ -196,9 +77,32 @@ LOG.AbstractBox.prototype.getChildSize = function(childNumber) {
 }
 
 LOG.AbstractBox.prototype.add = function(element, size) { //  size: { size, sizeUnit: %|px|em }
-    var boxItem = new LOG.BoxItem(this.doc, this.sizeProperty, this.reservedSpacePosition, element, size);
-    this.element.appendChild(boxItem.element);
-    this.sizes.push(boxItem);
+    var sizeElement;
+    this.element.appendChild(
+        sizeElement = LOG.createElement(
+            this.doc, 'div',
+            { // opera 9.25 doesn't understand border-box if set as as an attribute of .style
+                style: 'position: relative; -moz-box-sizing: border-box; box-sizing: border-box'
+            },
+            [
+            
+                LOG.createElement(
+                    this.doc, 'div',
+                    {
+                        style: {
+                            height: '100%',
+                            overflow: 'hidden'
+                        }
+                    },
+                    [
+                        element
+                    ]
+                )
+            ]
+        )
+    );
+    size.element = sizeElement;
+    this.sizes.push(size);
     this.updateSizes();
 }
 

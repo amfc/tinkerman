@@ -3,7 +3,6 @@ LOG.isKonq = LOG.userAgent.indexOf('konqueror') != -1;
 LOG.isGecko = !LOG.isKonq && LOG.userAgent.indexOf('gecko') != -1;
 LOG.isOpera = LOG.userAgent.indexOf('opera') != -1;
 LOG.isIE = LOG.userAgent.indexOf('msie') != -1 && !LOG.isOpera;
-LOG.isIE7 = LOG.isIE && window.XMLHttpRequest;
 
 
 LOG.preventDefault = function(event) {
