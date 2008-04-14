@@ -140,6 +140,15 @@ LOG.getScrollBarPositions = function() {
     return {x: x, y: y}
 }
 
+LOG.getPositionFromEvent = function(event) {
+    if (event.pageX) { /* Standards... */
+        return {x: event.pageX, y: event.pageY};
+    } else { /* ie ... */
+        var pos = LOG.getScrollBarPositions();
+        return {x: event.clientX + pos.x, y: event.clientY + pos.y};
+    }
+}
+
 // Gets the absolute position of the element from the body
 // It takes into account any element scroll position
 LOG.getPosition = function(obj) {

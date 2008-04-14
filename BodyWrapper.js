@@ -68,6 +68,9 @@ LOG.BodyWrapper = function(ownerDocument, initialSize, startWithFixedSize) {
     document.body.style.overflow = 'hidden';
     document.body.style.margin = '0';
     
+    if (initialSize < 0.1 || initialSize > 0.9) {
+        initialSize = 0.3333333;
+    }
     if (startWithFixedSize) {
         this.size = initialSize;
         this.lock(startWithFixedSize);
@@ -117,14 +120,24 @@ LOG.BodyWrapper.prototype.onDragKeypress = function(event) {
 
 LOG.BodyWrapper.prototype.onResizeHandleMousedown = function(event) {
     this.dragging = true;
-    this.originalDelta = event.clientY - this.bottomElement.offsetTop;
+    this.originalDelta = event.clientY - DOM.getPosition(this.bottomElement).y;
     this.element.style.borderColor = 'black';
+    this.draggingElement = LOG.createElement(document, 'div', { style: { width: '100%', border: '1px dotted black', position: 'absolute', left: 0 } });
+    this.draggingElement.style.top = ((1 - this.size) * 100) + '%';
+    document.body.appendChild(this.draggingElement);
     LOG.addObjEventListener(this, document, 'mousemove', this.onMousemove);
     LOG.addObjEventListener(this, document, 'mouseup', this.onMouseup);
     LOG.addObjEventListener(this, document, 'keypress', this.onDragKeypress);
+    LOG.addObjEventListener(this, this.doc, 'mousemove', this.onMousemove);
+    LOG.addObjEventListener(this, this.doc, 'mouseup', this.onMouseup);
+    LOG.addObjEventListener(this, this.doc, 'keypress', this.onDragKeypress);
     if (LOG.isIE) {
         LOG.addObjEventListener(this, document, 'selectstart', this.onSelectstart);
+        LOG.addObjEventListener(this, this.doc, 'selectstart', this.onSelectstart);
     }
+    this.oldBodyCursor = document.body.style.cursor ? document.body.style.cursor : '';
+    document.body.style.cursor = 'n-resize';
+    this.doc.body.style.cursor = 'n-resize';
     LOG.stopPropagation(event);
     LOG.preventDefault(event);
 }
@@ -132,15 +145,25 @@ LOG.BodyWrapper.prototype.onResizeHandleMousedown = function(event) {
 LOG.BodyWrapper.prototype.endDrag = function() {
     this.dragging = false;
     this.element.style.borderColor = 'gray';
+    this.draggingElement.parentNode.removeChild(this.draggingElement);
+    delete this.draggingElement;
+    document.body.style.cursor = this.oldBodyCursor;
+    this.doc.body.style.cursor = '';
+    delete this.oldBodyCursor;
     LOG.removeObjEventListener(this, document, 'mousemove', this.onMousemove);
     LOG.removeObjEventListener(this, document, 'mouseup', this.onMouseup);
     LOG.removeObjEventListener(this, document, 'keypress', this.onDragKeypress);
+    LOG.removeObjEventListener(this, this.doc, 'mousemove', this.onMousemove);
+    LOG.removeObjEventListener(this, this.doc, 'mouseup', this.onMouseup);
+    LOG.removeObjEventListener(this, this.doc, 'keypress', this.onDragKeypress);
     if (LOG.isIE) {
         LOG.removeObjEventListener(this, document, 'selectstart', this.onSelectstart);
+        LOG.removeObjEventListener(this, this.doc, 'selectstart', this.onSelectstart);
     }
     if (this.ondragend) {
         this.ondragend();
     }
+    this.setSize(this.chosenSize);
 }
 
 LOG.BodyWrapper.prototype.onSelectstart = function(event) {
@@ -150,11 +173,18 @@ LOG.BodyWrapper.prototype.onSelectstart = function(event) {
 
 LOG.BodyWrapper.prototype.onMousemove = function(event) {
     if (this.dragging) {
-        var top = (event.clientY - this.originalDelta) / LOG.getWindowInnerSize(this.ownerDocument).h;
-        if (top < 0) {
-            top = 0;
+        var top = LOG.getPositionFromEvent(event).y;
+        if (LOG.getElementFromEvent(event).ownerDocument == this.doc) {
+            top += LOG.getPosition(this.iframe).y;
         }
-        this.setSize(1 - top);
+        top = (top - this.originalDelta) / LOG.getWindowInnerSize(this.ownerDocument).h;
+        if (top < 0.1) {
+            top = 0.1;
+        } else if ( top > 0.9) {
+            top = 0.9;
+        }
+        this.chosenSize = 1 - top;
+        this.draggingElement.style.top = ((1 - this.chosenSize) * 100) + '%';
         return false;
     }
 }
@@ -213,7 +243,6 @@ LOG.BodyWrapper.prototype.show = function() {
 }
 
 LOG.BodyWrapper.prototype.appendChild = function(elementToWrap) {
-    //~ this.bottomElement.ownerDocument.importNode(elementToWrap, true);
     this.doc.body.appendChild(elementToWrap);
 }
 
