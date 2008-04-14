@@ -10,7 +10,7 @@ LOG.LogRunner = function() {
     LOG.addEventListener(document, 'mouseup', this.caller('onClick'), true);
     LOG.addEventListener(document, 'click', this.caller('onClick'), true);
     LOG.addEventListener(window, 'unload', this.caller('onUnload'));
-    this.createAndAppendLogger();
+    this.appendLogger();
 }
 
 LOG.setTypeName(LOG.LogRunner, 'LOG.LogRunner');
@@ -22,13 +22,9 @@ LOG.LogRunner.prototype.caller = function(methodName) {
     }
 }
 
-LOG.LogRunner.prototype.createAndAppendLogger = function() {
-    this.createLogger();
-    this.appendLogger();
-}
 
-LOG.LogRunner.prototype.createLogger = function() {
-    LOG.logger = new LOG.Logger(document, this.willOpenInNewWindow, this.historyManager, this.loggerSavedOpenSections);
+LOG.LogRunner.prototype.createLogger = function(doc) {
+    LOG.logger = new LOG.Logger(doc, this.willOpenInNewWindow, this.historyManager, this.loggerSavedOpenSections);
     LOG.logger.onnewwindowtoggleclick = this.caller('onLoggerNewWindowToggleClick');
     LOG.logger.onescpress = this.caller('onLoggerEscPress');
     LOG.logger.oncollapsetoggleclick = this.caller('onLoggerCollapseToggleClick');
@@ -48,7 +44,7 @@ LOG.LogRunner.prototype.createWindowContainer = function() {
 
 LOG.LogRunner.prototype.createBodyWrapperContainer = function() {
     var collapsed = LOG.getCookie('LOG_OPEN') != 'true';
-    var container = new LOG.BodyWrapper(this.doc, LOG.logger.element, this.containerSavedSize, collapsed ? '1.3em' : undefined);
+    var container = new LOG.BodyWrapper(this.doc, this.containerSavedSize, collapsed ? '1.3em' : undefined);
     container.ondragend = this.caller('onBodyWrapperDragEnd');
     this.setCollapsed(container, collapsed);
     return container;
@@ -73,6 +69,10 @@ LOG.LogRunner.prototype.appendLoggerNow = function() {
         delete this.appendLoggerNowCaller;
     }
     this.createContainer();
+    if (LOG.logger) { // FIXME: import nodes
+    } else {
+        this.createLogger(this.container.doc);
+    }
     this.container.appendChild(LOG.logger.element);
     LOG.logger.setInNewWindow(this.willOpenInNewWindow);
 }
@@ -101,7 +101,9 @@ LOG.LogRunner.prototype.setCollapsed = function(bodyWrapper, collapsed) {
     } else {
         bodyWrapper.unlock();
     }
-    LOG.logger.setCollapsed(collapsed);
+    if (LOG.logger) {
+        LOG.logger.setCollapsed(collapsed);
+    }
     this.collapsed = collapsed;
 }
 
@@ -119,7 +121,7 @@ LOG.LogRunner.prototype.onLoggerNewWindowToggleClick = function() {
 LOG.LogRunner.prototype.onLogWindowUnload = function() {
     delete this.logWindow;
     this.willOpenInNewWindow = false;
-    this.createLogger();
+    this.appendLogger();
 }
 
 LOG.LogRunner.prototype.deleteContainer = function() {

@@ -1,4 +1,4 @@
-LOG.BodyWrapper = function(ownerDocument, elementToWrap, initialSize, startWithFixedSize) {
+LOG.BodyWrapper = function(ownerDocument, initialSize, startWithFixedSize) {
     this.dragging = false;
     this.ownerDocument = ownerDocument;
     var doc = this.ownerDocument;
@@ -49,6 +49,15 @@ LOG.BodyWrapper = function(ownerDocument, elementToWrap, initialSize, startWithF
                                 cursor: 'n-resize'
                             }
                         }
+                    ),
+                    this.iframe = LOG.createElement(doc, 'iframe',
+                        {
+                            style: {
+                                border: 'none',
+                                height: '100%',
+                                width: '100%'
+                            }
+                        }
                     )
                 ]
             )
@@ -74,6 +83,11 @@ LOG.BodyWrapper = function(ownerDocument, elementToWrap, initialSize, startWithF
     }
     this.hidden = false;
     doc.body.appendChild(this.element);
+    this.iframe.contentWindow.document.open();
+    this.iframe.contentWindow.document.write('<html><head><style type="text/css">body { margin: 0; overflow: hidden; }</style></head><body></body></html>');
+    this.iframe.contentWindow.document.close();
+    this.doc = this.iframe.contentWindow.document
+    
     LOG.addObjEventListener(this, this.resizeHandle, 'mousedown', this.onResizeHandleMousedown);
 }
 
@@ -200,7 +214,7 @@ LOG.BodyWrapper.prototype.show = function() {
 
 LOG.BodyWrapper.prototype.appendChild = function(elementToWrap) {
     //~ this.bottomElement.ownerDocument.importNode(elementToWrap, true);
-    this.bottomElement.appendChild(elementToWrap);
+    this.doc.body.appendChild(elementToWrap);
 }
 
 LOG.BodyWrapper.prototype.getBody = function() {
