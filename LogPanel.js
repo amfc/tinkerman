@@ -40,7 +40,6 @@ LOG.LogPanel = function(doc, name, selected, content) {
                                 borderTop: '1px solid #ccc',
                                 borderBottom: '1px solid #ccc',
                                 backgroundColor: 'white',
-                                fontSize: '10px',
                                 padding: '5px',
                                 fontWeight: 'normal',
                                 backgroundColor: '#fcfcfc',

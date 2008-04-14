@@ -17,7 +17,6 @@ LOG.CommandEditor = function(doc, evalCallback, resizeCallback, historyManager) 
                 {
                     style: {
                         height: '100%',
-                        fontSize: '10px',
                         borderSpacing: 0
                     }
                 },

@@ -15,7 +15,6 @@ LOG.CommandInput = function(doc, useTextArea, evaluator, historyManager) {
                 border: 'none',
                 padding: '0',
                 fontFamily: 'terminus, monospace',
-                fontSize: '13px',
                 fontWeight: 'normal'
             },
             onmousedown: LOG.createEventHandler(doc, this, 'onInputMouseDown')

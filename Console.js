@@ -35,7 +35,6 @@ LOG.Console.prototype.appendRow = function(messageHtmlFragment, title, newLineAf
     }
     this.n++;
     newRow.style.fontFamily = 'terminus, monospace';
-    newRow.style.fontSize = '9px';
     newRow.style.color = 'black';
     newRow.style.borderBottom = '1px solid #aaaaaa';
     if (LOG.isGecko) {
