@@ -68,7 +68,7 @@ LOG.BodyWrapper = function(ownerDocument, initialSize, startWithFixedSize) {
     document.body.style.overflow = 'hidden';
     document.body.style.margin = '0';
     
-    if (initialSize < 0.1 || initialSize > 0.9) {
+    if (isNaN(initialSize) || initialSize < 0.1 || initialSize > 0.9) {
         initialSize = 0.3333333;
     }
     if (startWithFixedSize) {
@@ -120,9 +120,9 @@ LOG.BodyWrapper.prototype.onDragKeypress = function(event) {
 
 LOG.BodyWrapper.prototype.onResizeHandleMousedown = function(event) {
     this.dragging = true;
-    this.originalDelta = event.clientY - DOM.getPosition(this.bottomElement).y;
+    this.originalDelta = DOM.getPositionFromEvent(event).y - DOM.getPosition(this.bottomElement).y;
     this.element.style.borderColor = 'black';
-    this.draggingElement = LOG.createElement(document, 'div', { style: { width: '100%', border: '1px dotted black', position: 'absolute', left: 0 } });
+    this.draggingElement = LOG.createElement(document, 'div', { style: { width: '100%', borderTop: '1px dotted black', height: 0, position: 'absolute', left: 0 } });
     this.draggingElement.style.top = ((1 - this.size) * 100) + '%';
     document.body.appendChild(this.draggingElement);
     LOG.addObjEventListener(this, document, 'mousemove', this.onMousemove);
@@ -145,7 +145,7 @@ LOG.BodyWrapper.prototype.onResizeHandleMousedown = function(event) {
 LOG.BodyWrapper.prototype.endDrag = function() {
     this.dragging = false;
     this.element.style.borderColor = 'gray';
-    this.draggingElement.parentNode.removeChild(this.draggingElement);
+    document.body.removeChild(this.draggingElement);
     delete this.draggingElement;
     document.body.style.cursor = this.oldBodyCursor;
     this.doc.body.style.cursor = '';

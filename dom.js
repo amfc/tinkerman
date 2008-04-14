@@ -125,7 +125,7 @@ LOG.getWindowInnerSize = function(doc) {
 }
 
 LOG.getScrollBarPositions = function() {
-    var document = LOG.console.ownerDocument;
+    var document = LOG.logger.doc;
     var x, y;
     if (typeof document.documentElement != 'undefined' && typeof document.documentElement.scrollLeft != 'undefined') {
         x = document.documentElement.scrollLeft;
