@@ -102,7 +102,7 @@ LOG.getValueAsLogItem = function(doc, value, stackedMode, alreadyLoggedContainer
     if (!alreadyLoggedContainers) {
         alreadyLoggedContainers = [];
     }
-    if (LOG.indexOf(alreadyLoggedContainers, value) != -1) {
+    if (value instanceof Object && LOG.indexOf(alreadyLoggedContainers, value) != -1) {
         return new LOG.RefLogItem(doc, value, stackedMode, alreadyLoggedContainers);
     } else if (value != null && typeof value == 'object') {
         if (LOG.instanceOfWindow(value) || LOG.instanceOfDocument(value) || value instanceof Date || value.getTypeName) {

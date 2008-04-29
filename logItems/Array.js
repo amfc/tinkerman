@@ -112,7 +112,7 @@ LOG.ArrayLogItem = function(doc, value, stackedMode, alreadyLoggedContainers) {
     this.oldValue = LOG.shallowClone(value);
     
     for (var i = 0; i < value.length; i++) {
-        this.createProperty(i, LOG.getValueAsLogItem(this.doc, value[i], stackedMode, alreadyLoggedContainers));
+        this.createProperty(i);
         me.lastVisibleProperty = this.properties[i];
         this.propertiesSpan.appendChild(this.properties[i].element);
     }
