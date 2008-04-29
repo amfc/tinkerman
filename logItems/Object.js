@@ -323,7 +323,7 @@ LOG.ObjectLogItem.prototype.updateAndMarkDifferences = function() {
         while (propertyValueElement.firstChild) {
             propertyValueElement.removeChild(propertyValueElement.firstChild);
         }
-        me.properties[key].logItem = LOG.getValueAsLogItem(LOG.console.ownerDocument, me.value[key], me.stackedMode, me.alreadyLoggedContainers); // FIXME: LOG.console doesn't exist anymore
+        me.properties[key].logItem = LOG.getValueAsLogItem(me.doc, me.value[key], me.stackedMode, me.alreadyLoggedContainers); // FIXME: LOG.console doesn't exist anymore
         me.properties[key].element = me.properties[key].logItem.element;
         if (wasShowingChildren) {
             me.properties[key].logItem.setShowChildren(wasShowingChildren);

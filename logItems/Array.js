@@ -288,7 +288,7 @@ LOG.ArrayLogItem.prototype.updateAndMarkDifferences = function() {
         while (propertyValueElement.firstChild) {
             propertyValueElement.removeChild(propertyValueElement.firstChild);
         }
-        me.properties[key].logItem = LOG.getValueAsLogItem(LOG.console.ownerDocument, me.value[key], me.stackedMode, me.alreadyLoggedContainers);
+        me.properties[key].logItem = LOG.getValueAsLogItem(me.doc, me.value[key], me.stackedMode, me.alreadyLoggedContainers);
         if (wasShowingChildren) {
             me.properties[key].logItem.setShowChildren(wasShowingChildren);
         }
