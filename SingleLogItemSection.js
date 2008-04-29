@@ -22,7 +22,7 @@ LOG.SingleLogItemSection.prototype.focusValue = function(value, dontLog, panel, 
     var path = LOG.guessDomNodeOwnerName(value, [ { obj: this.logItem.value, name: this.objectName, parent: null } ]);
     if (!dontLog) {
         // Log the path into the console panel
-        var logItem = new LOG.PathToObjectLogItem(this.doc, path, dontSeparatePathBySpaces);
+        var logItem = new LOG.PathToObjectLogItem(this.doc, path, dontSeparateBySpaces);
         LOG.logger.defaultConsole.appendRow(logItem.element);
     }
     if (path && this.selected) {
