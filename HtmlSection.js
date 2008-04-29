@@ -14,7 +14,7 @@ LOG.HtmlSection.prototype.getSelected = function() {
     return this.selected;
 }
 
-LOG.HtmlSection.prototype.focusValue = function(value, dontLog, panel) {
+LOG.HtmlSection.prototype.focusValue = function(value, dontLog, panel, dontSeparateBySpaces) {
     function getPathToNodeFromHtmlNode(node) {
         var htmlNode = document.getElementsByTagName('html')[0];
         var path = [];

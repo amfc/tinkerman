@@ -197,7 +197,7 @@ LOG.LogRunner.prototype.onMouseDown = function(event) {
     if (LOG.getButtonFromEvent(event) == 'left' && event.ctrlKey && event.shiftKey) {
         LOG.nextClickShouldBeStopped = true;
         var element = LOG.getElementFromEvent(event);
-        LOG.logger.focusValue(element);
+        LOG.logger.focusValue(element, undefined, event.altKey);
         LOG.preventDefault(event);
         LOG.stopPropagation(event);
     } else if (LOG.getButtonFromEvent(event) == 'left' && event.altKey && event.ctrlKey) { // FIXME: iats dependancy, unmigrated

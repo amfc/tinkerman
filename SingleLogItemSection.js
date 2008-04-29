@@ -15,14 +15,14 @@ LOG.SingleLogItemSection.prototype.getSelected = function() {
     return this.selected;
 }
 
-LOG.SingleLogItemSection.prototype.focusValue = function(value, dontLog, panel) {
+LOG.SingleLogItemSection.prototype.focusValue = function(value, dontLog, panel, dontSeparateBySpaces) {
     if (!this.objectName) {
         return;
     }
     var path = LOG.guessDomNodeOwnerName(value, [ { obj: this.logItem.value, name: this.objectName, parent: null } ]);
     if (!dontLog) {
         // Log the path into the console panel
-        var logItem = new LOG.PathToObjectLogItem(this.doc, path);
+        var logItem = new LOG.PathToObjectLogItem(this.doc, path, dontSeparatePathBySpaces);
         LOG.logger.defaultConsole.appendRow(logItem.element);
     }
     if (path && this.selected) {

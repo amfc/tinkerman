@@ -1,4 +1,4 @@
-LOG.PathToObjectLogItem = function(doc, value) {
+LOG.PathToObjectLogItem = function(doc, value, dontSeparateBySpaces) {
     this.doc = doc;
     var me = this;
     this.value = value;
@@ -10,7 +10,9 @@ LOG.PathToObjectLogItem = function(doc, value) {
         var part, i;
         for (i = 0; i < value.pathToObject.length; ++i) {
             part = new LOG.PathToObjectPart(this.doc, value.pathToObject[i].obj, i == 0 ? value.pathToObject[i].name : LOG.getPropertyAccessor(value.pathToObject[i].name));
-            this.element.appendChild(LOG.createElement(this.doc, 'span', { style: { fontSize: '0.1pt' } }, [ ' ' ]));
+            if (!dontSeparateBySpaces) {
+                this.element.appendChild(LOG.createElement(this.doc, 'span', { style: { fontSize: '0.1pt' } }, [ ' ' ]));
+            }
             this.element.appendChild(part.element);
         }
         var node = value.pathToObject[value.pathToObject.length - 1].obj;

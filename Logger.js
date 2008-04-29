@@ -293,11 +293,11 @@ LOG.Logger.prototype.getValueAsLogItem = function(value, stackedMode, alreadyLog
 }
 
 // This searchs for some value in all the selected panels and focuses it
-LOG.Logger.prototype.focusValue = function(value, dontLog) {
+LOG.Logger.prototype.focusValue = function(value, dontLog, dontSeparatePathBySpaces) {
     for (var sectionName in this.panels) {
         var section = this.panels[sectionName].content;
         if (section.focusValue) {
-            section.focusValue(value, dontLog, this.panels[sectionName]);
+            section.focusValue(value, dontLog, this.panels[sectionName], dontSeparatePathBySpaces);
         }
     }
 }
