@@ -106,12 +106,18 @@ LOG.BodyWrapper.prototype.uninit = function() {
         this.topElement.removeChild(child);
         doc.body.appendChild(child);
     }
+    var me = this;
     delete this.element;
     delete this.topElement;
     delete this.bottomElement;
-    document.body.style.overflow = this.oldBodyOverflow ? this.oldBodyOverflow : '';
-    document.body.style.margin = this.oldBodyMargin ? this.oldBodyMargin : '';
-    LOG.removeObjEventListener(this, this.resizeHandle, 'mousedown', this.onResizeHandleMousedown);
+    setTimeout(
+        function() { // otherwise IE (6, 7) crashes
+            document.body.style.overflow = me.oldBodyOverflow ? me.oldBodyOverflow : '';
+            document.body.style.margin = me.oldBodyMargin ? me.oldBodyMargin : '';
+            LOG.removeObjEventListener(me, me.resizeHandle, 'mousedown', me.onResizeHandleMousedown);
+        },
+        0
+    );
 }
 
 LOG.BodyWrapper.prototype.onDragKeypress = function(event) {
