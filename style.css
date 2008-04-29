@@ -1,0 +1,10 @@
+body {
+    margin: 0;
+    overflow: hidden;
+    font-family: lucida console, monospace;
+    font-size: 9pt
+}
+
+td {
+    font-size: 9pt
+}

@@ -79,7 +79,7 @@ LOG.BodyWrapper = function(ownerDocument, initialSize, startWithFixedSize) {
     }
     
     var child;
-    while (doc.body.firstChild) {
+    while (doc.body.firstChild) { 
         child = doc.body.firstChild;
         doc.body.removeChild(child);
         this.topElement.appendChild(child);
@@ -87,7 +87,7 @@ LOG.BodyWrapper = function(ownerDocument, initialSize, startWithFixedSize) {
     this.hidden = false;
     doc.body.appendChild(this.element);
     this.iframe.contentWindow.document.open();
-    this.iframe.contentWindow.document.write('<html><head><style type="text/css">body { margin: 0; overflow: hidden; font-family: terminus, lucida console, monospace; font-size: 12pt;}</style></head><body></body></html>');
+    this.iframe.contentWindow.document.write(LOG.defaultHtml);
     this.iframe.contentWindow.document.close();
     this.doc = this.iframe.contentWindow.document
     

@@ -1,4 +1,7 @@
 <script src="<?=$tinkermanPath?>core.js" type="text/javascript"></script>
+<script type="text/javascript">
+LOG.url="<?=$tinkermanPath?>"; 
+</script>
 <script src="<?=$tinkermanPath?>cookie.js" type="text/javascript"></script>
 <script src="<?=$tinkermanPath?>dom.js" type="text/javascript"></script>
 <script src="<?=$tinkermanPath?>var.js" type="text/javascript"></script>
