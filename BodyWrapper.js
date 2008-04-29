@@ -90,7 +90,9 @@ LOG.BodyWrapper = function(ownerDocument, initialSize, startWithFixedSize) {
     this.iframe.contentWindow.document.write(LOG.defaultHtml);
     this.iframe.contentWindow.document.close();
     this.doc = this.iframe.contentWindow.document
-    
+    if (LOG.isIE) {
+        this.doc.body.scroll = "no"; // CSS doesn't always affect the scrollbar
+    }
     LOG.addObjEventListener(this, this.resizeHandle, 'mousedown', this.onResizeHandleMousedown);
 }
 
