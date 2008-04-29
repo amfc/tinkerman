@@ -1,4 +1,3 @@
-// FIXME: This should take the object from where to start
 // example for objectsToStartWith: [ { obj: page, name: 'page', parent: null } ]
 LOG.guessNameAsArray = function(objToFind, objectsToStartWith) {
     function getPath(item) {
@@ -21,6 +20,9 @@ LOG.guessNameAsArray = function(objToFind, objectsToStartWith) {
     while (objectsToCheck.length > 0) {
         currentItem = objectsToCheck.shift();
         parentObj = currentItem.obj;
+        if (parentObj.dontGuessNames) {
+            continue;
+        }
         for (name in parentObj) {
             try {
                 if (!parentObj[name]) {
@@ -41,13 +43,17 @@ LOG.guessNameAsArray = function(objToFind, objectsToStartWith) {
             if (typeof parentObj[name] != "object") {
                 continue;
             }
-            if (parentObj[name].nodeType) {
-                continue;
-            }
-            if (parentObj[name] == window) {
-                continue;
-            }
-            if (LOG.indexOf(checkedObjects, parentObj[name]) !== -1) {
+            try {
+                if (parentObj[name].nodeType) {
+                    continue;
+                }
+                if (parentObj[name] == window) {
+                    continue;
+                }
+                if (LOG.indexOf(checkedObjects, parentObj[name]) !== -1) {
+                    continue;
+                }
+            } catch (e) {
                 continue;
             }
             checkedObjects.push(parentObj[name]);
@@ -89,16 +95,30 @@ LOG.getPropertyAccessor = function(propertyName) {
 }
 
 LOG.guessName = function(objToFind, objectsToStartWith) {
-    function pathToString(pathElements) {
-        var out = pathElements[0];
+    function objectPathToString(pathElements) {
+        var out = pathElements[0].name;
         for (var i = 1; i < pathElements.length; ++i) {
             out += LOG.getPropertyAccessor(pathElements[i].name);
         }
         return out;
     }
-    var path = LOG.guessNameAsArray(objToFind, objectsToStartWith);
+    function elementPathToString(pathElements) {
+        var out = '';
+        for (var i = 0; i < pathElements.length; ++i) {
+            if (i > 0) {
+                out += '.';
+            }
+            out += 'childNodes[' + pathElements[i] + ']';
+        }
+        return out;
+    }
+    var path = LOG.guessDomNodeOwnerName(objToFind, objectsToStartWith);
     if (path) {
-        return pathToString(path);
+        var str = objectPathToString(path.pathToObject);
+        if (path.pathToElement.length) {
+            str += '.' + elementPathToString(path.pathToElement)
+        }
+        return str;
     }
     return null;
 }
