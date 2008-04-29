@@ -49,6 +49,5 @@ LOG.LogWindow.prototype.onUnload = function(event) {
 }
 
 LOG.LogWindow.prototype.appendChild = function(elementToWrap) {
-    this.doc.importNode(elementToWrap, true);
     this.doc.body.appendChild(elementToWrap);
 }
