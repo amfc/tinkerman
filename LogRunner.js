@@ -69,10 +69,7 @@ LOG.LogRunner.prototype.appendLoggerNow = function() {
         delete this.appendLoggerNowCaller;
     }
     this.createContainer();
-    if (LOG.logger) { // FIXME: import nodes
-    } else {
-        this.createLogger(this.container.doc);
-    }
+    this.createLogger(this.container.doc);
     this.container.appendChild(LOG.logger.element);
     LOG.logger.setInNewWindow(this.willOpenInNewWindow);
 }
