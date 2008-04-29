@@ -10,7 +10,7 @@ LOG.guessNameAsArray = function(objToFind, objectsToStartWith) {
     }
     
     var checkedObjects = [];
-    var objectsToCheck = objectsToStartWith;
+    var objectsToCheck = LOG.shallowClone(objectsToStartWith);
     for (var i = 0; i < objectsToCheck.length; ++i) {
         if (objectsToCheck[i].obj == objToFind) {
             return getPath(objectsToCheck[i]);
