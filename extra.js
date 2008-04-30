@@ -25,6 +25,6 @@ LOG.openClassInEditor = function(value) {
     if (value.getPackage()) {
         var packageName = value.getPackage().name;
         var className = value.getSimpleClassName();
-        document.location = 'openClass.php?package=' + escape(packageName) + '&class=' + escape(className);
+        document.location = 'openClass.php?fileName=' + escape(Package.getFileName(packageName)) + '&class=' + escape(className);
     }
 }
