@@ -11,7 +11,7 @@ LOG.BasicLogItem = function(doc, value, stackedMode, alreadyLoggedContainers) {
         } else if (typeof value == 'undefined') {
             return 'undefined';
         } else if (typeof value == 'string') {
-            return '"' + value.toString().replace(/"/, '\\"') + '"';
+            return '"' + value.toString().replace(/"/g, '\\"') + '"';
         } else if (typeof value != 'undefined' && typeof value.toString == 'function') {
             return value.toString();
         }
