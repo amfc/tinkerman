@@ -76,7 +76,6 @@ LOG.ExceptionLogItem.prototype.onShowMoreLinkClick = function(event) {
     this.toggleShowMoreInfo();
 }
 
-
 LOG.ExceptionLogItem.prototype.onNameLinkClick = function(event) {
     LogAndStore(this.value);
     LOG.stopPropagation(event);
@@ -186,9 +185,10 @@ LOG.ExceptionLogItem.prototype.getStackHtmlElement = function(fileName, lineNumb
     }
 }
 
-LOG.ExceptionLogItem.prototype.getFileLink = function(fileName, lineNumber) {
+// FIXME: iats dependency: this should be done from outside
+LOG.ExceptionLogItem.getFileLink = function(ownerDoc, fileName, lineNumber) { // this is available to use from outside
     return LOG.createElement(
-        this.doc, 'a',
+        ownerDoc, 'a',
         {
             href: 'openFile.php?file=' + escape(fileName) + '&line=' + lineNumber
         },
@@ -196,6 +196,10 @@ LOG.ExceptionLogItem.prototype.getFileLink = function(fileName, lineNumber) {
             fileName + ' line ' + lineNumber
         ]
     );
+}
+
+LOG.ExceptionLogItem.prototype.getFileLink = function(fileName, lineNumber) {
+    return LOG.ExceptionLogItem.getFileLink(this.doc, fileName, lineNumber);
 }
 
 LOG.ExceptionLogItem.prototype.setShowMoreInfo = function(show) {
