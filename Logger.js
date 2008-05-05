@@ -182,8 +182,9 @@ LOG.Logger.prototype.logAndStore = function(value, source) {
     if (source) {
         this.logObjectSource(value, null, this.stackedMode);
     } else {
-        this.defaultConsole.appendRow(LOG.getValueAsHtmlElement(document, value, this.stackedMode, undefined, true));
+        this.defaultConsole.appendRow(LOG.getValueAsHtmlElement(this.doc, value, this.stackedMode, undefined, true));
     }
+
     if (this.commandEditor.commandInput.element.value == '' || this.commandEditor.commandInput.element.value.match(/^\$[0-9]+$/)) {
         this.commandEditor.commandInput.element.value = '$' + pos;
     }

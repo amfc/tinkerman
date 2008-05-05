@@ -11,9 +11,9 @@ LOG.getGetPositionInVariablesElement = function(doc, value) {
             },
             onclick: function(event) {
                 if (!event) {
-                    event = LOG.console.getWindow().event;
+                    event = doc.parentWindow.event;
                 }
-                LOG.console.writeStringToInput('$' + positionInVariables)
+                LOG.logger.commandEditor.commandInput.writeStringToInput('$' + positionInVariables);
                 LOG.stopPropagation(event);
                 LOG.preventDefault(event);
             }
@@ -49,7 +49,7 @@ LOG.getExtraInfoToLogAsHtmlElement = function(doc, value, stackedMode, alreadyLo
                     onclick: (function(item) {
                         return function(event) {
                             if (!event) {
-                                event = LOG.console.getWindow().event;
+                                event = doc.parentWindow.event;
                             }
                             Log(extraInfoToLog[item].call(value));
                             LOG.stopPropagation(event);

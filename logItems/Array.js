@@ -37,7 +37,7 @@ LOG.ArrayLogItem = function(doc, value, stackedMode, alreadyLoggedContainers) {
                     },
                     onclick: function(event) {
                         if (!event) {
-                            event = LOG.console.getWindow().event;
+                            event = doc.parentWindow.event;
                         }
                         LogAndStore(value);
                         LOG.stopPropagation(event);
@@ -63,7 +63,7 @@ LOG.ArrayLogItem = function(doc, value, stackedMode, alreadyLoggedContainers) {
                     },
                     onclick: function(event) {
                         if (!event) {
-                            event = LOG.console.getWindow().event;
+                            event = doc.parentWindow.event;
                         }
                         LOG.preventDefault(event);
                         LOG.stopPropagation(event);
@@ -92,7 +92,7 @@ LOG.ArrayLogItem = function(doc, value, stackedMode, alreadyLoggedContainers) {
                     },
                     onclick: function(event) {
                         if (!event) {
-                            event = LOG.console.getWindow().event;
+                            event = doc.parentWindow.event;
                         }
                         LOG.preventDefault(event);
                         LOG.stopPropagation(event);

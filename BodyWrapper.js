@@ -52,6 +52,7 @@ LOG.BodyWrapper = function(ownerDocument, initialSize, startWithFixedSize) {
                     ),
                     this.iframe = LOG.createElement(doc, 'iframe',
                         {
+                            frameBorder: LOG.isIE ? '0' : null,
                             style: {
                                 border: 'none',
                                 height: '100%',

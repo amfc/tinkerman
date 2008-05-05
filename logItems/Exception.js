@@ -122,7 +122,7 @@ LOG.ExceptionLogItem.prototype.getStackAsArray = function(stackString) {
 }
 
 function getStackFromArguments() {
-    var currentCaller = arguments.callee.caller.caller.caller; // I skip 2
+    var currentCaller = arguments.callee.caller;
     var stack = [];
     var caller;
     while (currentCaller) {
