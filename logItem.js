@@ -34,7 +34,6 @@ LOG.getExtraInfoToLogAsHtmlElement = function(doc, value, stackedMode, alreadyLo
     }
     var extraInfoToLog = value.getExtraInfoToLog();
     var element = LOG.createElement(doc, 'span', {});
-
     for (var item in extraInfoToLog) {
         if (typeof extraInfoToLog[item] == 'function') {
             element.appendChild(doc.createTextNode(' '));
@@ -102,27 +101,32 @@ LOG.getValueAsLogItem = function(doc, value, stackedMode, alreadyLoggedContainer
     if (!alreadyLoggedContainers) {
         alreadyLoggedContainers = [];
     }
+    
     if (value instanceof Object && LOG.indexOf(alreadyLoggedContainers, value) != -1) {
         return new LOG.RefLogItem(doc, value, stackedMode, alreadyLoggedContainers);
-    } else if (value != null && typeof value == 'object') {
-        if (LOG.instanceOfWindow(value) || LOG.instanceOfDocument(value) || value instanceof Date || value.getTypeName) {
-            return new LOG.TypedObjectLogItem(doc, value, stackedMode, alreadyLoggedContainers);
-        } else if (value instanceof Array || value.item && typeof value.length != 'undefined') {
-            return new LOG.ArrayLogItem(doc, value, stackedMode, alreadyLoggedContainers);
-        } else if (value.nodeType) { // DOM node
-            if (value.nodeType == 1) { // 1: element node
-                return new LOG.HTMLElementLogItem(doc, value, stackedMode, alreadyLoggedContainers);
-            } else {
-                return new LOG.BasicLogItem(doc, value, stackedMode, alreadyLoggedContainers);
-            }
-        } else if (value.constructor != Object) {
-            return new LOG.TypedObjectLogItem(doc, value, stackedMode, alreadyLoggedContainers);
-        } else {
-            return new LOG.ObjectLogItem(doc, value, stackedMode, alreadyLoggedContainers, showFirstLevelObjectChildren, showExpandObjectChildren);
-        }
-    } else if (typeof value == 'function') {
-        return new LOG.FunctionLogItem(doc, value, stackedMode, alreadyLoggedContainers);
     } else {
-        return new LOG.BasicLogItem(doc, value, stackedMode, alreadyLoggedContainers);
+        if (value && value.createLogItem) {
+            return value.createLogItem(doc, stackedMode, alreadyLoggedContainers, showFirstLevelObjectChildren, showExpandObjectChildren);
+        } else if (value != null && typeof value == 'object') {
+            if (LOG.instanceOfWindow(value) || LOG.instanceOfDocument(value) || value instanceof Date || value.getTypeName) {
+                return new LOG.TypedObjectLogItem(doc, value, stackedMode, alreadyLoggedContainers);
+            } else if (value instanceof Array || value.item && typeof value.length != 'undefined') {
+                return new LOG.ArrayLogItem(doc, value, stackedMode, alreadyLoggedContainers);
+            } else if (value.nodeType) { // DOM node
+                if (value.nodeType == 1) { // 1: element node
+                    return new LOG.HTMLElementLogItem(doc, value, stackedMode, alreadyLoggedContainers);
+                } else {
+                    return new LOG.BasicLogItem(doc, value, stackedMode, alreadyLoggedContainers);
+                }
+            } else if (value.constructor != Object) {
+                return new LOG.TypedObjectLogItem(doc, value, stackedMode, alreadyLoggedContainers);
+            } else {
+                return new LOG.ObjectLogItem(doc, value, stackedMode, alreadyLoggedContainers, showFirstLevelObjectChildren, showExpandObjectChildren);
+            }
+        } else if (typeof value == 'function') {
+            return new LOG.FunctionLogItem(doc, value, stackedMode, alreadyLoggedContainers);
+        } else {
+            return new LOG.BasicLogItem(doc, value, stackedMode, alreadyLoggedContainers);
+        }
     }
 }
