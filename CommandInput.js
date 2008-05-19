@@ -20,7 +20,7 @@ LOG.CommandInput = function(doc, useTextArea, evaluator, historyManager) {
             onmousedown: LOG.createEventHandler(doc, this, 'onInputMouseDown')
         }
     );
-    if (LOG.isIE) {
+    if (LOG.isIE || LOG.isKonq) {
         this.element.onkeydown = LOG.createEventHandler(doc, this, 'onInputKeyPressOrDown');
     } else {
         this.element.onkeypress = LOG.createEventHandler(doc, this, 'onInputKeyPressOrDown');
