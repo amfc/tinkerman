@@ -135,6 +135,7 @@ LOG.LogRunner.prototype.onBodyWrapperDragEnd = function() {
 LOG.LogRunner.prototype.setCollapsed = function(bodyWrapper, collapsed) {
     if (collapsed) {
         bodyWrapper.lock('17px');
+        window.focus();
     } else {
         bodyWrapper.unlock();
     }
@@ -170,30 +171,35 @@ LOG.LogRunner.prototype.deleteContainer = function() {
 
 LOG.LogRunner.prototype.onKeyDown = function(event) {
     var chr = String.fromCharCode(event.keyCode).toLowerCase();
-    if (event.altKey && event.shiftKey) {
-        if (chr == 'm') {
-            if (!LOG.logger) {
-                this.stopDebugging = false;
-                this.createAndAppendLogger();
-            }
-            this.showLogger();
-            LOG.preventDefault(event);
-            LOG.stopPropagation(event);
-        } else if (chr == 't') {
-            this.onLoggerNewWindowToggleClick(event);
-            LOG.preventDefault(event);
-            LOG.stopPropagation(event);
+    if (event.keyCode == 120) {
+        if (!LOG.logger) {
+            this.stopDebugging = false;
+            this.createAndAppendLogger();
         }
+        this.showLogger();
+        LOG.preventDefault(event);
+        LOG.stopPropagation(event);
+    } else if (event.altKey && event.shiftKey && chr == 't') {
+        this.onLoggerNewWindowToggleClick(event);
+        LOG.preventDefault(event);
+        LOG.stopPropagation(event);
     }
 }
 
 LOG.LogRunner.prototype.showLogger = function() {
+    if (!this.willOpenInNewWindow) {
+        this.setCollapsed(this.container, false);
+    }
     this.container.show();
     LOG.logger.focus();
 }
 
 LOG.LogRunner.prototype.hide = function() {
-    this.container.hide();
+    if (!this.willOpenInNewWindow) {
+        this.setCollapsed(this.container, true);
+    } else {
+        this.container.hide();
+    }
 }
 
 LOG.LogRunner.prototype.onUnload = function() {
