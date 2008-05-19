@@ -1,4 +1,4 @@
-LOG.BodyWrapper = function(ownerDocument, initialSize, startWithFixedSize) {
+LOG.BodyWrapper = function(ownerDocument, initialSize, startWithFixedSize, onload) {
     this.dragging = false;
     this.ownerDocument = ownerDocument;
     var doc = this.ownerDocument;
@@ -78,19 +78,20 @@ LOG.BodyWrapper = function(ownerDocument, initialSize, startWithFixedSize) {
     } else {
         this.setSize(initialSize ? initialSize : 0.3333333);
     }
-    
     var child;
     while (doc.body.firstChild) { 
         child = doc.body.firstChild;
         doc.body.removeChild(child);
         this.topElement.appendChild(child);
     }
+    this.onload = onload;
     this.hidden = false;
     doc.body.appendChild(this.element);
-    this.iframe.contentWindow.document.open();
-    this.iframe.contentWindow.document.write(LOG.defaultHtml);
-    this.iframe.contentWindow.document.close();
-    this.doc = this.iframe.contentWindow.document
+    this.doc = this.iframe.contentWindow.document;
+    this.doc.open();
+    this.doc.write(LOG.getDefaultHtml(function() { me.onDocumentLoad(); }));
+    this.doc.close();
+    var me = this;
     if (LOG.isIE) {
         this.doc.body.scroll = "no"; // CSS doesn't always affect the scrollbar
     }
@@ -98,6 +99,10 @@ LOG.BodyWrapper = function(ownerDocument, initialSize, startWithFixedSize) {
 }
 
 LOG.setTypeName(LOG.BodyWrapper, 'LOG.BodyWrapper');
+
+LOG.BodyWrapper.prototype.onDocumentLoad = function() {
+    this.onload();
+}
 
 LOG.BodyWrapper.prototype.uninit = function() {
     var doc = this.ownerDocument;

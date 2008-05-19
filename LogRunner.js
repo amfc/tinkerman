@@ -4,6 +4,7 @@ LOG.LogRunner = function() {
     this.historyManager = new LOG.HistoryManager(LOG.getCookie('LOG_HISTORY'));
     this.containerSavedSize = parseFloat(LOG.getCookie('LOG_SIZE'));
     this.loggerSavedOpenSections = LOG.getCookie('LOG_OPEN_SECTIONS');
+    this.collapsed = LOG.getCookie('LOG_OPEN') != 'true';
     LOG.addEventListener(document, 'keydown', LOG.createEventHandler(document, this, 'onKeyDown'), true);
     LOG.addEventListener(document, 'selectstart', this.caller('onDocumentSelectStart'), true);
     LOG.addEventListener(document, 'mousedown', this.caller('onMouseDown'), true);
@@ -28,38 +29,65 @@ LOG.LogRunner.prototype.createLogger = function(doc) {
     LOG.logger.onnewwindowtoggleclick = this.caller('onLoggerNewWindowToggleClick');
     LOG.logger.onescpress = this.caller('onLoggerEscPress');
     LOG.logger.oncollapsetoggleclick = this.caller('onLoggerCollapseToggleClick');
+    LOG.logger.setCollapsed(this.collapsed);
 }
 
-LOG.LogRunner.prototype.createWindowContainer = function() {
+LOG.LogRunner.prototype.createWindowContainer = function(callback) {
     var container;
+    var me = this;
     try {
-        container = new LOG.LogWindow();
+        new LOG.LogWindow(
+            function (container) {
+                container.onkeydown = me.caller('onKeyDown');
+                container.onunload = me.caller('onLogWindowUnload');
+                callback(container);
+            }
+        );
     } catch (e) {
-        return null;
+        callback(null);
     }
-    container.onkeydown = this.caller('onKeyDown');
-    container.onunload = this.caller('onLogWindowUnload');
-    return container;
 }
 
-LOG.LogRunner.prototype.createBodyWrapperContainer = function() {
-    var collapsed = LOG.getCookie('LOG_OPEN') != 'true';
-    var container = new LOG.BodyWrapper(this.doc, this.containerSavedSize, collapsed ? '1.3em' : undefined);
-    container.ondragend = this.caller('onBodyWrapperDragEnd');
-    this.setCollapsed(container, collapsed);
-    return container;
+LOG.LogRunner.prototype.createBodyWrapperContainer = function(callback) {
+    var me = this;
+    var container = new LOG.BodyWrapper(
+        this.doc,
+        this.containerSavedSize,
+        this.collapsed ? '17px' : undefined,
+        function () {
+            container.ondragend = me.caller('onBodyWrapperDragEnd');
+            me.setCollapsed(container, me.collapsed);
+            callback(container);
+        }
+    );
 }
 
-LOG.LogRunner.prototype.createContainer = function() {
+LOG.LogRunner.prototype.createContainer = function(callback) {
     var container;
-    if (this.willOpenInNewWindow && (container = this.createWindowContainer())) {
-        this.container = container;
+    var me = this;
+    if (this.willOpenInNewWindow) {
+        this.createWindowContainer(
+            function (container) {
+                if (container) {
+                    me.container = container;
+                    callback();
+                } else {
+                    me.willOpenInNewWindow = false;
+                    me.createContainer(callback);
+                }
+            }
+        );
     } else {
         this.willOpenInNewWindow = false;
         if (this.container) { // there is an old window or BodyWrapper left
             this.container.uninit();
         }
-        this.container = this.createBodyWrapperContainer();
+        this.createBodyWrapperContainer(
+            function(container) {
+                me.container = container;
+                callback();
+            }
+        );
     }
 }
 
@@ -68,10 +96,15 @@ LOG.LogRunner.prototype.appendLoggerNow = function() {
         LOG.removeEventListener(window, 'load', this.appendLoggerNowCaller);
         delete this.appendLoggerNowCaller;
     }
-    this.createContainer();
-    this.createLogger(this.container.doc);
-    this.container.appendChild(LOG.logger.element);
-    LOG.logger.setInNewWindow(this.willOpenInNewWindow);
+    var me = this;
+    this.createContainer(
+        function() {
+            me.createLogger(me.container.doc);
+            me.container.appendChild(LOG.logger.element);
+            LOG.logger.setInNewWindow(me.willOpenInNewWindow);
+            // LOG.logger.focus();
+        }
+    );
 }
 
 LOG.LogRunner.prototype.appendLogger = function() {
@@ -94,7 +127,7 @@ LOG.LogRunner.prototype.onBodyWrapperDragEnd = function() {
 
 LOG.LogRunner.prototype.setCollapsed = function(bodyWrapper, collapsed) {
     if (collapsed) {
-        bodyWrapper.lock('1.3em');
+        bodyWrapper.lock('17px');
     } else {
         bodyWrapper.unlock();
     }
@@ -112,7 +145,6 @@ LOG.LogRunner.prototype.onLoggerNewWindowToggleClick = function() {
     this.deleteContainer();
     this.willOpenInNewWindow = !this.willOpenInNewWindow;
     this.appendLogger();
-    LOG.logger.focus();
 }
 
 LOG.LogRunner.prototype.onLogWindowUnload = function() {

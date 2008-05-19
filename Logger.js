@@ -98,6 +98,9 @@ LOG.setTypeName(LOG.Logger, 'LOG.Logger');
 LOG.Logger.prototype.setInNewWindow = function(inNewWindow) {
     this.inNewWindowAttachDetachPrefix.nodeValue = inNewWindow ? 'at' : 'de';
     this.collapseButton.style.display = inNewWindow ? 'none' : '';
+    if (inNewWindow) {
+        this.setCollapsed(false);
+    }
 }
 
 LOG.Logger.prototype.unserializeOpenSections = function(str) {
