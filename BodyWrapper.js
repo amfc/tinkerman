@@ -88,14 +88,25 @@ LOG.BodyWrapper = function(ownerDocument, initialSize, startWithFixedSize, onloa
     this.hidden = false;
     doc.body.appendChild(this.element);
     var me = this;
-    this.doc = this.iframe.contentWindow.document;
-    this.doc.open();
-    this.doc.write(LOG.getDefaultHtml(function() { me.onDocumentLoad(); }));
-    this.doc.close();
-    if (LOG.isIE) {
-        this.doc.body.scroll = "no"; // CSS doesn't always affect the scrollbar
+    
+    function onIframeLoad() {
+        me.iframe.onload = null;
+        me.doc = me.iframe.contentWindow.document;
+        me.doc.open();
+        me.doc.write(LOG.getDefaultHtml(function() { me.onDocumentLoad(); }));
+        me.doc.close();
+        if (LOG.isIE) {
+            me.doc.body.scroll = "no"; // CSS doesn't always affect the scrollbar
+        }
+        LOG.addObjEventListener(me, me.resizeHandle, 'mousedown', me.onResizeHandleMousedown);
+        alert('2sd2');
     }
-    LOG.addObjEventListener(this, this.resizeHandle, 'mousedown', this.onResizeHandleMousedown);
+    
+    if (this.iframe.contentWindow) { // Konqueror needs this, the onload doesn't work (ie, fx and opera do)
+        onIframeLoad();
+    } else { // Opera needs this, the contentWindow is not ready yet (ie, fx and konqueror do)
+        this.iframe.onload = onIframeLoad();
+    }
 }
 
 LOG.setTypeName(LOG.BodyWrapper, 'LOG.BodyWrapper');
