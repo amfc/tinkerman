@@ -30,6 +30,13 @@ LOG.LogRunner.prototype.createLogger = function(doc) {
     LOG.logger.onescpress = this.caller('onLoggerEscPress');
     LOG.logger.oncollapsetoggleclick = this.caller('onLoggerCollapseToggleClick');
     LOG.logger.setCollapsed(this.collapsed);
+    LOG.logger.onexpandrequest = this.caller('onLoggerExpandRequest');
+}
+
+LOG.LogRunner.prototype.onLoggerExpandRequest = function() {
+    if (!this.willOpenInNewWindow) {
+        this.setCollapsed(this.container, false);
+    }
 }
 
 LOG.LogRunner.prototype.createWindowContainer = function(callback) {

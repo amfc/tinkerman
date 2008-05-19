@@ -62,7 +62,10 @@ LOG.Logger = function(doc, inNewWindow, historyManager, openSectionsStr) {
             ]
         )
     );
-    
+    var me = this;
+    this.panelManager.onpanellabelclick = function(panel, selected) {
+        return me.onPanelLabelClick(panel, selected);
+    }
     this.element = LOG.createElement(doc, 'div',
         {
             onkeydown: LOG.createEventHandler(doc, this, 'onKeyDown'),
@@ -83,8 +86,6 @@ LOG.Logger = function(doc, inNewWindow, historyManager, openSectionsStr) {
     
     this.evaluator = new LOG.Evaluator(this);
 
-    var me = this;
-    
     this.htmlSection = this.addSection('html', new LOG.HtmlSection(doc));
     this.historyManager = historyManager;
     this.commandEditor = new LOG.CommandEditor(doc, this.evaluator, function() { me.updateCommandEditorSize() }, this.historyManager);
@@ -94,6 +95,16 @@ LOG.Logger = function(doc, inNewWindow, historyManager, openSectionsStr) {
 }
 
 LOG.setTypeName(LOG.Logger, 'LOG.Logger');
+
+LOG.Logger.prototype.onPanelLabelClick = function(panel, selected) {
+    if (this.collapsed) {
+        if (this.onexpandrequest) {
+            this.onexpandrequest();
+        }
+        this.setCollapsed(false);
+        return !selected; // We cancel (return true) if the panel would be unselected (we want to open the panel)
+    }
+}
 
 LOG.Logger.prototype.setInNewWindow = function(inNewWindow) {
     this.inNewWindowAttachDetachPrefix.nodeValue = inNewWindow ? 'at' : 'de';

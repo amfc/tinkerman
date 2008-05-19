@@ -63,10 +63,18 @@ LOG.PanelManager.prototype.setBodyHidden = function(hidden) {
     this.box.setChildHidden(1, hidden);
 }
 
+LOG.PanelManager.prototype.onLabelClick = function(logPanel, selected) {
+    if (this.onpanellabelclick) {
+        return this.onpanellabelclick(logPanel, selected);
+    }
+}
+
 LOG.PanelManager.prototype.add = function(logPanel) {
     if (this.panelLabels.childNodes.length > 0) {
         this.panelLabels.appendChild(this.doc.createTextNode(' '));
     }
+    var me = this;
+    logPanel.onlabelclick = function(selected) { return me.onLabelClick(logPanel, selected); }
     this.panelLabels.appendChild(logPanel.labelElement);
     this.panelElements.appendChild(logPanel.panelElement);
     return logPanel;

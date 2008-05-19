@@ -75,7 +75,10 @@ LOG.LogPanel.prototype.setContent = function(content) {
     }
 }
 
-LOG.LogPanel.prototype.onLabelClick = function(selected) {
+LOG.LogPanel.prototype.onLabelClick = function(event) {
+    if (this.onlabelclick && this.onlabelclick(!this.selected)) {
+        return;
+    }
     this.setSelected(!this.selected);
 }
 
