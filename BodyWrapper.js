@@ -99,7 +99,6 @@ LOG.BodyWrapper = function(ownerDocument, initialSize, startWithFixedSize, onloa
             me.doc.body.scroll = "no"; // CSS doesn't always affect the scrollbar
         }
         LOG.addObjEventListener(me, me.resizeHandle, 'mousedown', me.onResizeHandleMousedown);
-        alert('2sd2');
     }
     
     if (this.iframe.contentWindow) { // Konqueror needs this, the onload doesn't work (ie, fx and opera do)
