@@ -91,19 +91,22 @@ LOG.BodyWrapper = function(ownerDocument, initialSize, startWithFixedSize, onloa
     
     function onIframeLoad() {
         me.iframe.onload = null;
-        me.doc = me.iframe.contentWindow.document;
-        me.doc.open();
-        me.doc.write(LOG.getDefaultHtml(function() { me.onDocumentLoad(); }));
-        me.doc.close();
-        if (LOG.isIE) {
-            me.doc.body.scroll = "no"; // CSS doesn't always affect the scrollbar
+        if (!me.iframe.contentWindow) {
+            setTimeout(onIframeLoad, 0);
+        } else {
+            me.doc = me.iframe.contentWindow.document;
+            me.doc.open();
+            me.doc.write(LOG.getDefaultHtml(function() { me.onDocumentLoad(); }));
+            me.doc.close();
+            if (LOG.isIE) {
+                me.doc.body.scroll = "no"; // CSS doesn't always affect the scrollbar
+            }
+            LOG.addObjEventListener(me, me.resizeHandle, 'mousedown', me.onResizeHandleMousedown);
         }
-        LOG.addObjEventListener(me, me.resizeHandle, 'mousedown', me.onResizeHandleMousedown);
     }
-    
-    if (this.iframe.contentWindow) { // Konqueror needs this, the onload doesn't work (ie, fx and opera do)
+    if (this.iframe.contentWindow && me.iframe.contentWindow.document) { // Konqueror needs this, the onload doesn't work (ie, fx and opera do)
         onIframeLoad();
-    } else { // Opera needs this, the contentWindow is not ready yet (ie, fx and konqueror do)
+    } else { // Opera needs this, the contentWindow is not ready yet (in ie, fx and konq this is not a problem)
         this.iframe.onload = onIframeLoad();
     }
 }
