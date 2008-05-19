@@ -110,7 +110,13 @@ LOG.getValueAsLogItem = function(doc, value, stackedMode, alreadyLoggedContainer
         } else if (value != null && typeof value == 'object') {
             if (LOG.instanceOfWindow(value) || LOG.instanceOfDocument(value) || value instanceof Date || value.getTypeName) {
                 return new LOG.TypedObjectLogItem(doc, value, stackedMode, alreadyLoggedContainers);
-            } else if (value instanceof Array || value.item && typeof value.length != 'undefined') {
+            } else if (
+                value instanceof Array ||
+                typeof value.length != 'undefined' && (
+                    value.item || // DOM collections
+                    value.slice && value.pop && value.push // Arrays from other windows (in konq all arrays which are logged)
+                )
+            ) {
                 return new LOG.ArrayLogItem(doc, value, stackedMode, alreadyLoggedContainers);
             } else if (value.nodeType) { // DOM node
                 if (value.nodeType == 1) { // 1: element node
