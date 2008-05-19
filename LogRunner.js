@@ -50,11 +50,11 @@ LOG.LogRunner.prototype.createWindowContainer = function(callback) {
 
 LOG.LogRunner.prototype.createBodyWrapperContainer = function(callback) {
     var me = this;
-    var container = new LOG.BodyWrapper(
+    new LOG.BodyWrapper(
         this.doc,
         this.containerSavedSize,
         this.collapsed ? '17px' : undefined,
-        function () {
+        function (container) {
             container.ondragend = me.caller('onBodyWrapperDragEnd');
             me.setCollapsed(container, me.collapsed);
             callback(container);

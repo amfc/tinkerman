@@ -87,11 +87,11 @@ LOG.BodyWrapper = function(ownerDocument, initialSize, startWithFixedSize, onloa
     this.onload = onload;
     this.hidden = false;
     doc.body.appendChild(this.element);
+    var me = this;
     this.doc = this.iframe.contentWindow.document;
     this.doc.open();
     this.doc.write(LOG.getDefaultHtml(function() { me.onDocumentLoad(); }));
     this.doc.close();
-    var me = this;
     if (LOG.isIE) {
         this.doc.body.scroll = "no"; // CSS doesn't always affect the scrollbar
     }
@@ -101,7 +101,7 @@ LOG.BodyWrapper = function(ownerDocument, initialSize, startWithFixedSize, onloa
 LOG.setTypeName(LOG.BodyWrapper, 'LOG.BodyWrapper');
 
 LOG.BodyWrapper.prototype.onDocumentLoad = function() {
-    this.onload();
+    this.onload(this);
 }
 
 LOG.BodyWrapper.prototype.uninit = function() {
@@ -134,7 +134,7 @@ LOG.BodyWrapper.prototype.onDragKeypress = function(event) {
 
 LOG.BodyWrapper.prototype.onResizeHandleMousedown = function(event) {
     this.dragging = true;
-    this.originalDelta = DOM.getPositionFromEvent(event).y - DOM.getPosition(this.bottomElement).y;
+    this.originalDelta = LOG.getPositionFromEvent(event).y - LOG.getPosition(this.bottomElement, true).y;
     this.element.style.borderColor = 'black';
     this.draggingElement = LOG.createElement(document, 'div', { style: { width: '100%', borderTop: '1px dotted black', height: 0, position: 'absolute', left: 0 } });
     this.draggingElement.style.top = ((1 - this.size) * 100) + '%';
@@ -189,7 +189,7 @@ LOG.BodyWrapper.prototype.onMousemove = function(event) {
     if (this.dragging) {
         var top = LOG.getPositionFromEvent(event).y;
         if (LOG.getElementFromEvent(event).ownerDocument == this.doc) {
-            top += LOG.getPosition(this.iframe).y;
+            top += LOG.getPosition(this.iframe, true).y;
         }
         top = (top - this.originalDelta) / LOG.getWindowInnerSize(this.ownerDocument).h;
         if (top < 0.1) {
