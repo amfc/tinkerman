@@ -2,6 +2,7 @@ LOG.PanelManager = function(doc, rightToolbarElement) {
     this.doc = doc;
     this.box = new LOG.Vbox(doc);
     this.element = this.box.element;
+    this.panels = [];
     this.scrollContainer = LOG.createElement(this.doc, 'div',
         {
             style: {
@@ -63,7 +64,21 @@ LOG.PanelManager.prototype.setBodyHidden = function(hidden) {
     this.box.setChildHidden(1, hidden);
 }
 
-LOG.PanelManager.prototype.onLabelClick = function(logPanel, selected) {
+LOG.PanelManager.prototype.onPanelSelectChange = function(logPanel, selected) {
+    var visiblePanels = 0;
+    for (var i = 0; i < this.panels.length; ++i) {
+        if (this.panels[i].getSelected()) {
+            ++visiblePanels;
+        }
+    }
+    for (var i = 0; i < this.panels.length; ++i) {
+        if (this.panels[i].getSelected()) {
+            this.panels[i].setWidth((100 / visiblePanels) + '%');
+        }
+    }
+}
+
+LOG.PanelManager.prototype.onPanelLabelClick = function(logPanel, selected) {
     if (this.onpanellabelclick) {
         return this.onpanellabelclick(logPanel, selected);
     }
@@ -74,8 +89,10 @@ LOG.PanelManager.prototype.add = function(logPanel) {
         this.panelLabels.appendChild(this.doc.createTextNode(' '));
     }
     var me = this;
-    logPanel.onlabelclick = function(selected) { return me.onLabelClick(logPanel, selected); }
+    logPanel.onlabelclick = function(selected) { return me.onPanelLabelClick(logPanel, selected); }
+    logPanel.onselectchange = function(selected) { return me.onPanelSelectChange(logPanel, selected); }
     this.panelLabels.appendChild(logPanel.labelElement);
     this.panelElements.appendChild(logPanel.panelElement);
+    this.panels.push(logPanel);
     return logPanel;
 }

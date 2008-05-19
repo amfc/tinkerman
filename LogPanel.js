@@ -62,6 +62,10 @@ LOG.LogPanel = function(doc, name, selected, content) {
 
 LOG.setTypeName(LOG.LogPanel, 'LOG.LogPanel');
 
+LOG.LogPanel.prototype.setWidth = function(width) {
+    this.panelElement.style.width = width;
+}
+
 LOG.LogPanel.prototype.setContent = function(content) {
     if (this.contentElementContainer.firstChild) {
         this.contentElementContainer.removeChild(this.contentElementContainer.firstChild);
@@ -103,6 +107,9 @@ LOG.LogPanel.prototype.setSelected = function(selected) {
     this.selected = selected;
     if (this.content && this.content.setSelected) {
         this.content.setSelected(selected);
+    }
+    if (this.onselectchange) {
+        this.onselectchange(selected);
     }
 }
 
