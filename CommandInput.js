@@ -22,7 +22,8 @@ LOG.CommandInput = function(doc, useTextArea, evaluator, historyManager) {
     );
     if (LOG.isIE || LOG.isKonq) {
         this.element.onkeydown = LOG.createEventHandler(doc, this, 'onInputKeyPressOrDown');
-    } else {
+    }
+    if (!LOG.isIE) { // Konq needs both
         this.element.onkeypress = LOG.createEventHandler(doc, this, 'onInputKeyPressOrDown');
     }
 }
@@ -116,6 +117,17 @@ LOG.CommandInput.prototype.onInputKeyPressOrDown = function(event) {
     //   cancellable)
     if (event.charCode) { // This only works for Konqueror, as Opera doesn't support charCode
         return;
+    }
+    if (LOG.isKonq) {
+        if (event.keyCode == 9) {
+            if (event.type != 'keydown') {
+                return;
+            }
+        } else {
+            if (event.type == 'keydown') {
+                return;
+            }
+        }
     }
     if (event.keyCode == 9) { // Tab
         LOG.stopPropagation(event);
