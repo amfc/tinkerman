@@ -1,4 +1,4 @@
-LOG.BodyWrapper = function(ownerDocument, initialSize, startWithFixedSize) {
+LOG.BodyWrapper = function(ownerDocument, initialSize, startWithFixedSize, onload) {
     this.dragging = false;
     this.ownerDocument = ownerDocument;
     var doc = this.ownerDocument;
@@ -78,26 +78,44 @@ LOG.BodyWrapper = function(ownerDocument, initialSize, startWithFixedSize) {
     } else {
         this.setSize(initialSize ? initialSize : 0.3333333);
     }
-    
     var child;
     while (doc.body.firstChild) { 
         child = doc.body.firstChild;
         doc.body.removeChild(child);
         this.topElement.appendChild(child);
     }
+    this.onload = onload;
     this.hidden = false;
     doc.body.appendChild(this.element);
-    this.iframe.contentWindow.document.open();
-    this.iframe.contentWindow.document.write(LOG.defaultHtml);
-    this.iframe.contentWindow.document.close();
-    this.doc = this.iframe.contentWindow.document
-    if (LOG.isIE) {
-        this.doc.body.scroll = "no"; // CSS doesn't always affect the scrollbar
+    var me = this;
+    
+    function onIframeLoad() {
+        me.iframe.onload = null;
+        if (!me.iframe.contentWindow) {
+            setTimeout(onIframeLoad, 0);
+        } else {
+            me.doc = me.iframe.contentWindow.document;
+            me.doc.open();
+            me.doc.write(LOG.getDefaultHtml(function() { me.onDocumentLoad(); }));
+            me.doc.close();
+            if (LOG.isIE) {
+                me.doc.body.scroll = "no"; // CSS doesn't always affect the scrollbar
+            }
+            LOG.addObjEventListener(me, me.resizeHandle, 'mousedown', me.onResizeHandleMousedown);
+        }
     }
-    LOG.addObjEventListener(this, this.resizeHandle, 'mousedown', this.onResizeHandleMousedown);
+    if (this.iframe.contentWindow && me.iframe.contentWindow.document) { // Konqueror needs this, the onload doesn't work (ie, fx and opera do)
+        onIframeLoad();
+    } else { // Opera needs this, the contentWindow is not ready yet (in ie, fx and konq this is not a problem)
+        this.iframe.onload = onIframeLoad();
+    }
 }
 
 LOG.setTypeName(LOG.BodyWrapper, 'LOG.BodyWrapper');
+
+LOG.BodyWrapper.prototype.onDocumentLoad = function() {
+    this.onload(this);
+}
 
 LOG.BodyWrapper.prototype.uninit = function() {
     var doc = this.ownerDocument;
@@ -129,7 +147,7 @@ LOG.BodyWrapper.prototype.onDragKeypress = function(event) {
 
 LOG.BodyWrapper.prototype.onResizeHandleMousedown = function(event) {
     this.dragging = true;
-    this.originalDelta = DOM.getPositionFromEvent(event).y - DOM.getPosition(this.bottomElement).y;
+    this.originalDelta = LOG.getPositionFromEvent(event).y - LOG.getPosition(this.bottomElement, true).y;
     this.element.style.borderColor = 'black';
     this.draggingElement = LOG.createElement(document, 'div', { style: { width: '100%', borderTop: '1px dotted black', height: 0, position: 'absolute', left: 0 } });
     this.draggingElement.style.top = ((1 - this.size) * 100) + '%';
@@ -184,7 +202,7 @@ LOG.BodyWrapper.prototype.onMousemove = function(event) {
     if (this.dragging) {
         var top = LOG.getPositionFromEvent(event).y;
         if (LOG.getElementFromEvent(event).ownerDocument == this.doc) {
-            top += LOG.getPosition(this.iframe).y;
+            top += LOG.getPosition(this.iframe, true).y;
         }
         top = (top - this.originalDelta) / LOG.getWindowInnerSize(this.ownerDocument).h;
         if (top < 0.1) {

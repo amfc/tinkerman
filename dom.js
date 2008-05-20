@@ -151,7 +151,7 @@ LOG.getPositionFromEvent = function(event) {
 
 // Gets the absolute position of the element from the body
 // It takes into account any element scroll position
-LOG.getPosition = function(obj) {
+LOG.getPosition = function(obj, dontAdjustForScroll) {
     var left = 0;
     var top = 0;
     if (obj.offsetParent) {
@@ -161,11 +161,12 @@ LOG.getPosition = function(obj) {
             obj = obj.offsetParent;
         }
     }
-    left += LOG.getBody().scrollLeft;
-    top += LOG.getBody().scrollTop;
+    if (!dontAdjustForScroll) {
+        left += LOG.getBody().scrollLeft;
+        top += LOG.getBody().scrollTop;
+    }
     return {x: left, y: top};
 }
-
 
 // Takes into account if the LOG wrapper element is active and either returns the true document's body or LOG's
 LOG.getBody = function(element) {

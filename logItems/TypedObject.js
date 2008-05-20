@@ -104,10 +104,7 @@ LOG.TypedObjectLogItem.prototype.onSrcLinkClick = function(event) {
     LOG.preventDefault(event);
 }
 
-
-LOG.TypedObjectLogItem.prototype.getTypeName = function() {
-    var value = this.value;
-    
+LOG.TypedObjectLogItem.getTypeName = function(value) {
     if (LOG.instanceOfWindow(value)) {
         return "Window";
     } else if (LOG.instanceOfDocument(value)) {
@@ -141,6 +138,10 @@ LOG.TypedObjectLogItem.prototype.getTypeName = function() {
         txt += 'Anonymous';
     }
     return txt;
+}
+
+LOG.TypedObjectLogItem.prototype.getTypeName = function() {
+    return LOG.TypedObjectLogItem.getTypeName(this.value);
 }
 
 LOG.TypedObjectLogItem.prototype.expandProperty = function(pathToProperty) {

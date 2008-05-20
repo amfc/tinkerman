@@ -1,19 +1,26 @@
-LOG.LogWindow = function() {
+LOG.LogWindow = function(callback) {
     this.window = window.open('', 'LOG_logWindow', 'resizable=yes,scrollbars=yes,status=yes');
     if (!this.window) {
         throw "Cannot create window";
     }
     this.doc = this.window.document;
     this.doc.open();
-    this.doc.write(LOG.defaultHtml);
+    var me = this;
+    this.doc.write(
+        LOG.getDefaultHtml(
+            function() {
+                me.doc.title = 'Log: ' + window.document.title;
+                if (LOG.isGecko) {
+                    me.window.onunload = me.caller('onUnload');
+                } else {
+                    me.doc.body.onunload = me.caller('onUnload');
+                }
+                me.doc.body.onkeydown = LOG.createEventHandler(me.doc, me, 'onKeyDown');
+                callback(me);
+            }
+        )
+    );
     this.doc.close();
-    this.doc.title = 'Log: ' + window.document.title;
-    if (LOG.isGecko) {
-        this.window.onunload = this.caller('onUnload');
-    } else {
-        this.doc.body.onunload = this.caller('onUnload');
-    }
-    this.doc.body.onkeydown = LOG.createEventHandler(this.doc, this, 'onKeyDown');
 }
 
 LOG.setTypeName(LOG.LogWindow, 'LOG.LogWindow');

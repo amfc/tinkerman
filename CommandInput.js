@@ -20,9 +20,10 @@ LOG.CommandInput = function(doc, useTextArea, evaluator, historyManager) {
             onmousedown: LOG.createEventHandler(doc, this, 'onInputMouseDown')
         }
     );
-    if (LOG.isIE) {
+    if (LOG.isIE || LOG.isKonq) {
         this.element.onkeydown = LOG.createEventHandler(doc, this, 'onInputKeyPressOrDown');
-    } else {
+    }
+    if (!LOG.isIE) { // Konq needs both
         this.element.onkeypress = LOG.createEventHandler(doc, this, 'onInputKeyPressOrDown');
     }
 }
@@ -109,6 +110,25 @@ LOG.CommandInput.prototype.onInputKeyPressOrDown = function(event) {
         }
         return common;
     }
+    // Konqueror and opera return normal keys with keyCode as the charCode
+    //  For Konqueror we skip them here to prevent "(" to be detected as "down" and similar
+    //  For opera it seems not to be possible, so we require control+shift to use these keys
+    //   (since control alone triggers a link navigation behaviour which doesn't seem to be
+    //   cancellable)
+    if (event.charCode) { // This only works for Konqueror, as Opera doesn't support charCode
+        return;
+    }
+    if (LOG.isKonq) {
+        if (event.keyCode == 9) {
+            if (event.type != 'keydown') {
+                return;
+            }
+        } else {
+            if (event.type == 'keydown') {
+                return;
+            }
+        }
+    }
     if (event.keyCode == 9) { // Tab
         LOG.stopPropagation(event);
         LOG.preventDefault(event);
@@ -150,11 +170,11 @@ LOG.CommandInput.prototype.onInputKeyPressOrDown = function(event) {
             var commonStartPos = currentWordAndPosition.end + commonStart.length - currentWordAndPosition.word.length;
             LOG.setTextInputSelection(this.element, [commonStartPos, commonStartPos]);
         }
-    } else if (event.keyCode == 38 && (!this.useTextArea || event.ctrlKey)) { // Up
+    } else if (event.keyCode == 38 && (!this.useTextArea || event.ctrlKey) && (!LOG.isOpera || (event.ctrlKey && event.shiftKey))) { // Up
         this.element.value = this.historyManager.up(this.element.value);
         LOG.stopPropagation(event);
         LOG.preventDefault(event);
-    } else if (event.keyCode == 40 && (!this.useTextArea || event.ctrlKey)) { // Down
+    } else if (event.keyCode == 40 && (!this.useTextArea || event.ctrlKey) && (!LOG.isOpera || (event.ctrlKey && event.shiftKey))) { // Down
         this.element.value = this.historyManager.down();
         LOG.stopPropagation(event);
         LOG.preventDefault(event);
