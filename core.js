@@ -3,6 +3,7 @@
 var LOG = {};
 LOG.dontLogResult = {}; // This is used internally to avoid logging some things
 LOG.clickedMessages = [];
+LOG.pendingLogCalls = []; // This is used to wait until the page is loaded
 
 LOG.setTypeName = function(constructor, name) {
     constructor.prototype.getTypeName = function() {
@@ -50,7 +51,12 @@ LOG.createOutlineFromElement = function(element) {
 }
 
 function Log(message, title, section, dontOpen, stackedMode) {
-    return LOG.logger.log(message, title, true, section, dontOpen, stackedMode);
+    if (LOG.logger) {
+        return LOG.logger.log(message, title, true, section, dontOpen, stackedMode);
+    } else {
+        LOG.pendingLogCalls.push([message, title, section, dontOpen, stackedMode]);
+        return message;
+    }
 }
 
 function LogAndStore(value, source) {

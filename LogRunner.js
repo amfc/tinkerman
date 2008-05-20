@@ -28,6 +28,11 @@ LOG.LogRunner.prototype.createLogger = function(doc) {
     LOG.logger.onnewwindowtoggleclick = this.caller('onLoggerNewWindowToggleClick');
     LOG.logger.onescpress = this.caller('onLoggerEscPress');
     LOG.logger.oncollapsetoggleclick = this.caller('onLoggerCollapseToggleClick');
+    
+    for (var i = 0; i < LOG.pendingLogCalls.length; ++i) {
+        Log.apply(window, LOG.pendingLogCalls[i]);
+    }
+    LOG.pendingLogCalls = [];
 }
 
 LOG.LogRunner.prototype.createWindowContainer = function() {
