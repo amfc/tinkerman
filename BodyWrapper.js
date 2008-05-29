@@ -66,10 +66,16 @@ LOG.BodyWrapper = function(ownerDocument, initialSize, startWithFixedSize, onloa
     );
     this.oldBodyOverflow = document.body.style.overflow;
     this.oldBodyMargin = document.body.style.margin;
-    this.oldHtmlHeight = document.getElementsByTagName('html')[0].style.height;
     document.body.style.overflow = 'hidden';
     document.body.style.margin = '0';
-    document.getElementsByTagName('html')[0].style.height = '100%';
+    this.oldBodyHeight = document.body.style.height;
+    if (LOG.isIE) {
+        this.oldDocScroll = document.body.scroll;
+        this.oldHtmlHeight = document.getElementsByTagName('html')[0].style.height;
+        document.getElementsByTagName('html')[0].style.height = '100%';
+        document.body.scroll = "no"; // CSS doesn't always affect the scrollbar
+    }
+    document.body.style.height = '100%';
     
     if (isNaN(initialSize) || initialSize < 0.1 || initialSize > 0.9) {
         initialSize = 0.3333333;
@@ -135,7 +141,11 @@ LOG.BodyWrapper.prototype.uninit = function() {
         function() { // otherwise IE (6, 7) crashes
             document.body.style.overflow = me.oldBodyOverflow ? me.oldBodyOverflow : '';
             document.body.style.margin = me.oldBodyMargin ? me.oldBodyMargin : '';
-            document.getElementsByTagName('html')[0].style.height = me.oldHtmlHeight;
+            document.body.style.height = me.oldBodyHeight;
+            if (LOG.isIE) {
+                document.body.scroll = me.oldDocScroll; // CSS doesn't always affect the scrollbar
+                document.getElementsByTagName('html')[0].style.height = me.oldHtmlHeight;
+            }
             LOG.removeObjEventListener(me, me.resizeHandle, 'mousedown', me.onResizeHandleMousedown);
         },
         0

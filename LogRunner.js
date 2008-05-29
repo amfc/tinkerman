@@ -92,6 +92,7 @@ LOG.LogRunner.prototype.createContainer = function(callback) {
         this.willOpenInNewWindow = false;
         if (this.container) { // there is an old window or BodyWrapper left
             this.container.uninit();
+            delete this.container;
         }
         this.createBodyWrapperContainer(
             function(container) {
@@ -155,8 +156,10 @@ LOG.LogRunner.prototype.onLoggerCollapseToggleClick = function() {
 
 LOG.LogRunner.prototype.onLoggerNewWindowToggleClick = function() {
     this.deleteContainer();
-    this.willOpenInNewWindow = !this.willOpenInNewWindow;
-    this.appendLogger();
+    if (!this.willOpenInNewWindow) { // otherwise this will be handled by onLogWindowUnload
+        this.willOpenInNewWindow = !this.willOpenInNewWindow;
+        this.appendLogger();
+    }
 }
 
 LOG.LogRunner.prototype.onLogWindowUnload = function() {
