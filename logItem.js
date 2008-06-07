@@ -92,7 +92,7 @@ LOG.instanceOfHTMLDocument = function(value) {
 }
 
 LOG.instanceOfWindow = function(value) {
-    return value.self == value && value == value.window;
+    return value && value.self == value && value == value.window;
 }
 
 
