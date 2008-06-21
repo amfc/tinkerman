@@ -29,6 +29,7 @@ LOG.LogRunner.prototype.createLogger = function(doc) {
     LOG.logger.onnewwindowtoggleclick = this.caller('onLoggerNewWindowToggleClick');
     LOG.logger.onescpress = this.caller('onLoggerEscPress');
     LOG.logger.oncollapsetoggleclick = this.caller('onLoggerCollapseToggleClick');
+    LOG.logger.onconsolerowappend = this.caller('onConsoleRowAppend');
     for (var i = 0; i < LOG.pendingLogCalls.length; ++i) {
         Log.apply(window, LOG.pendingLogCalls[i]);
     }
@@ -148,6 +149,12 @@ LOG.LogRunner.prototype.setCollapsed = function(bodyWrapper, collapsed) {
         LOG.logger.setCollapsed(collapsed);
     }
     this.collapsed = collapsed;
+}
+
+LOG.LogRunner.prototype.onConsoleRowAppend = function(console) {
+    if (console.shouldExpandOnRowAppend) {
+        this.showLogger();
+    }
 }
 
 LOG.LogRunner.prototype.onLoggerCollapseToggleClick = function() {
