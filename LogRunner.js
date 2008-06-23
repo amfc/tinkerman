@@ -259,24 +259,6 @@ LOG.LogRunner.prototype.onMouseDown = function(event) {
         LOG.logger.focusValue(element, undefined, event.altKey);
         LOG.preventDefault(event);
         LOG.stopPropagation(event);
-    } else if (LOG.getButtonFromEvent(event) == 'left' && event.altKey && event.ctrlKey) { // FIXME: iats dependancy, unmigrated
-        if (!window.Reloadable) {
-            return;
-        }
-        var element = LOG.getElementFromEvent(event);
-        var path = LOG.guessDomNodeOwnerName(LOG.getElementFromEvent(event));
-        if (path && path.pathToObject) {
-            var i = 0;
-            for (var i = path.pathToObject.length - 1; i >= 0; --i) {
-                if (path.pathToObject[i].obj instanceof window.Reloadable) { // FIXME
-                    LOG.openClassInEditor(path.pathToObject[i].obj);
-                    break;
-                }
-            }
-        }
-        LOG.preventDefault(event);
-        LOG.stopPropagation(event);
-        LOG.nextClickShouldBeStopped = true;
     } else {
         LOG.nextClickShouldBeStopped = false;
     }
