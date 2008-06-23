@@ -24,6 +24,9 @@ LOG.guessNameAsArray = function(objToFind, objectsToStartWith) {
             continue;
         }
         for (name in parentObj) {
+            if (parentObj.dontGuessNamesList && LOG.indexOf(parentObj.dontGuessNamesList, name) != -1) {
+                continue;
+            }
             try {
                 if (!parentObj[name]) {
                     continue;
