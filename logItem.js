@@ -110,6 +110,12 @@ LOG.getValueAsLogItem = function(doc, value, stackedMode, alreadyLoggedContainer
         } else if (value != null && typeof value == 'object') {
             if (LOG.instanceOfWindow(value) || LOG.instanceOfDocument(value) || value instanceof Date || value.getTypeName) {
                 return new LOG.TypedObjectLogItem(doc, value, stackedMode, alreadyLoggedContainers);
+            } else if (value.nodeType) { // DOM node
+                if (value.nodeType == 1) { // 1: element node
+                    return new LOG.HTMLElementLogItem(doc, value, stackedMode, alreadyLoggedContainers);
+                } else {
+                    return new LOG.BasicLogItem(doc, value, stackedMode, alreadyLoggedContainers);
+                }
             } else if (
                 value instanceof Array ||
                 typeof value.length != 'undefined' && (
@@ -118,12 +124,6 @@ LOG.getValueAsLogItem = function(doc, value, stackedMode, alreadyLoggedContainer
                 )
             ) {
                 return new LOG.ArrayLogItem(doc, value, stackedMode, alreadyLoggedContainers);
-            } else if (value.nodeType) { // DOM node
-                if (value.nodeType == 1) { // 1: element node
-                    return new LOG.HTMLElementLogItem(doc, value, stackedMode, alreadyLoggedContainers);
-                } else {
-                    return new LOG.BasicLogItem(doc, value, stackedMode, alreadyLoggedContainers);
-                }
             } else if (value.constructor != Object) {
                 return new LOG.TypedObjectLogItem(doc, value, stackedMode, alreadyLoggedContainers);
             } else {

@@ -68,6 +68,9 @@ LOG.Console.prototype.appendRow = function(messageHtmlFragment, title, newLineAf
         this.element.appendChild(newRow);
         this.element.parentNode.scrollTop = this.element.parentNode.scrollHeight - this.element.parentNode.offsetHeight + 1;
     }
+    if (this.onrowappend) {
+        this.onrowappend();
+    }
 }
 
 LOG.Console.prototype.clear = function() {

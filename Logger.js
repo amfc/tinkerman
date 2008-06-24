@@ -80,7 +80,7 @@ LOG.Logger = function(doc, inNewWindow, historyManager, openSectionsStr) {
     );
     
     // create the default console
-    var consoleSection = this.addConsoleSection('console');
+    var consoleSection = this.addConsoleSection('console', true);
     consoleSection.setSelected(true);
     this.defaultConsole = consoleSection.content;
     
@@ -103,6 +103,12 @@ LOG.Logger.prototype.onPanelLabelClick = function(panel, selected) {
         }
         this.setCollapsed(false);
         return !selected; // We cancel (return true) if the panel would be unselected (we want to open the panel)
+    }
+}
+
+LOG.Logger.prototype.onConsoleRowAppend = function(console) {
+    if (this.onconsolerowappend) {
+        this.onconsolerowappend(console);
     }
 }
 
@@ -238,15 +244,18 @@ LOG.Logger.prototype.onKeyDown = function(event) {
     }
 }
 
-LOG.Logger.prototype.addConsoleSection = function(sectionName) {
-    return this.addSection(sectionName, new LOG.Console(this.doc));
+LOG.Logger.prototype.addConsoleSection = function(sectionName, shouldExpandOnRowAppend) {
+    var console = new LOG.Console(this.doc);
+    console.onrowappend = (function(me) { return function() { me.onConsoleRowAppend(console) } })(this);
+    console.shouldExpandOnRowAppend = shouldExpandOnRowAppend;
+    return this.addSection(sectionName, console);
 }
 
-LOG.Logger.prototype.getOrAddConsoleSection = function(sectionName) {
+LOG.Logger.prototype.getOrAddConsoleSection = function(sectionName, shouldExpandOnRowAppend) {
     if (this.panels[sectionName]) {
         return this.panels[sectionName];
     } else {
-        return this.addConsoleSection(sectionName);
+        return this.addConsoleSection(sectionName, shouldExpandOnRowAppend);
     }
 }
 
