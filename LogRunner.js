@@ -152,7 +152,7 @@ LOG.LogRunner.prototype.setCollapsed = function(bodyWrapper, collapsed) {
 }
 
 LOG.LogRunner.prototype.onConsoleRowAppend = function(console) {
-    if (console.shouldExpandOnRowAppend) {
+    if (console.shouldExpandOnRowAppend && this.collapsed) {
         this.showLogger();
     }
 }
