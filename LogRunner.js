@@ -246,13 +246,14 @@ LOG.LogRunner.prototype.onDocumentSelectStart = function() {
 }
 
 LOG.LogRunner.prototype.onMouseDown = function(event) {
-    if (LOG.getButtonFromEvent(event) == 'left' && event.ctrlKey && event.shiftKey) {
+    // To support mac we allow left or middle click
+    if (LOG.getButtonFromEvent(event) != 'middle' && event.ctrlKey && event.shiftKey) {
         LOG.nextClickShouldBeStopped = true;
         var element = LOG.getElementFromEvent(event);
         LOG.logger.focusValue(element, undefined, event.altKey);
         LOG.preventDefault(event);
         LOG.stopPropagation(event);
-    } else if (LOG.getButtonFromEvent(event) == 'left' && event.altKey && event.ctrlKey) { // FIXME: iats dependancy, unmigrated
+    } else if (LOG.getButtonFromEvent(event) != 'middle' && event.altKey && event.ctrlKey) { // FIXME: iats dependancy, unmigrated
         if (!window.Reloadable) {
             return;
         }
