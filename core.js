@@ -36,7 +36,11 @@ LOG.createOutlineFromElement = function(element) {
     div.style.position = 'absolute';
     div.style.width = element.offsetWidth + 'px';
     div.style.height = element.offsetHeight + 'px';
-    var pos = LOG.getPosition(element);
+    try {
+        var pos = LOG.getPosition(element);
+    } catch (e) { // ie sometimes throws exceptions (it happened with iframes) while accessing offsetParent
+        var pos = { x: 0, y: 0 };
+    }
     div.style.left = pos.x + 'px';
     div.style.top = pos.y + 'px';
     var labelElement = document.createElement('label');
