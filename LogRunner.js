@@ -190,7 +190,7 @@ LOG.LogRunner.prototype.onKeyDown = function(event) {
             this.stopDebugging = false;
             this.createAndAppendLogger();
         }
-        this.showLogger();
+        this.showLogger(true);
         LOG.preventDefault(event);
         LOG.stopPropagation(event);
     } else if (event.altKey && event.shiftKey && chr == 't') {
@@ -200,12 +200,14 @@ LOG.LogRunner.prototype.onKeyDown = function(event) {
     }
 }
 
-LOG.LogRunner.prototype.showLogger = function() {
+LOG.LogRunner.prototype.showLogger = function(alsoFocus) {
     if (!this.willOpenInNewWindow) {
         this.setCollapsed(this.container, false);
+        this.container.show();
     }
-    this.container.show();
-    LOG.logger.focus();
+    if (alsoFocus) {
+        LOG.logger.focus();
+    }
 }
 
 LOG.LogRunner.prototype.hide = function() {
