@@ -84,6 +84,13 @@ LOG.PanelManager.prototype.onPanelLabelClick = function(logPanel, selected) {
     }
 }
 
+LOG.PanelManager.prototype.remove = function(logPanel) { // FIXME: remove the extra space between panels
+    var index = LOG.indexOf(this.panels, logPanel);
+    this.panels.splice(index, 1);
+    this.panelLabels.removeChild(logPanel.labelElement);
+    this.panelElements.removeChild(logPanel.panelElement);
+}
+
 LOG.PanelManager.prototype.add = function(logPanel) {
     if (this.panelLabels.childNodes.length > 0) {
         this.panelLabels.appendChild(this.doc.createTextNode(' '));

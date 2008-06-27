@@ -278,6 +278,11 @@ LOG.Logger.prototype.addSection = function(sectionName, content) {
     return panel;
 }
 
+LOG.Logger.prototype.removeSection = function(sectionName) {
+    this.panelManager.remove(this.panels[sectionName]);
+    delete this.panels[sectionName];
+}
+
 LOG.Logger.prototype.onClearClick = function(event) {
     LOG.stopPropagation(event);
     LOG.preventDefault(event);
