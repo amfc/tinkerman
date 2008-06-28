@@ -136,24 +136,45 @@ LOG.getChildNodeNumber = function(domNode) {
     return null;
 }
 
-LOG.guessDomNodeOwnerName = function(domNode, objectsToStartWith) {
+LOG.guessDomNodeOwnerName = function(domNode, objectsToStartWith) { // FIXME: iats specific
     if (domNode == null) {
         return null;
     } else {
-        var path = LOG.guessNameAsArray(domNode, objectsToStartWith);
-        if (path == null) {
-            var returnValue = LOG.guessDomNodeOwnerName(domNode.parentNode, objectsToStartWith);
-            if (returnValue == null) {
-                return null;
+        if (domNode.nodeType) {
+            var currentDomNode = domNode;
+            var steps = [];
+            while (currentDomNode && !currentDomNode.parentWidget) {
+                steps.unshift(LOG.getChildNodeNumber(currentDomNode));
+                currentDomNode = currentDomNode.parentNode;
             }
-            returnValue.pathToElement.push(LOG.getChildNodeNumber(domNode));
-            return returnValue;
-        } else {
+            var parentWidget = currentDomNode ? currentDomNode.parentWidget : null;
+            if (parentWidget) {
+                for (var prop in parentWidget) {
+                    if (parentWidget[prop] == domNode) {
+                        var path = LOG.guessNameAsArray(parentWidget, objectsToStartWith);
+                        return {
+                            pathToObject: path.concat(
+                                {
+                                    obj: domNode,
+                                    name: prop,
+                                    parent: path[path.length - 1].obj
+                                }
+                            ),
+                            pathToElement: []
+                        };
+                    }
+                }
+            }
+            var path = LOG.guessNameAsArray(currentDomNode, objectsToStartWith);
             return {
                 pathToObject: path,
+                pathToElement: steps
+            };
+        } else {
+            return {
+                pathToObject: LOG.guessNameAsArray(parentWidget, objectsToStartWith),
                 pathToElement: []
-            }
-            return path;
+            };
         }
     }
 }
