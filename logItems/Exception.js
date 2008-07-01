@@ -187,10 +187,21 @@ LOG.ExceptionLogItem.prototype.getStackHtmlElement = function(fileName, lineNumb
 
 // FIXME: iats dependency: this should be done from outside
 LOG.ExceptionLogItem.getFileLink = function(ownerDoc, fileName, lineNumber) { // this is available to use from outside
+    var onClickListener = {
+        onClick: function(event) {
+            if (OPEN_FILES_ON_SERVER) {
+                LOG.preventDefault(event);
+                var request = LOG.createHttpRequest();
+                request.open('GET', 'openFile.php?file=' + escape(fileName) + '&line=' + lineNumber + '&onServer=1', false);
+                request.send(null);
+            }
+        }
+    };
     return LOG.createElement(
         ownerDoc, 'a',
         {
-            href: 'openFile.php?file=' + escape(fileName) + '&line=' + lineNumber
+            href: 'openFile.php?file=' + escape(fileName) + '&line=' + lineNumber,
+            onclick: LOG.createEventHandler(ownerDoc, onClickListener, 'onClick')
         },
         [
             fileName + ' line ' + lineNumber
