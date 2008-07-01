@@ -52,7 +52,8 @@ LOG.PathToObjectPart = function(doc, value, pathPartName) {
                 me.hideElementOutline();
             },
             onmousedown: LOG.createEventHandler(this.doc, this, 'onLinkMouseDown'),
-            onclick: LOG.createEventHandler(this.doc, this, 'onLinkClick')
+            onclick: LOG.createEventHandler(this.doc, this, 'onLinkClick'),
+            title: value.getClassName ? value.getClassName() : ''
         },
         [ pathPartName ]
     );
