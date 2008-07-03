@@ -96,6 +96,54 @@ LOG.instanceOfWindow = function(value) {
 }
 
 
+LOG.asText = function(value) {
+    if (value != null && typeof value == 'object') {
+        if (LOG.instanceOfWindow(value) || LOG.instanceOfDocument(value) || value instanceof Date || value.getTypeName) {
+            return '<<' + LOG.TypedObjectLogItem.getTypeName(value) + '>>';
+        } else if (value.nodeType) { // DOM node
+            if (value.nodeType == 1) { // 1: element node
+                return '<' + value.tagName + '>';
+            } else {
+                return '<<' + value.nodeName + '>>';
+            }
+        } else if (
+            value instanceof Array ||
+            typeof value.length != 'undefined' && (
+                value.item || // DOM collections
+                value.slice && value.pop && value.push // Arrays from other windows (in konq all arrays which are logged)
+            )
+        ) {
+            var out = '[';
+            for (var i = 0; i < value.length; ++i) {
+                if (i > 0) {
+                    out += ', ';
+                }
+                out += LOG.logAsText(value[i]);
+            }
+            out += ']';
+            return out;
+        } else if (value.constructor != Object) {
+            return '<<' + LOG.TypedObjectLogItem.getTypeName(value) + '>>';
+        } else {
+            var out = '{';
+            for (var prop in value) {
+                if (i > 0) {
+                    out += ', ';
+                }
+                out += prop + ':' + LOG.logAsText(value[prop]);
+            }
+            out += '}';
+            return out;
+        }
+    } else if (typeof value == 'function') {
+        return 'func'
+    } else if (typeof value == 'string') {
+        return '"' + value.toString() + '"';
+    } else {
+        return value.toString();
+    }
+}
+
 LOG.getValueAsLogItem = function(doc, value, stackedMode, alreadyLoggedContainers, showFirstLevelObjectChildren, showExpandObjectChildren) {
     // Simple object (used as hash tables), array, html element and typed objects are special (since they are implemented as separate objects) and should be handled separately
     if (!alreadyLoggedContainers) {
