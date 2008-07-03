@@ -11,6 +11,21 @@ LOG.ExceptionLogItem = function(doc, value) {
     } else {
         this.stack = this.value.stack;
     }
+    var exceptionName = 'Exception';
+    try {
+        exceptionName = value.name;
+    } catch (e) {
+    }
+    
+    var exceptionMessage = 'Could not access message';
+    try {
+        exceptionMessage = value.message;
+    } catch (e) {
+        try {
+            exceptionMessage = value.toString();
+        } catch (e) {
+        }
+    }
     
     this.element = LOG.createElement(
         this.doc, 'span',
@@ -36,10 +51,10 @@ LOG.ExceptionLogItem = function(doc, value) {
                     },
                     onclick: LOG.createEventHandler(this.doc, this, 'onNameLinkClik')
                 },
-                [ value.name ? value.name : 'Exception' ]
+                [ exceptionName ]
             ),
             ' ',
-            value.message ? value.message : value.toString(),
+            exceptionMessage,
             LOG.isGecko ? ' in ' : null,
             (LOG.isGecko && this.value.fileName) ? this.getFileLink(this.getLocalFile(this.value.fileName), this.value.lineNumber) : null,
             ' ',
