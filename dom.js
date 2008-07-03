@@ -266,7 +266,7 @@ LOG.createElement = function(ownerDocument, tagName, attributes, childNodes) {
             if (childNodes[i] === null) {
                 continue;
             } else if (typeof childNodes[i] == 'string' || typeof childNodes[i] == 'number') {
-                element.appendChild(ownerDocument.createTextNode(childNodes[i]));
+                element.appendChild(ownerDocument.createTextNode(childNodes[i].toString())); // the toString here is needed since sometimes in ie7 some things which are strings cannot be used for parameters to createTextNode
             } else {
                 element.appendChild(childNodes[i]);
             }
