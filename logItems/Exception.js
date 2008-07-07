@@ -13,13 +13,17 @@ LOG.ExceptionLogItem = function(doc, value) {
     }
     var exceptionName = 'Exception';
     try {
-        exceptionName = value.name;
+        if (value.name) {
+            exceptionName = value.name;
+        }
     } catch (e) {
     }
     
     var exceptionMessage = 'Could not access message';
     try {
-        exceptionMessage = value.message;
+        if (value.message) {
+            exceptionMessage = value.message;
+        }
     } catch (e) {
         try {
             exceptionMessage = value.toString();
