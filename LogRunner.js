@@ -1,4 +1,5 @@
 LOG.LogRunner = function() {
+    LOG.n = 0;
     this.doc = document;
     this.willOpenInNewWindow = LOG.getCookie('LOG_IN_NEW_WINDOW') == 'true';
     this.historyManager = new LOG.HistoryManager(LOG.getCookie('LOG_HISTORY'));

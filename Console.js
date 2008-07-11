@@ -2,7 +2,6 @@ LOG.Console = function(doc) {
     this.maxCount = 1000;
     this.append = true;
     this.stopDebugging = false;
-    this.n = 0;
     this.doc = doc;
     this.stackedMode = true;
     this.count = 0;
@@ -33,7 +32,7 @@ LOG.Console.prototype.appendRow = function(messageHtmlFragment, title, newLineAf
     } else {
         this.count++;
     }
-    this.n++;
+    LOG.n++;
     newRow.style.fontFamily = 'terminus, monospace';
     newRow.style.color = 'black';
     newRow.style.borderBottom = '1px solid #aaaaaa';
@@ -49,7 +48,7 @@ LOG.Console.prototype.appendRow = function(messageHtmlFragment, title, newLineAf
         newRow.style.backgroundColor = '#fff3f2';
     }
     var em = this.doc.createElement('em');
-    em.appendChild(this.doc.createTextNode(this.n));
+    em.appendChild(this.doc.createTextNode(LOG.n));
     newRow.appendChild(em);
     newRow.appendChild(this.doc.createTextNode(': '));
     
