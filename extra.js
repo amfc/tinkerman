@@ -28,3 +28,7 @@ LOG.openClassInEditor = function(value) {
         document.location = 'openClass.php?fileName=' + escape(Package.getFileName(packageName)) + '&class=' + escape(className);
     }
 }
+
+LOG.openPhpMethodInEditor = function(className, method) {
+    document.location = 'openMethod.php?fileName=' + escape('actions/' + className + '.php') + '&method=' + escape(method) + '&class=' + escape(className);
+}
