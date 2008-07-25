@@ -152,8 +152,8 @@ LOG.LogRunner.prototype.setCollapsed = function(bodyWrapper, collapsed) {
     this.collapsed = collapsed;
 }
 
-LOG.LogRunner.prototype.onConsoleRowAppend = function(console) {
-    if (console.shouldExpandOnRowAppend && this.collapsed) {
+LOG.LogRunner.prototype.onConsoleRowAppend = function(console, dontOpen) {
+    if (!dontOpen && console.shouldExpandOnRowAppend && this.collapsed) {
         this.showLogger();
     }
 }

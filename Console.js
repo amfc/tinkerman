@@ -18,7 +18,7 @@ LOG.Console.prototype.getWindow = function() {
     }
 }
 
-LOG.Console.prototype.appendRow = function(messageHtmlFragment, title, newLineAfterTitle, titleColor) {
+LOG.Console.prototype.appendRow = function(messageHtmlFragment, title, newLineAfterTitle, titleColor, dontOpen) {
     var newRow = this.doc.createElement('div');
     if (this.stopDebugging) {
         return;
@@ -68,7 +68,7 @@ LOG.Console.prototype.appendRow = function(messageHtmlFragment, title, newLineAf
         this.element.parentNode.scrollTop = this.element.parentNode.scrollHeight - this.element.parentNode.offsetHeight + 1;
     }
     if (this.onrowappend) {
-        this.onrowappend();
+        this.onrowappend(dontOpen);
     }
 }
 

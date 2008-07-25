@@ -106,9 +106,9 @@ LOG.Logger.prototype.onPanelLabelClick = function(panel, selected) {
     }
 }
 
-LOG.Logger.prototype.onConsoleRowAppend = function(console) {
+LOG.Logger.prototype.onConsoleRowAppend = function(console, dontOpen) {
     if (this.onconsolerowappend) {
-        this.onconsolerowappend(console);
+        this.onconsolerowappend(console, dontOpen);
     }
 }
 
@@ -182,7 +182,8 @@ LOG.Logger.prototype.log = function(message, title, newLineAfterTitle, sectionNa
         ),
         title,
         newLineAfterTitle,
-        null
+        null,
+        dontOpen
     );
     if (!dontOpen) {
         section.setSelected(true);
@@ -246,7 +247,7 @@ LOG.Logger.prototype.onKeyDown = function(event) {
 
 LOG.Logger.prototype.addConsoleSection = function(sectionName, shouldExpandOnRowAppend) {
     var console = new LOG.Console(this.doc);
-    console.onrowappend = (function(me) { return function() { me.onConsoleRowAppend(console) } })(this);
+    console.onrowappend = (function(me) { return function(dontOpen) { me.onConsoleRowAppend(console, dontOpen) } })(this);
     console.shouldExpandOnRowAppend = shouldExpandOnRowAppend;
     return this.addSection(sectionName, console);
 }
