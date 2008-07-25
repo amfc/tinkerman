@@ -152,6 +152,9 @@ LOG.guessDomNodeOwnerName = function(domNode, objectsToStartWith) { // FIXME: ia
                 for (var prop in parentWidget) {
                     if (parentWidget[prop] == domNode) {
                         var path = LOG.guessNameAsArray(parentWidget, objectsToStartWith);
+                        if (!path) {
+                            return null;
+                        }
                         return {
                             pathToObject: path.concat(
                                 {
