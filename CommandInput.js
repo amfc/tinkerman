@@ -34,22 +34,21 @@ LOG.CommandInput.prototype.onInputMouseDown = function(event) {
     LOG.stopPropagation(event);
 }
 
-LOG.CommandInput.prototype.getCurrentExpression = function() {
+LOG.CommandInput.prototype.getCurrentExpression = function(code, position) {
     function skipString(quote) {
         for (--startWordPos; startWordPos > 0; --startWordPos) {
-            if (value.charAt(startWordPos) == quote && value.charAt(startWordPos - 1) != '\\') {
+            if (code.charAt(startWordPos) == quote && code.charAt(startWordPos - 1) != '\\') {
                 return;
             }
         }
         throw 'unterminated string';
     }
     
-    var endWordPos = LOG.getTextInputSelection(this.element)[0];
+    var endWordPos = position;
     var startWordPos = endWordPos;
-    var value = this.element.value;
     var depth = 0, chr, bracketDepth = 0;
     while (startWordPos > 0) {
-        chr = value.charAt(startWordPos - 1);
+        chr = code.charAt(startWordPos - 1);
         if (chr == ')') {
             ++depth;
         } else if (chr == '(') {
@@ -71,7 +70,7 @@ LOG.CommandInput.prototype.getCurrentExpression = function() {
         }
         --startWordPos;
     }
-    return value.substr(startWordPos, endWordPos - startWordPos);
+    return code.substr(startWordPos, endWordPos - startWordPos);
 }
 
 LOG.CommandInput.prototype.getCurrentWordAndPosition = function() {
@@ -93,7 +92,7 @@ LOG.CommandInput.prototype.getCurrentWordAndPosition = function() {
     }
 }
 
-LOG.CommandInput.prototype.onInputKeyPressOrDown = function(event) {
+LOG.CommandInput.prototype.suggestJs = function(code, currentPosition) {
     function getCommonStart(list) {
         var common = list[0];
         var j;
@@ -110,6 +109,50 @@ LOG.CommandInput.prototype.onInputKeyPressOrDown = function(event) {
         }
         return common;
     }
+    
+    var currentExpression = this.getCurrentExpression(code, currentPosition);
+    var currentWordAndPosition = this.getCurrentWordAndPosition();
+    var names;
+    if (currentExpression == currentWordAndPosition.word) {
+        names = LOG.getObjectProperties(window).concat(
+            [
+                'escape', 'unescape', 'encodeURI', 'decodeURI', 'encodeURIComponent',
+                'decodeURIComponent', 'isFinite', 'isNaN', 'Number', 'eval', 'parseFloat',
+                'parseInt', 'String', 'Infinity', 'undefined', 'NaN', 'true', 'false'
+            ]
+        );
+    } else {
+        var script = currentExpression.substr(0, currentExpression.length - currentWordAndPosition.word.length);
+        if (script.charAt(script.length - 1) == '.') {
+            script = script.substr(0, script.length - 1);
+        }
+        var result = this.evaluator.evalScript(script);
+        if (typeof result != 'object' || result == LOG.dontLogResult) {
+            return;
+        }
+        names = LOG.getObjectProperties(result);
+    }
+    var matches = this.getNamesStartingWith(currentWordAndPosition.word, names);
+    var newPosition = currentPosition;
+    var newCode = code;
+    if (matches.length > 0) {
+        var commonStart = getCommonStart(matches);
+        if (commonStart.length > currentWordAndPosition.word.length) {
+            newCode = code.substr(0, currentWordAndPosition.end) +
+                commonStart.substr(currentWordAndPosition.word.length) +
+                code.substr(currentWordAndPosition.end)
+            ;
+            newPosition = currentWordAndPosition.end + commonStart.length - currentWordAndPosition.word.length;
+        }
+    }
+    return {
+        matches: matches,
+        newCode: newCode,
+        newPosition: newPosition
+    }
+}
+
+LOG.CommandInput.prototype.onInputKeyPressOrDown = function(event) {
     // Konqueror and opera return normal keys with keyCode as the charCode
     //  For Konqueror we skip them here to prevent "(" to be detected as "down" and similar
     //  For opera it seems not to be possible, so we require control+shift to use these keys
@@ -132,43 +175,11 @@ LOG.CommandInput.prototype.onInputKeyPressOrDown = function(event) {
     if (event.keyCode == 9) { // Tab
         LOG.stopPropagation(event);
         LOG.preventDefault(event);
-        var currentExpression = this.getCurrentExpression();
-        var currentWordAndPosition = this.getCurrentWordAndPosition();
-        var names;
-        if (currentExpression == currentWordAndPosition.word) {
-            names = LOG.getObjectProperties(window).concat(
-                [
-                    'escape', 'unescape', 'encodeURI', 'decodeURI', 'encodeURIComponent',
-                    'decodeURIComponent', 'isFinite', 'isNaN', 'Number', 'eval', 'parseFloat',
-                    'parseInt', 'String', 'Infinity', 'undefined', 'NaN', 'true', 'false'
-                ]
-            );
-        } else {
-            var script = currentExpression.substr(0, currentExpression.length - currentWordAndPosition.word.length);
-            if (script.charAt(script.length - 1) == '.') {
-                script = script.substr(0, script.length - 1);
-            }
-            var result = this.evaluator.evalScript(script);
-            if (typeof result != 'object' || result == LOG.dontLogResult) {
-                return;
-            }
-            names = LOG.getObjectProperties(result);
-        }
-        var matches = this.getNamesStartingWith(currentWordAndPosition.word, names);
-        if (matches.length == 0) {
-            return;
-        }
-        if (matches.length > 1) {
-            Log(matches, 'Matches');
-        }
-        var commonStart = getCommonStart(matches);
-        if (commonStart.length > currentWordAndPosition.word.length) {
-            this.element.value = this.element.value.substr(0, currentWordAndPosition.end) +
-                commonStart.substr(currentWordAndPosition.word.length) +
-                this.element.value.substr(currentWordAndPosition.end)
-            ;
-            var commonStartPos = currentWordAndPosition.end + commonStart.length - currentWordAndPosition.word.length;
-            LOG.setTextInputSelection(this.element, [commonStartPos, commonStartPos]);
+        var suggestion = this.suggestJs(this.element.value, LOG.getTextInputSelection(this.element)[0]);
+        LOG.setTextInputSelection(this.element, [suggestion.newPosition, suggestion.newPosition]);
+        this.element.value = suggestion.newCode;
+        if (suggestion.matches.length > 1) {
+            Log(suggestion.matches, 'Matches');
         }
     } else if (event.keyCode == 38 && (!this.useTextArea || event.ctrlKey) && (!LOG.isOpera || (event.ctrlKey && event.shiftKey))) { // Up
         this.element.value = this.historyManager.up(this.element.value);

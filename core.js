@@ -100,3 +100,19 @@ LOG.createHttpRequest = function() {
         throw "Can't create XMLHttpRequest";
     }
 }
+
+
+// Extension prefixes for commands
+
+LOG.extensions = {};
+
+/*
+
+example:
+
+LOG.extensions.php = {
+    exec: function() { eval in php... },
+    suggest: function(code, currentPosition) {  return { matches: [ 'option1', 'option2', etc ], newCode: 'var x = pepe', newPosition: 12 } }
+}
+
+*/
