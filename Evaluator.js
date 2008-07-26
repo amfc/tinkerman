@@ -4,6 +4,8 @@ LOG.Evaluator = function(logger) {
 
 LOG.setTypeName(LOG.Evaluator, 'LOG.Evaluator');
 
+LOG.Evaluator.prototype.extensions = {};
+
 LOG.Evaluator.prototype.evalScriptAndPrintResults = function($script) {
     var result = this.evalScript($script);
     if (result !== LOG.dontLogResult) {
@@ -33,6 +35,11 @@ LOG.Evaluator.prototype.evalScript = function($script) {
             'Help'
         );
         return LOG.dontLogResult;
+    }
+    for (var prefix in this.extensions) {
+        if ($script.substr(0, prefix.length + 1) == prefix + ':') {
+            return this.extensions[prefix]($script.substr(prefix.length + 1));
+        }
     }
     try {
         var vars = {
