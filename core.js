@@ -83,7 +83,7 @@ function LogE(expression) {
 function LogError(e) {
     var logItem = new LOG.ExceptionLogItem(LOG.logger.doc, e);
     LOG.logger.defaultConsole.appendRow(
-        logItem.element,
+        logItem,
         'error',
         true,
         'red'

@@ -23,7 +23,7 @@ LOG.SingleLogItemSection.prototype.focusValue = function(value, dontLog, panel, 
     if (!dontLog) {
         // Log the path into the console panel
         var logItem = new LOG.PathToObjectLogItem(this.doc, path, dontSeparateBySpaces);
-        LOG.logger.defaultConsole.appendRow(logItem.element);
+        LOG.logger.defaultConsole.appendRow(logItem);
     }
     if (path && this.selected) {
         if (this.logItem.value == path.pathToObject[0].obj) {
