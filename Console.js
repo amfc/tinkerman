@@ -1,11 +1,11 @@
 LOG.Console = function(doc) {
     this.maxCount = 1000;
-    this.append = true;
     this.stopDebugging = false;
     this.doc = doc;
     this.stackedMode = true;
     this.count = 0;
     this.element = LOG.createElement(doc, 'div');
+    this.historyLogItems = [];
 }
 
 LOG.setTypeName(LOG.Console, 'LOG.Console');
@@ -24,11 +24,8 @@ LOG.Console.prototype.appendRow = function(logItem, title, newLineAfterTitle, ti
         return;
     }
     if (this.count >= this.maxCount) {
-        if (!this.append) {
-            this.element.removeChild(this.element.lastChild);
-        } else {
-            this.element.removeChild(this.element.firstChild);
-        }
+        this.element.removeChild(this.element.firstChild);
+        this.historyLogItems.shift();
     } else {
         this.count++;
     }
@@ -61,15 +58,16 @@ LOG.Console.prototype.appendRow = function(logItem, title, newLineAfterTitle, ti
         newRow.appendChild(strong);
     }
     newRow.appendChild(logItem.element);
-    if (!this.append) {
-        this.element.insertBefore(newRow, this.element.firstChild);
-    } else {
-        this.element.appendChild(newRow);
-        this.element.parentNode.scrollTop = this.element.parentNode.scrollHeight - this.element.parentNode.offsetHeight + 1;
-    }
+    this.element.appendChild(newRow);
+    this.element.parentNode.scrollTop = this.element.parentNode.scrollHeight - this.element.parentNode.offsetHeight + 1;
+    this.historyLogItems.push(logItem);
     if (this.onrowappend) {
         this.onrowappend(dontOpen);
     }
+}
+
+LOG.Console.prototype.getLastLogItemLogged = function() {
+    return this.historyLogItems[this.historyLogItems.length - 1];
 }
 
 LOG.Console.prototype.clear = function() {
