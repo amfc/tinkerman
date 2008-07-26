@@ -18,7 +18,7 @@ LOG.Console.prototype.getWindow = function() {
     }
 }
 
-LOG.Console.prototype.appendRow = function(messageHtmlFragment, title, newLineAfterTitle, titleColor, dontOpen) {
+LOG.Console.prototype.appendRow = function(logItem, title, newLineAfterTitle, titleColor, dontOpen) {
     var newRow = this.doc.createElement('div');
     if (this.stopDebugging) {
         return;
@@ -60,7 +60,7 @@ LOG.Console.prototype.appendRow = function(messageHtmlFragment, title, newLineAf
         strong.appendChild(this.doc.createTextNode(title + ': ' + (newLineAfterTitle ? '\n' : '')));
         newRow.appendChild(strong);
     }
-    newRow.appendChild(messageHtmlFragment);
+    newRow.appendChild(logItem.element);
     if (!this.append) {
         this.element.insertBefore(newRow, this.element.firstChild);
     } else {

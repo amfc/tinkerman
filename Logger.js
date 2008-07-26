@@ -147,13 +147,23 @@ LOG.Logger.prototype.serializeOpenSections = function() {
 LOG.setTypeName(LOG.Logger, 'LOG.Logger');
 
 LOG.Logger.prototype.logText = function(text, title) {
-    this.defaultConsole.appendRow(this.doc.createTextNode(text), title);
+    this.defaultConsole.appendRow(
+        LOG.getValueAsLogItem(
+            this.doc,
+            text,
+            null,
+            undefined,
+            true,
+            true
+        ),
+        title
+    );
 }
 
 LOG.Logger.prototype.logException = function(exception, title) {
     var logItem = new LOG.ExceptionLogItem(this.doc, exception);
     this.defaultConsole.appendRow(
-        logItem.element,
+        logItem,
         title,
         true,
         'red'
@@ -162,7 +172,7 @@ LOG.Logger.prototype.logException = function(exception, title) {
 
 LOG.Logger.prototype.logObjectSource = function(object, title) {
     var logItem = new LOG.ObjectLogItem(this.doc, object, this.stackedMode);
-    this.defaultConsole.appendRow(logItem.element, title);
+    this.defaultConsole.appendRow(logItem, title);
     return LOG.dontLogResult;
 }
 
@@ -172,7 +182,7 @@ LOG.Logger.prototype.log = function(message, title, newLineAfterTitle, sectionNa
     }
     var section = this.getOrAddConsoleSection(sectionName);
     section.content.appendRow(
-        LOG.getValueAsHtmlElement(
+        LOG.getValueAsLogItem(
             this.doc,
             message,
             stackedMode == undefined ? this.stackedMode : stackedMode,
@@ -203,7 +213,7 @@ LOG.Logger.prototype.logAndStore = function(value, source) {
     if (source) {
         this.logObjectSource(value, null, this.stackedMode);
     } else {
-        this.defaultConsole.appendRow(LOG.getValueAsHtmlElement(this.doc, value, this.stackedMode, undefined, true));
+        this.defaultConsole.appendRow(LOG.getValueAsLogItem(this.doc, value, this.stackedMode, undefined, true));
     }
 
     if (this.commandEditor.commandInput.element.value == '' || this.commandEditor.commandInput.element.value.match(/^\$[0-9]+$/)) {
