@@ -116,3 +116,12 @@ LOG.extensions.php = {
 }
 
 */
+
+LOG.getExtensionFromCode = function(code) {
+    for (var prefix in LOG.extensions) {
+        if (code.substr(0, prefix.length + 1) == prefix + ':') {
+            return LOG.extensions[prefix];
+        }
+    }
+    return null;
+}
