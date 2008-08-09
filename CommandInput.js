@@ -118,7 +118,6 @@ LOG.CommandInput.prototype.autoChooseSuggestion = function(code, currentWordAndP
                 code.substr(currentWordAndPosition.end)
             ;
             position = currentWordAndPosition.end + commonStart.length - currentWordAndPosition.word.length;
-            Log(position);
         }
     }
     return {
