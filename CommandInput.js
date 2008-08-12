@@ -145,7 +145,7 @@ LOG.CommandInput.prototype.suggestJs = function(code, currentPosition) {
             script = script.substr(0, script.length - 1);
         }
         var result = this.evaluator.evalScript(script);
-        if (typeof result != 'object' || result == LOG.dontLogResult) {
+        if ((typeof result != 'object' && typeof result != 'function') || result == LOG.dontLogResult) {
             return;
         }
         names = LOG.getObjectProperties(result);
@@ -181,6 +181,9 @@ LOG.CommandInput.prototype.onInputKeyPressOrDown = function(event) {
         var extension = LOG.getExtensionFromCode(value);
         var me = this;
         function handleSuggestion(suggestion) {
+            if (!suggestion) {
+                return;
+            }
             me.element.value = suggestion.newCode;
             LOG.setTextInputSelection(me.element, [suggestion.newPosition, suggestion.newPosition]);
             if (suggestion.matches.length > 1) {
