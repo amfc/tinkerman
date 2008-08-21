@@ -108,7 +108,6 @@ LOG.CommandInput.prototype.autoChooseSuggestion = function(code, currentWordAndP
         }
         return common;
     }
-
     var position = currentWordAndPosition.end;
     if (matches.length > 0) {
         var commonStart = getCommonStart(matches);
@@ -152,6 +151,50 @@ LOG.CommandInput.prototype.suggestJs = function(code, currentPosition) {
     }
     var matches = this.getNamesStartingWith(currentWordAndPosition.word, names);
     return this.autoChooseSuggestion(code, currentWordAndPosition, matches);
+}
+
+LOG.CommandInput.prototype.getValidPath = function(pathString) {
+    var regexpSimpleName = /^([a-z_$][a-z_$0-9]*)$/i;
+    var regexpSimpleNameStartingWithPoint = /\.([a-z_$][a-z_$0-9]*)$/i;
+    var regexpStringInBracketsWithSimpleQuote = /\[\'[^\]]+\'\]$/;
+    var regexpStringInBracketsWithDoubleQuote = /\[\"[^\]]+\"\]$/;
+    var regexpNumberInBrackets = /\[[0-9]+\]$/;
+    
+    function prepareMatchToReturn(match, str) {
+        return [
+            match[1],
+            str.substr(0, str.length - match[0].length)
+        ];
+    }
+    
+    function extractItem(str) {
+        var match;
+        if (match = str.match(regexpSimpleNameStartingWithPoint)) {
+            return prepareMatchToReturn(match, str);
+        } else if (match = str.match(regexpStringInBracketsWithSimpleQuote)) {
+            return prepareMatchToReturn(match, str);
+        } else if (match = str.match(regexpStringInBracketsWithDoubleQuote)) {
+            return prepareMatchToReturn(match, str);
+        } else if (match = str.match(regexpNumberInBrackets)) {
+            return prepareMatchToReturn(match, str);
+        } else {
+            return null;
+        }
+    }
+
+    var parts = [];
+    while (partAndRestOfPath = extractItem(pathString)) {
+        parts.unshift(partAndRestOfPath[0]);
+        pathString = partAndRestOfPath[1];
+        
+        //~ Log({pathString: pathString, parts: parts, partAndRestOfPath: partAndRestOfPath }, 'partAndRestOfPath');
+        
+        if (pathString.match(regexpSimpleName)) {
+            parts.unshift(pathString);
+            return parts.splice(0, parts.length - 1);
+        }
+    }
+    return null;
 }
 
 LOG.CommandInput.prototype.onInputKeyPressOrDown = function(event) {
