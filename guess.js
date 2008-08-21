@@ -136,49 +136,23 @@ LOG.getChildNodeNumber = function(domNode) {
     return null;
 }
 
-LOG.guessDomNodeOwnerName = function(domNode, objectsToStartWith) { // FIXME: iats specific
-    if (domNode == null) {
-        return null;
-    } else {
-        if (domNode.nodeType) {
-            var currentDomNode = domNode;
-            var steps = [];
-            while (currentDomNode && !currentDomNode.parentWidget) {
-                steps.unshift(LOG.getChildNodeNumber(currentDomNode));
-                currentDomNode = currentDomNode.parentNode;
-            }
-            var parentWidget = currentDomNode ? currentDomNode.parentWidget : null;
-            if (parentWidget) {
-                for (var prop in parentWidget) {
-                    if (parentWidget[prop] == domNode) {
-                        var path = LOG.guessNameAsArray(parentWidget, objectsToStartWith);
-                        if (!path) {
-                            return null;
-                        }
-                        return {
-                            pathToObject: path.concat(
-                                {
-                                    obj: domNode,
-                                    name: prop,
-                                    parent: path[path.length - 1].obj
-                                }
-                            ),
-                            pathToElement: []
-                        };
-                    }
-                }
-            }
-            var path = LOG.guessNameAsArray(currentDomNode, objectsToStartWith);
+LOG.guessDomNodeOwnerName = function(domNode, objectsToStartWith) {
+    var currentDomNode = domNode;
+    var steps = [];
+    while (currentDomNode && currentDomNode.nodeType == 1) {
+        var path = LOG.guessNameAsArray(currentDomNode, objectsToStartWith);
+        if (path) {
             return {
                 pathToObject: path,
                 pathToElement: steps
             };
-        } else {
-            return {
-                pathToObject: LOG.guessNameAsArray(parentWidget, objectsToStartWith),
-                pathToElement: []
-            };
         }
+        if (!currentDomNode.parentNode) {
+            return null;
+        }
+        steps.unshift(LOG.getChildNodeNumber(currentDomNode));
+        currentDomNode = currentDomNode.parentNode;
     }
+    return null;
 }
 
