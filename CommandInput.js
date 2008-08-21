@@ -110,6 +110,8 @@ LOG.CommandInput.prototype.suggestJs = function(code, currentPosition) {
         return common;
     }
     
+    var lastItemLogged = LOG.logger.defaultConsole.getLastLogItemLogged();
+    
     var currentExpression = this.getCurrentExpression(code, currentPosition);
     var currentWordAndPosition = this.getCurrentWordAndPosition();
     var names;
@@ -135,6 +137,7 @@ LOG.CommandInput.prototype.suggestJs = function(code, currentPosition) {
     var matches = this.getNamesStartingWith(currentWordAndPosition.word, names);
     var newPosition = currentPosition;
     var newCode = code;
+    
     if (matches.length > 0) {
         var commonStart = getCommonStart(matches);
         if (commonStart.length > currentWordAndPosition.word.length) {
@@ -144,12 +147,72 @@ LOG.CommandInput.prototype.suggestJs = function(code, currentPosition) {
             ;
             newPosition = currentWordAndPosition.end + commonStart.length - currentWordAndPosition.word.length;
         }
-    }
+        if (lastItemLogged && matches.length == 1) {
+            var parts = this.getValidPath(currentExpression);
+            var fullPath = new String();
+            var j = 0;
+            for (var i = 0; i < parts.length; ++i) {
+                if (fullPath.length > 0) {
+                    fullPath += '.';
+                }
+                j++;
+                fullPath += parts[i];
+                if (eval(fullPath) === lastItemLogged.value) {
+                    parts.push(matches[0]);
+                    lastItemLogged.expandProperty(parts.slice(j));
+                }
+            }
+        }
+    } 
     return {
         matches: matches,
         newCode: newCode,
         newPosition: newPosition
     }
+}
+
+LOG.CommandInput.prototype.getValidPath = function(pathString) {
+    var regexpSimpleName = /^([a-z_$][a-z_$0-9]*)$/i;
+    var regexpSimpleNameStartingWithPoint = /\.([a-z_$][a-z_$0-9]*)$/i;
+    var regexpStringInBracketsWithSimpleQuote = /\[\'[^\]]+\'\]$/;
+    var regexpStringInBracketsWithDoubleQuote = /\[\"[^\]]+\"\]$/;
+    var regexpNumberInBrackets = /\[[0-9]+\]$/;
+    
+    function prepareMatchToReturn(match, str) {
+        return [
+            match[1],
+            str.substr(0, str.length - match[0].length)
+        ];
+    }
+    
+    function extractItem(str) {
+        var match;
+        if (match = str.match(regexpSimpleNameStartingWithPoint)) {
+            return prepareMatchToReturn(match, str);
+        } else if (match = str.match(regexpStringInBracketsWithSimpleQuote)) {
+            return prepareMatchToReturn(match, str);
+        } else if (match = str.match(regexpStringInBracketsWithDoubleQuote)) {
+            return prepareMatchToReturn(match, str);
+        } else if (match = str.match(regexpNumberInBrackets)) {
+            return prepareMatchToReturn(match, str);
+        } else {
+            return null;
+        }
+    }
+
+    var parts = [];
+    while (partAndRestOfPath = extractItem(pathString)) {
+        parts.unshift(partAndRestOfPath[0]);
+        pathString = partAndRestOfPath[1];
+        
+        //~ Log({pathString: pathString, parts: parts, partAndRestOfPath: partAndRestOfPath }, 'partAndRestOfPath');
+        
+        if (pathString.match(regexpSimpleName)) {
+            parts.unshift(pathString);
+            return parts.splice(0, parts.length - 1);
+        }
+    }
+    return null;
 }
 
 LOG.CommandInput.prototype.onInputKeyPressOrDown = function(event) {
