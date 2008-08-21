@@ -3,7 +3,7 @@
 var LOG = {};
 LOG.dontLogResult = {}; // This is used internally to avoid logging some things
 LOG.clickedMessages = [];
-LOG.pendingLogCalls = []; // This is used to wait until the page is loaded
+LOG.callWhenLoggerReadyCallbacks = []; // This is used to wait until the page is loaded
 
 LOG.setTypeName = function(constructor, name) {
     constructor.prototype.getTypeName = function() {
@@ -11,8 +11,20 @@ LOG.setTypeName = function(constructor, name) {
     }
 }
 
+LOG.callWhenLoggerReady = function(callback) {
+    if (LOG.logger) {
+        callback();
+    } else {
+        LOG.callWhenLoggerReadyCallbacks.push(callback);
+    }
+}
+
 LOG.logAsSection = function(sectionName, object, objectName) {
-    return LOG.logger.getOrAddSection(sectionName, new LOG.SingleLogItemSection(LOG.logger.doc, LOG.logger.getValueAsLogItem(object), objectName));
+    LOG.callWhenLoggerReady(
+        function() {
+            LOG.logger.getOrAddSection(sectionName, new LOG.SingleLogItemSection(LOG.logger.doc, LOG.logger.getValueAsLogItem(object), objectName));
+        }
+    );
 }
 
 LOG.focusAndBlinkElement = function(element) {
@@ -55,16 +67,21 @@ LOG.createOutlineFromElement = function(element) {
 }
 
 function Log(message, title, section, dontOpen, stackedMode) {
-    if (LOG.logger) {
-        return LOG.logger.log(message, title, true, section, dontOpen, stackedMode);
-    } else {
-        LOG.pendingLogCalls.push([message, title, section, dontOpen, stackedMode]);
-        return message;
-    }
+    LOG.callWhenLoggerReady(
+        function() {
+            LOG.logger.log(message, title, true, section, dontOpen, stackedMode);
+        }
+    );
+    return message;
 }
 
 function LogAndStore(value, source) {
-    return LOG.logger.logAndStore(value, source);
+    LOG.callWhenLoggerReady(
+        function() {
+            LOG.logger.logAndStore(value, source);
+        }
+    );
+    return value;
 }
 
 function LogX(str) { // Log in external window

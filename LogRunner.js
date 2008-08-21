@@ -31,10 +31,10 @@ LOG.LogRunner.prototype.createLogger = function(doc) {
     LOG.logger.onescpress = this.caller('onLoggerEscPress');
     LOG.logger.oncollapsetoggleclick = this.caller('onLoggerCollapseToggleClick');
     LOG.logger.onconsolerowappend = this.caller('onConsoleRowAppend');
-    for (var i = 0; i < LOG.pendingLogCalls.length; ++i) {
-        Log.apply(window, LOG.pendingLogCalls[i]);
+    for (var i = 0; i < LOG.callWhenLoggerReadyCallbacks.length; ++i) {
+        LOG.callWhenLoggerReadyCallbacks[i]();
     }
-    LOG.pendingLogCalls = [];
+    LOG.callWhenLoggerReadyCallbacks = [];
     LOG.logger.setCollapsed(this.collapsed);
     LOG.logger.onexpandrequest = this.caller('onLoggerExpandRequest');
 }
