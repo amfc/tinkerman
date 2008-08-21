@@ -172,7 +172,7 @@ LOG.HTMLElementLogItem.prototype.expandChild = function(pathToChild) {
             this.setShowChildNodes(true, false);
         }
         var i = pathToChild.shift();
-        if (this.childNodeItems[i].expandChild) {
+        if (this.childNodeItems[i] && this.childNodeItems[i].expandChild) {
             return this.childNodeItems[i].expandChild(pathToChild);
         } else {
             Log('expanding something which is not an htmlelementlogitem');
