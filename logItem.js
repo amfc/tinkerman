@@ -149,7 +149,6 @@ LOG.getValueAsLogItem = function(doc, value, stackedMode, alreadyLoggedContainer
     if (!alreadyLoggedContainers) {
         alreadyLoggedContainers = [];
     }
-    
     if (value instanceof Object && LOG.indexOf(alreadyLoggedContainers, value) != -1) {
         return new LOG.RefLogItem(doc, value, stackedMode, alreadyLoggedContainers);
     } else {
@@ -158,7 +157,7 @@ LOG.getValueAsLogItem = function(doc, value, stackedMode, alreadyLoggedContainer
         } else if (value != null && typeof value == 'object') {
             if (LOG.instanceOfWindow(value) || LOG.instanceOfDocument(value) || value instanceof Date || value.getTypeName) {
                 return new LOG.TypedObjectLogItem(doc, value, stackedMode, alreadyLoggedContainers);
-            } else if (value.nodeType) { // DOM node
+            } else if (value.nodeType && value.nodeType != 11) { // DOM node (not a fragment)
                 if (value.nodeType == 1) { // 1: element node
                     return new LOG.HTMLElementLogItem(doc, value, stackedMode, alreadyLoggedContainers);
                 } else {
