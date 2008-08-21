@@ -17,8 +17,8 @@ LOG.PanelManager = function(doc, rightToolbarElement) {
                         width: '100%',
                         height: '100%'
                     },
-                    cellPadding: '0',
-                    cellSpacing: '0'
+                    cellPadding: 0,
+                    cellSpacing: 0
                 },
                 [
                     LOG.createElement(this.doc, 'tbody', {},

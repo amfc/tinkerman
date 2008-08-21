@@ -73,26 +73,25 @@ LOG.CommandInput.prototype.getCurrentExpression = function(code, position) {
     return code.substr(startWordPos, endWordPos - startWordPos);
 }
 
-LOG.CommandInput.prototype.getCurrentWordAndPosition = function() {
-    var endWordPos = LOG.getTextInputSelection(this.element)[0];
-    var startWordPos = endWordPos;
-    var value = this.element.value;
+LOG.CommandInput.prototype.getCurrentWordAndPosition = function(code, currentPosition) {
+    var endWordPos = currentPosition;
+    var startWordPos = currentPosition;
     var chr;
     while (startWordPos > 0) {
-        chr = value.charAt(startWordPos - 1);
+        chr = code.charAt(startWordPos - 1);
         if (!(/^[a-zA-Z0-9_$]$/.test(chr))) {
             break;
         }
         startWordPos--;
     }
     return {
-        word: value.substr(startWordPos, endWordPos - startWordPos),
+        word: code.substr(startWordPos, endWordPos - startWordPos),
         start: startWordPos,
         end: endWordPos
     }
 }
 
-LOG.CommandInput.prototype.suggestJs = function(code, currentPosition) {
+LOG.CommandInput.prototype.autoChooseSuggestion = function(code, currentWordAndPosition, matches) {
     function getCommonStart(list) {
         var common = list[0];
         var j;
@@ -109,11 +108,27 @@ LOG.CommandInput.prototype.suggestJs = function(code, currentPosition) {
         }
         return common;
     }
-    
-    var lastItemLogged = LOG.logger.defaultConsole.getLastLogItemLogged();
-    
+    var position = currentWordAndPosition.end;
+    if (matches.length > 0) {
+        var commonStart = getCommonStart(matches);
+        if (commonStart.length > currentWordAndPosition.word.length) {
+            code = code.substr(0, currentWordAndPosition.end) +
+                commonStart.substr(currentWordAndPosition.word.length) +
+                code.substr(currentWordAndPosition.end)
+            ;
+            position = currentWordAndPosition.end + commonStart.length - currentWordAndPosition.word.length;
+        }
+    }
+    return {
+        matches: matches,
+        newCode: code,
+        newPosition: position
+    }
+}
+
+LOG.CommandInput.prototype.suggestJs = function(code, currentPosition) {
     var currentExpression = this.getCurrentExpression(code, currentPosition);
-    var currentWordAndPosition = this.getCurrentWordAndPosition();
+    var currentWordAndPosition = this.getCurrentWordAndPosition(code, currentPosition);
     var names;
     if (currentExpression == currentWordAndPosition.word) {
         names = LOG.getObjectProperties(window).concat(
@@ -129,46 +144,13 @@ LOG.CommandInput.prototype.suggestJs = function(code, currentPosition) {
             script = script.substr(0, script.length - 1);
         }
         var result = this.evaluator.evalScript(script);
-        if (typeof result != 'object' || result == LOG.dontLogResult) {
+        if ((typeof result != 'object' && typeof result != 'function') || result == LOG.dontLogResult) {
             return;
         }
         names = LOG.getObjectProperties(result);
     }
     var matches = this.getNamesStartingWith(currentWordAndPosition.word, names);
-    var newPosition = currentPosition;
-    var newCode = code;
-    
-    if (matches.length > 0) {
-        var commonStart = getCommonStart(matches);
-        if (commonStart.length > currentWordAndPosition.word.length) {
-            newCode = code.substr(0, currentWordAndPosition.end) +
-                commonStart.substr(currentWordAndPosition.word.length) +
-                code.substr(currentWordAndPosition.end)
-            ;
-            newPosition = currentWordAndPosition.end + commonStart.length - currentWordAndPosition.word.length;
-        }
-        if (lastItemLogged && matches.length == 1) {
-            var parts = this.getValidPath(currentExpression);
-            var fullPath = new String();
-            var j = 0;
-            for (var i = 0; i < parts.length; ++i) {
-                if (fullPath.length > 0) {
-                    fullPath += '.';
-                }
-                j++;
-                fullPath += parts[i];
-                if (eval(fullPath) === lastItemLogged.value) {
-                    parts.push(matches[0]);
-                    lastItemLogged.expandProperty(parts.slice(j));
-                }
-            }
-        }
-    } 
-    return {
-        matches: matches,
-        newCode: newCode,
-        newPosition: newPosition
-    }
+    return this.autoChooseSuggestion(code, currentWordAndPosition, matches);
 }
 
 LOG.CommandInput.prototype.getValidPath = function(pathString) {
@@ -238,11 +220,24 @@ LOG.CommandInput.prototype.onInputKeyPressOrDown = function(event) {
     if (event.keyCode == 9) { // Tab
         LOG.stopPropagation(event);
         LOG.preventDefault(event);
-        var suggestion = this.suggestJs(this.element.value, LOG.getTextInputSelection(this.element)[0]);
-        LOG.setTextInputSelection(this.element, [suggestion.newPosition, suggestion.newPosition]);
-        this.element.value = suggestion.newCode;
-        if (suggestion.matches.length > 1) {
-            Log(suggestion.matches, 'Matches');
+        var value = this.element.value;
+        var extension = LOG.getExtensionFromCode(value);
+        var me = this;
+        function handleSuggestion(suggestion) {
+            if (!suggestion) {
+                return;
+            }
+            me.element.value = suggestion.newCode;
+            LOG.setTextInputSelection(me.element, [suggestion.newPosition, suggestion.newPosition]);
+            if (suggestion.matches.length > 1) {
+                Log(suggestion.matches, 'Matches');
+            }
+        }
+        
+        if (extension) {
+            extension.suggest(this.element.value, LOG.getTextInputSelection(this.element)[0], handleSuggestion);
+        } else {
+            handleSuggestion(this.suggestJs(this.element.value, LOG.getTextInputSelection(this.element)[0]));
         }
     } else if (event.keyCode == 38 && (!this.useTextArea || event.ctrlKey) && (!LOG.isOpera || (event.ctrlKey && event.shiftKey))) { // Up
         this.element.value = this.historyManager.up(this.element.value);
@@ -298,7 +293,7 @@ LOG.CommandInput.prototype.onInputKeyPressOrDown = function(event) {
 }
 
 LOG.CommandInput.prototype.writeStringToInput = function(str) {
-    var currentWordAndPosition = this.getCurrentWordAndPosition();
+    var currentWordAndPosition = this.getCurrentWordAndPosition(str, LOG.getTextInputSelection(this.element)[0]);
     this.element.value = this.element.value.substr(0, currentWordAndPosition.end) + str +
         this.element.value.substr(currentWordAndPosition.end)
     ;
