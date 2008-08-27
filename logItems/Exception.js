@@ -23,6 +23,8 @@ LOG.ExceptionLogItem = function(doc, value) {
     try {
         if (value.message) {
             exceptionMessage = value.message;
+        } else if (typeof value == 'string') {
+            exceptionMessage = value;
         }
     } catch (e) {
         try {
