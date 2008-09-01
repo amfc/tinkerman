@@ -18,6 +18,10 @@ LOG.Console.prototype.getWindow = function() {
     }
 }
 
+LOG.Console.prototype.scrollToBottom = function() {
+    this.element.parentNode.scrollTop = this.element.parentNode.scrollHeight - this.element.parentNode.offsetHeight + 1;
+}
+
 LOG.Console.prototype.appendRow = function(logItem, title, newLineAfterTitle, titleColor, dontOpen) {
     var newRow = this.doc.createElement('div');
     if (this.stopDebugging) {
@@ -59,7 +63,7 @@ LOG.Console.prototype.appendRow = function(logItem, title, newLineAfterTitle, ti
     }
     newRow.appendChild(logItem.element);
     this.element.appendChild(newRow);
-    this.element.parentNode.scrollTop = this.element.parentNode.scrollHeight - this.element.parentNode.offsetHeight + 1;
+    this.scrollToBottom();
     this.historyLogItems.push(logItem);
     if (this.onrowappend) {
         this.onrowappend(dontOpen);
