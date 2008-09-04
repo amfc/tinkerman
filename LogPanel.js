@@ -44,6 +44,7 @@ LOG.LogPanel = function(doc, name, selected, content) {
                                 fontWeight: 'normal',
                                 backgroundColor: '#fcfcfc',
                                 MozBoxSizing: 'border-box',
+                                WebkitBoxSizing: 'border-box',
                                 boxSizing: 'border-box',
                                 fontFamily: 'terminus, lucida console, monospace'
                             }

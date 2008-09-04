@@ -20,10 +20,10 @@ LOG.CommandInput = function(doc, useTextArea, evaluator, historyManager) {
             onmousedown: LOG.createEventHandler(doc, this, 'onInputMouseDown')
         }
     );
-    if (LOG.isIE || LOG.isKonq) {
+    if (LOG.isIE || LOG.isKonq || LOG.isWebKit) {
         this.element.onkeydown = LOG.createEventHandler(doc, this, 'onInputKeyPressOrDown');
     }
-    if (!LOG.isIE) { // Konq needs both
+    if (!LOG.isIE && !LOG.isWebKit) { // Konq needs both
         this.element.onkeypress = LOG.createEventHandler(doc, this, 'onInputKeyPressOrDown');
     }
 }

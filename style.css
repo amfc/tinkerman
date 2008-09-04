@@ -1,8 +1,13 @@
+html {
+    height: 100%;
+}
+
 body {
     margin: 0;
     overflow: hidden;
     font-family: lucida console, monospace;
-    font-size: 9pt
+    font-size: 9pt;
+    height: 100%;
 }
 
 td {
