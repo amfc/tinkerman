@@ -1,11 +1,51 @@
+LOG.ConsoleRow = function(doc, number, title, titleColor, logItem, newLineAfterTitle, isOdd) {
+    this.element = LOG.createElement(doc, 'div',
+        {
+            style: {
+                fontFamily: 'terminus, monospace',
+                color: 'black',
+                borderBottom: '1px solid #aaa',
+                whiteSpace: LOG.isGecko ? '-moz-pre-wrap' : 'pre',
+                padding: '2px',
+                backgroundColor: isOdd ? '#faffff' : '#fff3f2'
+            }
+        },
+        [
+            LOG.createElement(doc, 'em', null,
+                [
+                    number
+                ]
+            ),
+            ': ',
+            title ? LOG.createElement(doc, 'strong',
+                {
+                    style: {
+                        color: titleColor ? titleColor : null
+                    }
+                },
+                [
+                    title + ': ' + (newLineAfterTitle ? '\n' : '')
+                ]
+            ) : null,
+            logItem.element
+        ]
+    );
+    this.logItem = logItem;
+}
+
+LOG.setTypeName(LOG.ConsoleRow, 'LOG.ConsoleRow');
+
+
 LOG.Console = function(doc) {
-    this.maxCount = 1000;
+    this.maxCount = 100;
     this.stopDebugging = false;
     this.doc = doc;
     this.stackedMode = true;
-    this.count = 0;
     this.element = LOG.createElement(doc, 'div');
-    this.historyLogItems = [];
+    this.rows = [];
+    this.rowsToAppend = [];
+    this.rowsToRemove = [];
+    this.nextWillBeOdd = true;
 }
 
 LOG.setTypeName(LOG.Console, 'LOG.Console');
@@ -19,65 +59,51 @@ LOG.Console.prototype.getWindow = function() {
 }
 
 LOG.Console.prototype.scrollToBottom = function() {
-    this.element.parentNode.scrollTop = this.element.parentNode.scrollHeight - this.element.parentNode.offsetHeight + 1;
+    this.element.parentNode.scrollTop = this.element.parentNode.scrollHeight - this.element.parentNode.offsetHeight;
+}
+
+LOG.Console.prototype.appendMany = function() {
+    for (var i = 0; i < this.rowsToAppend.length; ++i) {
+        this.element.appendChild(this.rowsToAppend[i].element);
+    }
+    for (var i = 0; i < this.rowsToRemove.length; ++i) {
+        this.element.removeChild(this.rowsToRemove[i].element);
+    }
+    this.rowsToAppend = [];
+    this.rowsToRemove = [];
+    this.scrollToBottom();
 }
 
 LOG.Console.prototype.appendRow = function(logItem, title, newLineAfterTitle, titleColor, dontOpen) {
-    var newRow = this.doc.createElement('div');
     if (this.stopDebugging) {
         return;
     }
-    if (this.count >= this.maxCount) {
-        this.element.removeChild(this.element.firstChild);
-        this.historyLogItems.shift();
-    } else {
-        this.count++;
+    if (this.rows.length >= this.maxCount) {
+        this.rowsToRemove.push(this.rows[0]);
+        this.rows.shift();
     }
     LOG.n++;
-    newRow.style.fontFamily = 'terminus, monospace';
-    newRow.style.color = 'black';
-    newRow.style.borderBottom = '1px solid #aaaaaa';
-    if (LOG.isGecko) {
-        newRow.style.whiteSpace = '-moz-pre-wrap';
-    } else {
-        newRow.style.whiteSpace = 'pre'; // FIXME: doesn't seem to work in IE
-    }
-    newRow.style.padding = '2px';
-    if (this.count & 1) {
-        newRow.style.backgroundColor = '#faffff';
-    } else {
-        newRow.style.backgroundColor = '#fff3f2';
-    }
-    var em = this.doc.createElement('em');
-    em.appendChild(this.doc.createTextNode(LOG.n));
-    newRow.appendChild(em);
-    newRow.appendChild(this.doc.createTextNode(': '));
-    
-    if (title) {
-        var strong = this.doc.createElement('strong');
-        if (titleColor) {
-            strong.style.color = titleColor;
-        }
-        strong.appendChild(this.doc.createTextNode(title + ': ' + (newLineAfterTitle ? '\n' : '')));
-        newRow.appendChild(strong);
-    }
-    newRow.appendChild(logItem.element);
-    this.element.appendChild(newRow);
-    this.scrollToBottom();
-    this.historyLogItems.push(logItem);
+    var row = new LOG.ConsoleRow(this.doc, LOG.n, title, titleColor, logItem, newLineAfterTitle, this.nextWillBeOdd);
+    this.nextWillBeOdd = !this.nextWillBeOdd;
+    this.rows.push(row);
+    this.rowsToAppend.push(row);
     if (this.onrowappend) {
         this.onrowappend(dontOpen);
+    }
+    if (!this.waiting) {
+        this.waiting = true;
+        var me = this;
+        setTimeout(function() { me.waiting = false; me.appendMany(); }, 100);
     }
 }
 
 LOG.Console.prototype.getLastLogItemLogged = function() {
-    return this.historyLogItems[this.historyLogItems.length - 1];
+    return this.rows[this.rows.length - 1].logItem;
 }
 
 LOG.Console.prototype.clear = function() {
-    this.count = 0;
-    while (this.element.childNodes.length > 0) {
-        this.element.removeChild(this.element.firstChild);
+    for (var i = 0; i < this.rows.length; ++i) {
+        this.element.removeChild(this.rows[i].element);
     }
 }
 
