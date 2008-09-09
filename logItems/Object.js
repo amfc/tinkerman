@@ -494,15 +494,12 @@ LOG.ObjectLogItem.prototype.toggleMethodsVisible = function() {
 }
 
 LOG.ObjectLogItem.prototype.expandProperty = function(pathToProperty) {
-    Log(pathToProperty, 'pathToProperty', 'ppe');
-    var property = pathToProperty.shift();
+    var property = pathToProperty.shift().name;
     if (typeof this.value[property] == 'function') {
         this.toggleMethodsVisible(true);
     }
     this.setShowChildren(true);
     if (pathToProperty.length == 0) {
-        Log(this.properties, 'this.properties', 'ppe');
-        Log(property, 'property', 'ppe');
         return this.properties[property].logItem;
     } else {
         if (this.properties[property].logItem.expandProperty) {
