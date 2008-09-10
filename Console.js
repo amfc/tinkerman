@@ -105,6 +105,7 @@ LOG.Console.prototype.clear = function() {
     for (var i = 0; i < this.rows.length; ++i) {
         this.element.removeChild(this.rows[i].element);
     }
+    this.rows = [];
 }
 
 LOG.Console.prototype.focus = function() {
