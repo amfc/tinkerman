@@ -1,5 +1,8 @@
 LOG.FunctionLogItem = function(doc, value, stackedMode, alreadyLoggedContainers) {
     function getName() {
+        if (value.getNameToLog) {
+            return value.getNameToLog();
+        }
         var result = /function[^(]*(\([^)]*\))/.exec(value.toString());
         if (!result) {
             return value.toString();
