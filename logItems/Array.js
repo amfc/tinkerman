@@ -134,10 +134,10 @@ LOG.ArrayLogItem = function(doc, value, stackedMode, alreadyLoggedContainers) {
 LOG.setTypeName(LOG.ArrayLogItem, 'LOG.ArrayLogItem');
 
 LOG.ArrayLogItem.prototype.setShowChildren = function(showChildren, applyToChildren) {
-    if (!showChildren || !applyToChildren) {
+    if (!applyToChildren) {
         return;
     }
-    for (var i = 0; i < this.value.length; i++) {
+    for (var i = 0; i < this.properties.length; i++) {
         if (this.properties[i].logItem.setShowChildren) {
             this.properties[i].logItem.setShowChildren(true, true);
         }

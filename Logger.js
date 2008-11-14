@@ -85,7 +85,7 @@ LOG.Logger = function(doc, inNewWindow, historyManager, openSectionsStr) {
     this.defaultConsole = consoleSection.content;
     
     this.evaluator = new LOG.Evaluator(this);
-
+    
     this.htmlSection = this.addSection('html', new LOG.HtmlSection(doc));
     this.historyManager = historyManager;
     this.commandEditor = new LOG.CommandEditor(doc, this.evaluator, function() { me.updateCommandEditorSize() }, this.historyManager);
@@ -255,26 +255,40 @@ LOG.Logger.prototype.onKeyDown = function(event) {
     }
 }
 
-LOG.Logger.prototype.addConsoleSection = function(sectionName, shouldExpandOnRowAppend) {
+LOG.Logger.prototype.addConsoleSection = function(sectionName, shouldExpandOnRowAppend, toolbarContent) {
     var console = new LOG.Console(this.doc);
     console.onrowappend = (function(me) { return function(dontOpen) { me.onConsoleRowAppend(console, dontOpen) } })(this);
     console.shouldExpandOnRowAppend = shouldExpandOnRowAppend;
-    return this.addSection(sectionName, console);
+    return this.addSection(sectionName, console, toolbarContent);
 }
 
-LOG.Logger.prototype.getOrAddConsoleSection = function(sectionName, shouldExpandOnRowAppend) {
+LOG.Logger.prototype.getOrAddConsoleSection = function(sectionName, shouldExpandOnRowAppend, toolbarContent) {
     if (this.panels[sectionName]) {
+        if (toolbarContent !== undefined) {
+            this.panels[sectionName].setToolbarContent(toolbarContent);
+        }
         return this.panels[sectionName];
     } else {
         return this.addConsoleSection(sectionName, shouldExpandOnRowAppend);
     }
 }
 
-LOG.Logger.prototype.getOrAddSection = function(sectionName, content) {
+LOG.Logger.prototype.getSection = function(sectionName) {
+    if (this.panels[sectionName]) {
+        return this.panels[sectionName];
+    } else {
+        return null;
+    }
+}
+
+LOG.Logger.prototype.getOrAddSection = function(sectionName, content, toolbarContent) {
     if (this.panels[sectionName]) {
         // if content is set the old panel will have the content replaced
         if (content) {
             this.panels[sectionName].setContent(content);
+        }
+        if (toolbarContent) {
+            this.panels[sectionName].setToolbarContent(toolbarContent);
         }
         return this.panels[sectionName];
     } else {
@@ -282,8 +296,8 @@ LOG.Logger.prototype.getOrAddSection = function(sectionName, content) {
     }
 }
 
-LOG.Logger.prototype.addSection = function(sectionName, content) {
-    var panel = new LOG.LogPanel(this.doc, sectionName, false, content);
+LOG.Logger.prototype.addSection = function(sectionName, content, toolbarContent) {
+    var panel = new LOG.LogPanel(this.doc, sectionName, false, content, toolbarContent);
     this.panelManager.add(panel);
     this.panels[sectionName] = panel;
     return panel;

@@ -198,11 +198,7 @@ LOG.ObjectLogItem.prototype.onElementClick = function(event) {
 }
 
 LOG.ObjectLogItem.prototype.setShowChildren = function(showChildren, applyToChildren) {
-    if (this.showingChildren == showChildren) {
-        return;
-    }
     this.showingChildren = showChildren;
-    
     this.propertiesSpan.style.display = showChildren ? '' : 'none';
     this.ellipsisSpan.firstChild.nodeValue = showChildren ? ' ' : '...';
     this.updateLink.style.display = showChildren ? '' : 'none';
@@ -212,15 +208,21 @@ LOG.ObjectLogItem.prototype.setShowChildren = function(showChildren, applyToChil
     if (this.toggleChildrenLink) {
         this.toggleChildrenLink.firstChild.nodeValue = showChildren ? '-' : '+';
     }
-    
+    this.wasAutoUpdating = !!this.autoUpdateInterval;
+    this.setAutoUpdate(false);
+    for (var key in this.properties) {
+        if (this.properties[key].logItem.onRemove) {
+            this.properties[key].logItem.onRemove();
+        }
+        this.properties[key].element.parentNode.removeChild(this.properties[key].element);
+    }
+    this.properties = {};
+    this.alreadyLoggedContainers = [this.value];
     if (showChildren) {
         this.lastVisibleProperty = null; // the one which shouldn't have a coma
-        
         this.oldValue = LOG.shallowClone(this.value);
-        
         this.keys = LOG.getObjectProperties(this.value);
         this.keys.sort();
-        
         var key;
         this.someMethodExists = false;
         for (var i = 0; i < this.keys.length; ++i) {
@@ -252,16 +254,6 @@ LOG.ObjectLogItem.prototype.setShowChildren = function(showChildren, applyToChil
         if (this.wasAutoUpdating) {
             this.setAutoUpdate(true);
         }
-    } else {
-        this.wasAutoUpdating = !!this.autoUpdateInterval;
-        this.setAutoUpdate(false);
-        for (var key in this.properties) {
-            if (this.properties[key].logItem.onRemove) {
-                this.properties[key].logItem.onRemove();
-            }
-            this.properties[key].element.parentNode.removeChild(this.properties[key].element);
-        }
-        this.properties = {};
     }
 }
 

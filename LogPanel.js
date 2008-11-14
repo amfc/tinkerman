@@ -1,4 +1,4 @@
-LOG.LogPanel = function(doc, name, selected, content) {
+LOG.LogPanel = function(doc, name, selected, content, toolbarContent) {
     this.labelElement = LOG.createElement(doc, 'span',
         {
             style: {
@@ -19,6 +19,29 @@ LOG.LogPanel = function(doc, name, selected, content) {
             }
         },
         [
+            this.toolbarContentWrapper = LOG.createElement(doc, 'div',
+                {
+                    style: {
+                        position: 'relative',
+                        display: 'none'
+                    }
+                },
+                [
+                    this.toolbarContentContainer = LOG.createElement(doc, 'div',
+                        {
+                            style: {
+                                position: 'absolute',
+                                height: '2em',
+                                fontSize: '1em',
+                                width: '100%',
+                                top: '-1.8em',
+                                backgroundColor: '#f5f5ff',
+                                borderTop: '1px solid #ccf'
+                            }
+                        }
+                    )
+                ]
+            ),
             LOG.createElement(doc, 'div',
                 {
                     style: {
@@ -55,6 +78,7 @@ LOG.LogPanel = function(doc, name, selected, content) {
         ]
     );
     
+    this.setToolbarContent(toolbarContent);
     this.setSelected(selected);
     if (content) {
         this.setContent(content);
@@ -62,6 +86,18 @@ LOG.LogPanel = function(doc, name, selected, content) {
 }
 
 LOG.setTypeName(LOG.LogPanel, 'LOG.LogPanel');
+
+LOG.LogPanel.prototype.setToolbarContent = function(toolbarContent) {
+    if (this.toolbarContent) {
+        this.toolbarContentContainer.removeChild(this.toolbarContent);
+    }
+    if (toolbarContent) {
+        this.toolbarContentContainer.appendChild(toolbarContent);
+    }
+    this.toolbarContentWrapper.style.display = toolbarContent ? '' : 'none';
+    this.panelElement.style.paddingTop = toolbarContent ? '1.8em' : '';
+    this.toolbarContent = toolbarContent;
+}
 
 LOG.LogPanel.prototype.setWidth = function(width) {
     this.panelElement.style.width = width;
