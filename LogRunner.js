@@ -116,7 +116,6 @@ LOG.LogRunner.prototype.appendLoggerNow = function() {
             me.createLogger(me.container.doc);
             me.container.appendChild(LOG.logger.element);
             LOG.logger.setInNewWindow(me.willOpenInNewWindow);
-            // LOG.logger.focus();
         }
     );
 }
