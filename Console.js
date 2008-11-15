@@ -35,7 +35,6 @@ LOG.ConsoleRow = function(doc, number, title, titleColor, logItem, newLineAfterT
 
 LOG.setTypeName(LOG.ConsoleRow, 'LOG.ConsoleRow');
 
-
 LOG.Console = function(doc) {
     this.maxCount = 100;
     this.stopDebugging = false;
@@ -103,6 +102,9 @@ LOG.Console.prototype.getLastLogItemLogged = function() {
 
 LOG.Console.prototype.clear = function() {
     for (var i = 0; i < this.rows.length; ++i) {
+        if (this.rows[i].onremove) {
+            this.rows[i].onremove();
+        }
         this.element.removeChild(this.rows[i].element);
     }
     this.rows = [];
